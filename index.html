@@ -212,7 +212,7 @@ dialog::backdrop{background:rgba(3,12,18,.7);backdrop-filter:blur(3px)}
 .clbox{display:flex;flex-direction:column;gap:12px}
 .clbox .cd{align-self:center;font:600 12px var(--f-body);color:var(--mist);background:var(--reef);border-radius:999px;padding:3px 12px}
 .clbox pre{white-space:pre-wrap;font:13px/1.6 var(--f-data);color:#cfe3e0;margin:0}.clbox pre b{color:var(--octo)}
-.feedbar button{all:unset;cursor:pointer;font:600 12.5px var(--f-body);color:var(--mist);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+.feedbar button{all:unset;cursor:pointer;font:600 12.5px var(--f-body);color:var(--mist);border:1px solid var(--line);border-radius:999px;padding:5px 10px}
 .feedbar button[aria-pressed="true"]{color:var(--abyss);background:var(--glass);border-color:var(--glass)}
 .feedbar button:focus-visible{outline:2px solid var(--glass);outline-offset:2px}
 .feedbar .tg{margin-left:auto;font-size:12.5px;color:var(--mist);align-self:center}
@@ -226,7 +226,8 @@ dialog::backdrop{background:rgba(3,12,18,.7);backdrop-filter:blur(3px)}
 .bub .h .tm{margin-left:auto;font:500 11.5px var(--f-data);color:var(--mist)}
 .bub.alert{border-left:3px solid var(--sun)} .bub.alert .h{color:var(--sun)}
 .bub.alert.win{border-left-color:rgb(var(--up))} .bub.alert.loss{border-left-color:rgb(var(--down))}
-.bub.news .h{color:var(--coral)} .bub.changelog .h{color:var(--octo)}
+.bub.news .h{color:var(--coral)} .bub.changelog .h{color:var(--octo)} .bub.screener .h{color:var(--glass)} .bub.wisdom .h{color:var(--mist)}
+.bub.news{border-left:3px solid var(--coral)} .bub.screener{border-left:3px solid var(--glass)} .bub.wisdom{font-style:italic}
 .bub .body.clip{max-height:15.5em;overflow:hidden;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}
 .bub .more{all:unset;cursor:pointer;font:600 12.5px var(--f-body);color:var(--glass);margin-top:4px;display:inline-block}
 .bub .pics{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-top:8px}
@@ -601,7 +602,7 @@ let feedLive = null;
 function renderFeed(D, kinds){
   const byId = Object.fromEntries((D.digests || []).map(d => [d.id, d])), chartBy = Object.fromEntries((D.charts || []).map(c => [c.sym, c.src]));
   const FL = {US:"🇺🇸",DE:"🇩🇪",EU:"🇪🇺",GB:"🇬🇧",JP:"🇯🇵",CH:"🇨🇭",CN:"🇨🇳",FR:"🇫🇷",IT:"🇮🇹",CA:"🇨🇦",AU:"🇦🇺",NZ:"🇳🇿"};
-  const types = [["all","All"],["report","Reports"],["alert","Alerts"],["news","News"],["changelog","Changelog"]];
+  const types = [["all","All"],["alert","Alerts"],["screener","Screener"],["news","News"],["report","Reports"],["wisdom","Wisdom"]];
   let cur = "all", L = D.live; try { cur = localStorage.getItem("r3m-feed") || "all"; } catch {}
   if (!types.some(([k]) => k === cur)) cur = "all";
   const tm = t => new Intl.DateTimeFormat(de,{timeZone:BER,hour:"2-digit",minute:"2-digit"}).format(new Date(t));
@@ -617,15 +618,19 @@ function renderFeed(D, kinds){
       if (m.photo){ const sym = plain.split(/\s/)[0], prev = out[out.length-1];
         if (prev && prev.type === "photos" && Date.parse(m.t) - Date.parse(prev.t) < 120e3){ prev.syms.push(sym); continue; }
         out.push({type:"photos", t:m.t, syms:[sym]}); continue; }
+      if (/^🧪/.test(plain)) continue;   // test posts
       let type = "alert", kind = "";
-      if (/^⚠️/.test(plain)) type = "news";
+      if (/^(⚠️|Forex Factory)/.test(plain)) type = "news";
+      else if (/^(eqx|clx) screener/i.test(first)) type = "screener";
+      else if (/Trading Wisdom|Trading Floor|Message of the Day/.test(first)) type = "wisdom";
       else if (/^📝/.test(plain)) type = "changelog";
       else if (/R3M /.test(first)){ const k = KIND.find(([re]) => re.test(first)); if (k){ type = "report"; kind = k[1]; } }
       out.push({type, kind, t:m.t, html:m.html.replace(/\n/g, "<br>"), win:/ Hit|TP1 erreicht|TP2 erreicht/.test(plain), loss:/Stopped|ausgestoppt/.test(plain)}); }
     return out; };
   const bubble = x => {
     if (x.html != null){   // live message
-      const label = x.type === "report" ? (kinds[x.kind] || "Report") : x.type === "news" ? "⚠️ News heads-up" : x.type === "changelog" ? "📝 Changelog" : "🔔 Alert";
+      const label = x.type === "report" ? (kinds[x.kind] || "Report") : x.type === "news" ? "📰 News" : x.type === "screener" ? "📊 Screener"
+        : x.type === "wisdom" ? "💭 Wisdom" : x.type === "changelog" ? "📝 Changelog" : "🔔 Alert";
       return `<div class="bub ${x.type}${x.win ? " win" : x.loss ? " loss" : ""}">${head(label, x.t)}${clip(x.html)}</div>`; }
     if (x.type === "photos") return `<div class="bub report">${head("📈 Charts", x.t)}<div class="body">${esc(x.syms.join(" · "))}</div>`
       + `<div class="pics">${x.syms.filter(s => chartBy[s]).map(s => pic(chartBy[s], s + " chart")).join("")}</div></div>`;
@@ -643,7 +648,7 @@ function renderFeed(D, kinds){
   const draw = () => {
     const live = L && (L.items || []).length, F = live ? fromLive(L.items) : (D.feed || []);
     const of = k => k === "all" ? F.length : F.filter(x => x.type === k || (k === "report" && x.type === "photos")).length;
-    $("feedbar").innerHTML = (live ? `<span class="clmark"><span class="pill open" style="padding:2px 9px"><i></i>live</span> last message ${tm(L.items[L.items.length-1].t)}</span>` : "")
+    $("feedbar").innerHTML = (live ? `<span class="clmark"><span class="pill open" style="padding:2px 9px"><i></i>live</span> <span title="last message">${tm(L.items[L.items.length-1].t)}</span></span>` : "")
       + types.map(([k,l]) => `<button data-k="${k}" aria-pressed="${k === cur}">${l} <span class="num" style="opacity:.7">${of(k)}</span></button>`).join("")
       + (live ? "" : `<span class="tg">newest first</span>`);
     let last = "", h = "";
