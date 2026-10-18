@@ -408,7 +408,7 @@ const tvUrl = full => full ? "https://www.tradingview.com/symbols/" + encodeURIC
 const tvOf = (sym, ex) => sym.includes(":") ? sym : TVX[sym] || (ex ? ex + ":" + sym : "PEPPERSTONE:" + sym);
 const tv = (sym, text, ex, cls) => `<a class="tv${cls ? " " + cls : ""}" href="${tvUrl(tvOf(sym, ex))}" target="_blank" rel="noopener" title="${esc(sym)} on TradingView">${text ?? esc(sym)}</a>`;
 const FLAGS = {GER40:"🇩🇪",DAX:"🇩🇪",FDAX:"🇩🇪",UK100:"🇬🇧",EUSTX50:"🇪🇺",FESX:"🇪🇺",US500:"🇺🇸",NAS100:"🇺🇸",US30:"🇺🇸",US2000:"🇺🇸",SPX:"🇺🇸",NDX:"🇺🇸",DJI:"🇺🇸",ES:"🇺🇸",NQ:"🇺🇸",YM:"🇺🇸",RTY:"🇺🇸",VIX:"🇺🇸",JPN225:"🇯🇵",
-  EURUSD:"💶💵",GBPUSD:"💷💵",USDCHF:"💵🇨🇭",USDJPY:"💵💴",EURJPY:"💶💴",GBPJPY:"💷💴",EURGBP:"💶💷",EURCHF:"💶🇨🇭",AUDUSD:"🇦🇺💵",USDCAD:"💵🇨🇦",NZDUSD:"🇳🇿💵","6E":"💶","6J":"💴",DX:"💵",USDX:"💵",
+  EURUSD:"🇪🇺🇺🇸",GBPUSD:"🇬🇧🇺🇸",USDCHF:"🇺🇸🇨🇭",USDJPY:"🇺🇸🇯🇵",EURJPY:"🇪🇺🇯🇵",GBPJPY:"🇬🇧🇯🇵",EURGBP:"🇪🇺🇬🇧",EURCHF:"🇪🇺🇨🇭",AUDUSD:"🇦🇺🇺🇸",USDCAD:"🇺🇸🇨🇦",NZDUSD:"🇳🇿🇺🇸","6E":"🇪🇺","6J":"🇯🇵",DX:"🇺🇸",USDX:"🇺🇸",
   XAUUSD:"🥇",GC:"🥇",XAGUSD:"🥈",SI:"🥈",SPOTCRUDE:"🛢️",UKOIL:"🛢️",CL:"🛢️",BTCUSD:"🟠",BTC:"🟠",ETHUSD:"🔷",ETH:"🔷",SOLUSD:"🟣",SOL:"🟣",TOTAL3:"🪙"};
 const fl = sym => FLAGS[sym] ? `<span class="fl" aria-hidden="true">${FLAGS[sym]}</span>` : "";
 const heat = (el, v, span) => { el.style.setProperty("--h", Math.min(Math.abs(v) / span, 1).toFixed(2)); el.style.setProperty("--rgb", v >= 0 ? "var(--up)" : "var(--down)"); };
