@@ -396,7 +396,7 @@ a.chip{text-decoration:none}
   </div></section>
 
   <section id="feed"><div class="wrap">
-    <div class="sh"><h2>Feed</h2><span class="sub">Everything the R3M Signals group got · last 7 days · alerts arrive with the next morning digest</span></div>
+    <div class="sh"><h2>Feed</h2><span class="sub" id="feed-sub">Everything the R3M Signals group got · last 7 days</span></div>
     <div class="feedbar" id="feedbar" role="group" aria-label="Filter feed"></div>
     <div class="chat" id="chat" aria-live="off"></div>
   </div></section>
@@ -566,44 +566,75 @@ function render(D){
   tick();
 }
 
+let feedLive = null;
 function renderFeed(D, kinds){
-  const F = D.feed || [], byId = Object.fromEntries((D.digests || []).map(d => [d.id, d]));
+  const byId = Object.fromEntries((D.digests || []).map(d => [d.id, d])), chartBy = Object.fromEntries((D.charts || []).map(c => [c.sym, c.src]));
   const FL = {US:"🇺🇸",DE:"🇩🇪",EU:"🇪🇺",GB:"🇬🇧",JP:"🇯🇵",CH:"🇨🇭",CN:"🇨🇳",FR:"🇫🇷",IT:"🇮🇹",CA:"🇨🇦",AU:"🇦🇺",NZ:"🇳🇿"};
   const types = [["all","All"],["report","Reports"],["alert","Alerts"],["news","News"],["changelog","Changelog"]];
-  let cur = "all"; try { cur = localStorage.getItem("r3m-feed") || "all"; } catch {}
+  let cur = "all", L = D.live; try { cur = localStorage.getItem("r3m-feed") || "all"; } catch {}
   if (!types.some(([k]) => k === cur)) cur = "all";
   const tm = t => new Intl.DateTimeFormat(de,{timeZone:BER,hour:"2-digit",minute:"2-digit"}).format(new Date(t));
   const dayOf = t => new Intl.DateTimeFormat(de,{timeZone:BER,weekday:"short",day:"numeric",month:"short"}).format(new Date(t));
   const head = (label, t) => `<div class="h"><span>${label}</span><span class="tm">${tm(t)}</span></div>`;
+  const clip = html => `<div class="body clip">${html}</div><button class="more">Show more</button>`;
+  const pic = (src, alt) => `<img src="${esc(src)}" alt="${esc(alt)}" loading="lazy">`;
+  const KIND = [[/Morning/,"morning"],[/Weekly Review|Wochenrückblick/,"rueckblick"],[/Weekly Outlook|Wochenausblick/,"ausblick"],[/US.Close/,"abend"],
+    [/Midday|Halbzeit/,"mittag"],[/Gap.Check/,"gap"],[/Signal Report|Signal-Bilanz/,"bilanz"]];
+  /* live.json (the real group, bot messages only) → feed items */
+  const fromLive = items => { const out = [];
+    for (const m of items){ const plain = m.html.replace(/<[^>]+>/g, "").trim(), first = plain.split("\n")[0];
+      if (m.photo){ const sym = plain.split(/\s/)[0], prev = out[out.length-1];
+        if (prev && prev.type === "photos" && Date.parse(m.t) - Date.parse(prev.t) < 120e3){ prev.syms.push(sym); continue; }
+        out.push({type:"photos", t:m.t, syms:[sym]}); continue; }
+      let type = "alert", kind = "";
+      if (/^⚠️/.test(plain)) type = "news";
+      else if (/^📝/.test(plain)) type = "changelog";
+      else if (/R3M /.test(first)){ const k = KIND.find(([re]) => re.test(first)); if (k){ type = "report"; kind = k[1]; } }
+      out.push({type, kind, t:m.t, html:m.html.replace(/\n/g, "<br>"), win:/ Hit|TP1 erreicht|TP2 erreicht/.test(plain), loss:/Stopped|ausgestoppt/.test(plain)}); }
+    return out; };
   const bubble = x => {
+    if (x.html != null){   // live message
+      const label = x.type === "report" ? (kinds[x.kind] || "Report") : x.type === "news" ? "⚠️ News heads-up" : x.type === "changelog" ? "📝 Changelog" : "🔔 Alert";
+      return `<div class="bub ${x.type}${x.win ? " win" : x.loss ? " loss" : ""}">${head(label, x.t)}${clip(x.html)}</div>`; }
+    if (x.type === "photos") return `<div class="bub report">${head("📈 Charts", x.t)}<div class="body">${esc(x.syms.join(" · "))}</div>`
+      + `<div class="pics">${x.syms.filter(s => chartBy[s]).map(s => pic(chartBy[s], s + " chart")).join("")}</div></div>`;
     if (x.type === "report"){ const d = byId[x.id]; if (!d) return "";
-      const pics = (x.charts || []).length ? `<div class="pics">${x.charts.map(src => `<img src="${esc(src)}" alt="${esc(src.split("chart-")[1]?.replace(".png","") || "chart")} chart" loading="lazy">`).join("")}</div>` : "";
-      return `<div class="bub report">${head(kinds[x.kind] || "Report", x.t)}<div class="body clip">${d.html}</div><button class="more">Show more</button>${pics}</div>`; }
+      const pics = (x.charts || []).length ? `<div class="pics">${x.charts.map(src => pic(src, (src.split("chart-")[1] || "").replace(".png","") + " chart")).join("")}</div>` : "";
+      return `<div class="bub report">${head(kinds[x.kind] || "Report", x.t)}${clip(d.html)}${pics}</div>`; }
     if (x.type === "alert"){ const win = / Hit/.test(x.line), loss = /Stopped/.test(x.line);
       const meta = [x.tf, x.ses, x.script, x.grade].filter(Boolean).map(esc).join(" · ");
       return `<div class="bub alert${win ? " win" : loss ? " loss" : ""}">${head(`🔔 ${tv(x.tv, esc(x.sym))} <span class="sub" style="font-weight:500">${meta}</span>`, x.t)}<div class="body">${esc(x.line)}</div></div>`; }
     if (x.type === "news"){ const ex = [x.forecast && "fcst " + esc(x.forecast), x.previous && "prev " + esc(x.previous)].filter(Boolean).join(" · ");
       const ttl = x.tv ? `<a class="tv" href="${tvUrl(x.tv)}" target="_blank" rel="noopener">${esc(x.title)}</a>` : esc(x.title);
       return `<div class="bub news">${head("⚠️ News heads-up", x.t)}<div class="body">${FL[x.country] || "🌐"} ${ttl}${ex ? " · " + ex : ""}</div></div>`; }
-    if (x.type === "changelog") return `<div class="bub changelog">${head("📝 Changelog", x.t)}<div class="body clip"><pre>${esc(x.text)}</pre></div><button class="more">Show more</button></div>`;
+    if (x.type === "changelog") return `<div class="bub changelog">${head("📝 Changelog", x.t)}${clip(`<pre>${esc(x.text)}</pre>`)}</div>`;
     return ""; };
   const draw = () => {
-    $("feedbar").innerHTML = types.map(([k,l]) => `<button data-k="${k}" aria-pressed="${k === cur}">${l} <span class="num" style="opacity:.7">${k === "all" ? F.length : F.filter(x => x.type === k).length}</span></button>`).join("")
-      + `<span class="tg">newest at the bottom</span>`;
+    const live = L && (L.items || []).length, F = live ? fromLive(L.items) : (D.feed || []);
+    const of = k => k === "all" ? F.length : F.filter(x => x.type === k || (k === "report" && x.type === "photos")).length;
+    $("feedbar").innerHTML = types.map(([k,l]) => `<button data-k="${k}" aria-pressed="${k === cur}">${l} <span class="num" style="opacity:.7">${of(k)}</span></button>`).join("")
+      + `<span class="tg">${live ? `<span class="pill open" style="padding:2px 9px"><i></i>live</span> updated ${tm(L.updated)}` : "newest at the bottom"}</span>`;
     let last = "", h = "";
-    for (const x of F){ if (cur !== "all" && x.type !== cur) continue;
+    for (const x of F){ if (cur !== "all" && x.type !== cur && !(cur === "report" && x.type === "photos")) continue;
       const d = dayOf(x.t); if (d !== last){ h += `<div class="day">${d}</div>`; last = d; } h += bubble(x); }
-    const chat = $("chat"); chat.innerHTML = h || `<div class="empty">Nothing here yet.</div>`;
+    const chat = $("chat"), atEnd = !chat.childElementCount || chat.scrollHeight - chat.scrollTop - chat.clientHeight < 60, keep = chat.scrollTop;
+    chat.innerHTML = h || `<div class="empty">Nothing here yet.</div>`;
     chat.querySelectorAll(".bub").forEach(b => { const body = b.querySelector(".body.clip"), m = b.querySelector(".more");
       if (body && m && body.scrollHeight <= body.clientHeight + 4){ body.classList.remove("clip"); m.remove(); } });
-    chat.scrollTop = chat.scrollHeight; };
+    chat.scrollTop = atEnd ? chat.scrollHeight : keep;
+    if (atEnd){ const stick = () => { chat.scrollTop = chat.scrollHeight; };
+      chat.querySelectorAll("img").forEach(i => i.addEventListener("load", stick, {once: true})); setTimeout(stick, 400); }
+    $("feed-sub").textContent = "Everything the R3M Signals group got · last 7 days · " + (live ? "live, refreshes every ~5–15 min" : "alerts arrive with the next morning digest"); };
   $("feedbar").onclick = e => { const b = e.target.closest("button[data-k]"); if (!b) return; cur = b.dataset.k;
-    try { localStorage.setItem("r3m-feed", cur); } catch {} draw(); };
+    try { localStorage.setItem("r3m-feed", cur); } catch {} $("chat").innerHTML = ""; draw(); };
   $("chat").onclick = e => { const m = e.target.closest(".more"); if (m){ const body = m.previousElementSibling; const open = body.classList.toggle("clip");
       m.textContent = open ? "Show more" : "Show less"; return; }
     const img = e.target.closest(".pics img"); if (img){ $("dlg-t").textContent = img.alt; $("dlg-b").innerHTML = `<img src="${img.src}" alt="" style="width:100%;height:auto;border-radius:10px">`; $("dlg").showModal(); } };
+  feedLive = nl => { if (nl && nl.updated !== L?.updated){ L = nl; draw(); } };
   draw();
 }
+const getLive = () => fetch("live.json?t=" + Date.now(), {cache: "no-store"}).then(r => r.ok ? r.json() : null).catch(() => null);
+setInterval(() => { if (!document.hidden && feedLive) getLive().then(feedLive); }, 60000);
 
 function drawCurve(c){
   const svg = $("curve"), W = 560, H = 200, P = {l:40, r:12, t:12, b:24};
@@ -726,7 +757,7 @@ soundUI();
 orderTool();
 bubbles();
 setInterval(tick, 15000);
-fetch("data.json", {cache: "no-store"}).then(r => r.json()).then(render).catch(() => { $("mood").textContent = "Data not reachable right now"; tick(); });
+Promise.all([fetch("data.json", {cache: "no-store"}).then(r => r.json()), getLive()]).then(([D, L]) => { D.live = L; render(D); }).catch(() => { $("mood").textContent = "Data not reachable right now"; tick(); });
 })();
 </script>
 

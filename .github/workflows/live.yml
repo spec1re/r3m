@@ -1,0 +1,41 @@
+name: Live feed
+
+# Reads the R3M Signals group every ~5 min and updates live.json for the website.
+# Source of truth: spec1re/r3m-digest/site-ci/ – changes here are overwritten by the next site deploy.
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: live
+  cancel-in-progress: false
+
+jobs:
+  feed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Telethon
+        run: pip install -q telethon==1.36.0
+      - name: Read group
+        env:
+          TG_API_ID: ${{ secrets.TG_API_ID }}
+          TG_API_HASH: ${{ secrets.TG_API_HASH }}
+          TG_SESSION: ${{ secrets.TG_SESSION }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+        run: python3 .github/tg_feed.py live.json
+      - name: Publish
+        run: |
+          git add live.json 2>/dev/null || exit 0
+          git diff --cached --quiet && exit 0
+          git -c user.name="R3M Live" -c user.email="noreply@github.com" commit -qm "live feed"
+          for i in 1 2 3; do git push -q && exit 0; git pull -q --rebase origin main; done
+          exit 1
