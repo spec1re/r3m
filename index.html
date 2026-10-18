@@ -315,7 +315,7 @@ a.chip{text-decoration:none}
       <span class="pill" id="s-tokyo"><i></i>🇯🇵 Tokyo</span>
       <span class="pill" id="s-london"><i></i>🇬🇧 London</span>
       <span class="pill" id="s-ny"><i></i>🇺🇸 New York</span>
-      <button class="pill snd" id="snd-music" aria-pressed="false" title="Lo-fi music on or off">♪ Lo-fi <span class="eq" aria-hidden="true"><b></b><b></b><b></b></span></button>
+      <button class="pill snd" id="snd-music" aria-pressed="false" title="Lo-fi music: click for track 1">♪ Lo-fi<span id="snd-n" class="num"></span> <span class="eq" aria-hidden="true"><b></b><b></b><b></b></span></button>
       <button class="pill snd" id="snd-sfx" aria-pressed="false" title="Sound effects on or off">🫧 SFX</button>
     </div>
   </div>
@@ -723,18 +723,24 @@ function orderTool(){
 }
 /* Sound: lo-fi and blub effects, generated in the browser (Web Audio), starts on click only */
 const Sound = (() => {
-  let ctx, master, music, pad, wobble, timer, step = 0, nextT = 0, musicOn = false, sfxOn = false;
-  const BPM = 72, S16 = 60 / BPM / 4;
+  let ctx, master, music, pad, wobble, lp, timer, step = 0, nextT = 0, musicOn = false, sfxOn = false;
+  /* three soft tracks · no plucks, no crackle, no hats · one chord per bar, gentle kick that makes the pad breathe */
+  const TRACKS = [
+    {name: "Reef", bpm: 72, cut: 1800, voice: "rhodes", kick: [0,10], bass: [0,8],
+     chords: [[53,57,60,64],[52,55,59,62],[50,53,57,60],[48,52,55,59]], roots: [41,40,38,36]},          // Fmaj7 Em7 Dm7 Cmaj7
+    {name: "Night swim", bpm: 64, cut: 1300, voice: "rhodes", kick: [0,8], bass: [0],
+     chords: [[57,60,64,67,71],[53,57,60,64],[48,52,55,59],[55,59,62,64]], roots: [45,41,36,43]},       // Am9 Fmaj7 Cmaj7 G6
+    {name: "Dawn", bpm: 78, cut: 2100, voice: "pad", kick: [0,10], bass: [0,7],
+     chords: [[50,54,57,61,64],[47,50,54,57],[43,47,50,54],[45,49,52,54]], roots: [38,35,43,45]}];      // Dmaj9 Bm7 Gmaj7 A6
+  let T = TRACKS[0], S16 = 60 / T.bpm / 4;
   const midi = n => 440 * Math.pow(2, (n - 69) / 12);
-  const chords = [[53,57,60,64],[52,55,59,62],[50,53,57,60],[48,52,55,59]], roots = [41,40,38,36];
-  const pent = [72,74,76,79,81];
   function init(){
     if (ctx) return true;
     const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return false;
     ctx = new AC(); master = ctx.createGain(); master.gain.value = .9;
     const comp = ctx.createDynamicsCompressor(); master.connect(comp); comp.connect(ctx.destination);
     music = ctx.createGain(); music.gain.value = 0;
-    const lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 1800; lp.Q.value = .3;
+    lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = T.cut; lp.Q.value = .3;
     music.connect(lp); lp.connect(master);
     pad = ctx.createGain(); pad.gain.value = 1; pad.connect(music);          // chord bus (breathes with the kick)
     wobble = ctx.createGain(); wobble.gain.value = 5;                        // tape wobble ±5 cents
@@ -742,14 +748,20 @@ const Sound = (() => {
     return true;
   }
   const env = (g, t, peak, a, len) => { g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(peak, t + a); g.gain.exponentialRampToValueAtTime(.0005, t + len); };
-  function rhodes(t, notes, len){ notes.forEach((n, i) => {
+  function rhodes(t, notes, len){ notes.forEach(n => {
     const o = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain(), g2 = ctx.createGain(), trem = ctx.createGain(), tl = ctx.createOscillator(), td = ctx.createGain();
     o.type = "sine"; o.frequency.value = midi(n); o2.type = "sine"; o2.frequency.value = midi(n) * 2; g2.gain.value = .12;
     wobble.connect(o.detune); wobble.connect(o2.detune);
     tl.frequency.value = 3; td.gain.value = .08; tl.connect(td); td.connect(trem.gain); trem.gain.value = .82;   // soft tremolo
     o.connect(trem); o2.connect(g2); g2.connect(trem); trem.connect(g); g.connect(pad);
-    env(g, t, .045, .45, len);
+    env(g, t, .045 * 4 / Math.max(4, notes.length), .45, len);
     [o, o2, tl].forEach(x => { x.start(t); x.stop(t + len + .1); }); }); }
+  function warm(t, notes, len){ notes.forEach(n => {                         // soft pad: two slightly detuned triangles, slow swell
+    const g = ctx.createGain(), f = ctx.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = 900; f.Q.value = .2;
+    f.frequency.setValueAtTime(700, t); f.frequency.linearRampToValueAtTime(1300, t + len * .5); f.frequency.linearRampToValueAtTime(800, t + len);
+    [-6, 6].forEach(c => { const o = ctx.createOscillator(); o.type = "triangle"; o.frequency.value = midi(n); o.detune.value = c;
+      wobble.connect(o.detune); o.connect(f); o.start(t); o.stop(t + len + .2); });
+    f.connect(g); g.connect(pad); env(g, t, .03 * 4 / Math.max(4, notes.length), 1.1, len); }); }
   function tone(t, freq, peak, att, len, bus){ const o = ctx.createOscillator(), g = ctx.createGain();
     o.type = "sine"; o.frequency.value = freq; wobble.connect(o.detune); o.connect(g); g.connect(bus || music);
     env(g, t, peak, att, len); o.start(t); o.stop(t + len + .05); }
@@ -757,27 +769,35 @@ const Sound = (() => {
     o.frequency.setValueAtTime(72, t); o.frequency.exponentialRampToValueAtTime(46, t + .2);
     o.connect(g); g.connect(music); env(g, t, .18, .015, .38); o.start(t); o.stop(t + .45);
     pad.gain.cancelScheduledValues(t); pad.gain.setValueAtTime(.72, t); pad.gain.linearRampToValueAtTime(1, t + .35); }
-  function play(s, t){ const bar = Math.floor(s / 16) % 4, pos = s % 16;
-    if (pos === 0) rhodes(t, chords[bar], 3.6);
-    if (pos === 0 || pos === 8) tone(t, midi(roots[bar]), .085, .04, 1.5);
-    if (pos === 0 || pos === 10) kick(t);
+  function play(s, t){ const bar = Math.floor(s / 16) % T.chords.length, pos = s % 16, barLen = 16 * S16;
+    if (pos === 0) (T.voice === "pad" ? warm : rhodes)(t, T.chords[bar], barLen * .95);
+    if (T.bass.includes(pos)) tone(t, midi(T.roots[bar]), .085, .04, Math.min(1.5, barLen * .45));
+    if (T.kick.includes(pos)) kick(t);
   }
   function sched(){ while (nextT < ctx.currentTime + .15){ const sw = (step % 4 === 2) ? .04 : 0; play(step, nextT + sw); nextT += S16; step++; } }
-  function setMusic(on){ if (!init()) return false; ctx.resume(); musicOn = on; const t = ctx.currentTime;
+  /* track: 0, 1, 2 or -1 (off) */
+  function setTrack(i){ if (!init()) return false; ctx.resume(); const t = ctx.currentTime, was = musicOn;
     music.gain.cancelScheduledValues(t); music.gain.setValueAtTime(music.gain.value, t);
-    if (on){ music.gain.linearRampToValueAtTime(.6, t + 2.2); step = 0; nextT = t + .08; clearInterval(timer); timer = setInterval(sched, 25); }
-    else { music.gain.linearRampToValueAtTime(0, t + .9); setTimeout(() => { if (!musicOn) clearInterval(timer); }, 1000); }
+    if (i < 0){ musicOn = false; music.gain.linearRampToValueAtTime(0, t + .9); setTimeout(() => { if (!musicOn) clearInterval(timer); }, 1000); return true; }
+    musicOn = true; T = TRACKS[i]; S16 = 60 / T.bpm / 4;
+    lp.frequency.cancelScheduledValues(t); lp.frequency.setValueAtTime(lp.frequency.value, t); lp.frequency.linearRampToValueAtTime(T.cut, t + 1.5);
+    if (was){ music.gain.linearRampToValueAtTime(.25, t + .5); music.gain.linearRampToValueAtTime(.6, t + 2.5); }   // soft crossfade
+    else music.gain.linearRampToValueAtTime(.6, t + 2.2);
+    step = 0; nextT = t + (was ? .5 : .08); clearInterval(timer); timer = setInterval(sched, 25);
     return true; }
   function blub(kind){ if (!sfxOn || !init()) return; ctx.resume(); const t = ctx.currentTime, o = ctx.createOscillator(), g = ctx.createGain();
     const f0 = kind === "click" ? 210 + Math.random() * 40 : 380 + Math.random() * 260;
     o.type = "sine"; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f0 * (kind === "click" ? 3.2 : 2.4), t + (kind === "click" ? .11 : .07));
     o.connect(g); g.connect(master); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(kind === "click" ? .12 : .06, t + .006); g.gain.exponentialRampToValueAtTime(.0003, t + .14);
     o.start(t); o.stop(t + .18); }
-  return { setMusic, blub, setSfx: on => { sfxOn = on; if (on) init(); } };
+  return { setTrack, tracks: TRACKS.map(x => x.name), blub, setSfx: on => { sfxOn = on; if (on) init(); } };
 })();
 function soundUI(){
   const mb = $("snd-music"), sb = $("snd-sfx");
-  mb.onclick = () => { const on = mb.getAttribute("aria-pressed") !== "true"; if (Sound.setMusic(on)) mb.setAttribute("aria-pressed", String(on)); };
+  let tr = -1;   // off → track 1 → 2 → 3 → off
+  mb.onclick = () => { const n = tr + 1 >= Sound.tracks.length ? -1 : tr + 1; if (!Sound.setTrack(n)) return; tr = n;
+    mb.setAttribute("aria-pressed", String(tr >= 0)); $("snd-n").textContent = tr >= 0 ? " " + (tr + 1) : "";
+    mb.title = tr >= 0 ? `Lo-fi ${tr + 1} of ${Sound.tracks.length} · ${Sound.tracks[tr]} · click for ${tr + 1 < Sound.tracks.length ? "the next track" : "off"}` : "Lo-fi music: click for track 1"; };
   const setS = on => { Sound.setSfx(on); sb.setAttribute("aria-pressed", String(on)); try { localStorage.setItem("r3m-sfx", on ? "1" : "0"); } catch {} };
   sb.onclick = () => { setS(sb.getAttribute("aria-pressed") !== "true"); Sound.blub("click"); };
   let pref = null; try { pref = localStorage.getItem("r3m-sfx"); } catch {}
