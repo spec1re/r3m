@@ -473,7 +473,7 @@ function render(D){
   $("agenda").innerHTML = (M.agenda || []).map(a => `<div class="card"><div class="day">${esc(a.day)}</div><ul>${a.items.map(i => `<li>${esc(i)}</li>`).join("")}</ul></div>`).join("");
 
   /* Archiv */
-  const kinds = {morning:"☕ Morning", abend:"🌙 US-Close", rueckblick:"🔁 Rückblick", ausblick:"🔭 Ausblick", bilanz:"📊 Bilanz", gap:"🌙 Gap-Check"};
+  const kinds = {morning:"☕ Morning", abend:"🌙 US-Close", rueckblick:"🔁 Rückblick", ausblick:"🔭 Ausblick", bilanz:"📊 Bilanz", gap:"🌙 Gap-Check", mittag:"🕛 Halbzeit"};
   $("arch").innerHTML = (D.digests || []).map((d,i) => `<button data-i="${i}"><div class="d">${d.date.split("-").reverse().join(".")} · ${kinds[d.kind] || ""}</div><div class="t">${esc(d.title.replace(/^\S+\s*R3M\s*/, ""))}</div></button>`).join("");
   const card = (d,i) => `<button data-i="${i}"><div class="d">${d.date.split("-").reverse().join(".")} · ${kinds[d.kind] || ""}</div><div class="t">${esc(d.title.replace(/^\S+\s*R3M\s*/, ""))}</div></button>`;
   $("recent-arch").insertAdjacentHTML("beforeend", (D.digests || []).slice(0,3).map(card).join("") + `<a class="more" href="#archiv">Ganzes Archiv →</a>`);
