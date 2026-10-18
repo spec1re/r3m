@@ -131,7 +131,15 @@ h2{font:600 28px var(--f-display);margin:0;letter-spacing:-.2px}
 .charts figcaption{padding:8px 14px;font-size:13px;color:var(--mist)}
 
 /* Einschätzung */
-.outlook{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:12px}
+.outlook{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.oc{display:flex;flex-direction:column;padding:10px 12px 14px}
+.ch{all:unset;cursor:zoom-in;display:block;border-radius:10px;overflow:hidden;border:1px solid var(--line);margin-bottom:10px;aspect-ratio:16/9;background:var(--abyss)}
+.ch img{display:block;width:100%;height:100%;object-fit:cover;object-position:left center}
+.ch:hover,.ch:focus-visible{border-color:var(--glass)}
+.ch.none{cursor:default;display:grid;place-items:center;font-size:12.5px;color:var(--mist);text-align:center;padding:8px}
+@media (max-width:1500px){.outlook{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:1000px){.outlook{grid-template-columns:repeat(2,minmax(0,1fr))}.outlook>.card:last-child:nth-child(odd){grid-column:1/-1}}
+@media (max-width:640px){.outlook{grid-template-columns:1fr}}
 .outlook .card p{margin:4px 0 0;color:#d4e6e3}
 .outlook .sym{color:var(--glass)}
 .lv{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 6px}
@@ -253,7 +261,7 @@ pre.cl{white-space:pre-wrap;font:13px/1.55 var(--f-data);color:#cfe3e0;margin:6p
     <a class="brand" href="#top" aria-label="R3M Riff, nach oben">
       <svg viewBox="0 0 64 64" aria-hidden="true"><use href="#octo-mini"/></svg>R3M Riff</a>
     <nav aria-label="Abschnitte">
-      <a href="#maerkte">Märkte</a><a href="#charts">Charts</a><a href="#signale">Signale</a><a href="#termine">Termine</a><a href="#archiv">Archiv</a>
+      <a href="#maerkte">Märkte</a><a href="#signale">Signale</a><a href="#termine">Termine</a><a href="#archiv">Archiv</a>
     </nav>
     <div class="clock">
       <span class="time" id="clock">--:--</span>
@@ -316,13 +324,8 @@ pre.cl{white-space:pre-wrap;font:13px/1.55 var(--f-data);color:#cfe3e0;margin:6p
     <div class="groups" id="groups"></div>
   </div></section>
 
-  <section id="charts"><div class="wrap">
-    <div class="sh"><h2>Charts</h2><span class="sub" id="c-sub">1h · Vortag, Vorwoche und SMA50 eingezeichnet</span></div>
-    <div class="charts" id="chartgrid"></div>
-  </div></section>
-
   <section id="einschaetzung"><div class="wrap">
-    <div class="sh"><h2>Einschätzung</h2><span class="sub">Levels und Szenarien, keine Empfehlungen</span></div>
+    <div class="sh"><h2>Einschätzung</h2><span class="sub">Chart (1h) · Levels · Szenarien – keine Empfehlungen</span></div>
     <div class="outlook" id="outlook"></div>
   </div></section>
 
@@ -437,9 +440,7 @@ function render(D){
       <div class="price num">${fmt(i.price,1)}</div><div class="rl"><span>RSI ${i.rsi ?? "–"}</span><span>SMA50 ${fmt(i.sma50,0)} ${i.price < i.sma50 ? "↓" : "↑"}</span></div></article>`).join("")}</div></div>`);
   document.querySelectorAll(".tile,.fp").forEach(t => heat(t, +t.dataset.chg, span));
 
-  /* Charts */
-  $("chartgrid").innerHTML = (D.charts || []).length ? D.charts.map(c => `<figure><img src="${esc(c.src)}" alt="${esc(c.sym)} 1h-Chart mit Levels" loading="lazy"><figcaption>${esc(c.sym)} · Stand ${esc(c.date.split("-").reverse().join("."))}</figcaption></figure>`).join("")
-    : `<p class="sub">Charts kommen Mo–Fr mit dem Morning Digest.</p>`;
+  const chartBy = Object.fromEntries((D.charts || []).map(c => [c.sym, c]));
 
   const priceOf = sym => (M.pepper || []).find(p => p.sym === sym)?.price ?? (M.indices || []).find(i => i.sym === sym)?.price;
   $("outlook").innerHTML = (M.outlook || []).map(o => { const px = priceOf(o.sym);
@@ -447,7 +448,10 @@ function render(D){
       const c = d == null ? "" : d > 0.02 ? "res" : d < -0.02 ? "sup" : "now";
       return `<span class="${c}" title="${c === "res" ? "über dem Kurs" : c === "sup" ? "unter dem Kurs" : "am Kurs"}">${esc(l.name)} ${fmt(l.value)}${d == null ? "" : ` · ${d > 0 ? "+" : d < 0 ? "−" : ""}${fmt(Math.abs(d),1)} %`}</span>`; }).join("");
     const body = (o.up || o.down) ? `<div class="sc">${o.up ? `<p><b class="up">▲</b><span>${esc(o.up)}</span></p>` : ""}${o.down ? `<p><b class="down">▼</b><span>${esc(o.down)}</span></p>` : ""}</div>` : `<p>${esc(o.text)}</p>`;
-    return `<div class="card"><span class="sym">${esc(o.sym)}</span>${px ? ` <span class="sub num">${fmt(px)}</span>` : ""}${lv ? `<div class="lv">${lv}</div>` : ""}${body}</div>`; }).join("");
+    const ch = chartBy[o.sym];
+    const pic = ch ? `<button class="ch" data-src="${esc(ch.src)}" data-t="${esc(o.sym)} · 1h · Stand ${esc(ch.date.split("-").reverse().join("."))}" aria-label="${esc(o.sym)}-Chart vergrößern"><img src="${esc(ch.src)}" alt="${esc(o.sym)} 1h-Chart mit Levels" loading="lazy"></button>`
+      : `<div class="ch none">Chart kommt Mo–Fr mit dem Morning Digest</div>`;
+    return `<div class="card oc">${pic}<span class="sym">${esc(o.sym)}</span>${px ? ` <span class="sub num">${fmt(px)}</span>` : ""}${lv ? `<div class="lv">${lv}</div>` : ""}${body}</div>`; }).join("");
 
   /* Signale */
   const S = D.signals || {}, T = S.total || {};
@@ -480,6 +484,8 @@ function render(D){
   const open = e => { const b = e.target.closest("button[data-i]"); if (!b) return; const d = D.digests[+b.dataset.i];
     $("dlg-t").textContent = d.title; $("dlg-b").innerHTML = d.html; $("dlg").showModal(); };
   $("arch").onclick = open; $("recent-arch").onclick = open;
+  $("outlook").onclick = e => { const b = e.target.closest("button.ch"); if (!b) return;
+    $("dlg-t").textContent = b.dataset.t; $("dlg-b").innerHTML = `<img src="${b.dataset.src}" alt="" style="width:100%;height:auto;border-radius:10px">`; $("dlg").showModal(); };
   $("dlg-x").onclick = () => $("dlg").close();
   $("dlg").onclick = e => { if (e.target === $("dlg")) $("dlg").close(); };
 
@@ -525,7 +531,7 @@ function bubbles(){
 
 /* Entwurf: Abschnitte umsortieren */
 function orderTool(){
-  const main = document.querySelector("main"), names = {einschaetzung:"Einschätzung",charts:"Charts",termine:"Termine",maerkte:"Märkte",aktien:"Aktien",signale:"Signale",archiv:"Archiv"};
+  const main = document.querySelector("main"), names = {einschaetzung:"Einschätzung",termine:"Termine",maerkte:"Märkte",aktien:"Aktien",signale:"Signale",archiv:"Archiv"};
   const def = Object.keys(names); let cur = def;
   try { const v = JSON.parse(localStorage.getItem("r3m-order") || "null"); if (Array.isArray(v) && v.length === def.length && def.every(k => v.includes(k))) cur = v; } catch {}
   const apply = () => { cur.forEach(id => main.appendChild($(id)));
