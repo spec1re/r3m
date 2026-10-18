@@ -205,6 +205,29 @@ dialog::backdrop{background:rgba(3,12,18,.7);backdrop-filter:blur(3px)}
 .x{all:unset;cursor:pointer;font-size:22px;color:var(--mist);padding:2px 8px;border-radius:8px}
 .x:focus-visible{outline:2px solid var(--glass)}
 
+/* Feed (Telegram group, chat style) */
+.feedbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;max-width:980px}
+.feedbar button{all:unset;cursor:pointer;font:600 12.5px var(--f-body);color:var(--mist);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+.feedbar button[aria-pressed="true"]{color:var(--abyss);background:var(--glass);border-color:var(--glass)}
+.feedbar button:focus-visible{outline:2px solid var(--glass);outline-offset:2px}
+.feedbar .tg{margin-left:auto;font-size:12.5px;color:var(--mist);align-self:center}
+.chat{max-width:980px;max-height:min(760px,78vh);overflow:auto;overscroll-behavior:contain;background:linear-gradient(180deg,rgba(10,36,48,.6),rgba(6,26,36,.9));
+  border:1px solid var(--line);border-radius:18px;padding:14px 14px 18px;display:flex;flex-direction:column;gap:8px}
+.chat .day{align-self:center;font:600 12px var(--f-body);color:var(--mist);background:var(--reef);border-radius:999px;padding:3px 12px;margin:8px 0 2px;position:sticky;top:0;z-index:1;box-shadow:0 2px 8px rgba(3,12,18,.6)}
+.bub{align-self:flex-start;max-width:min(640px,100%);background:var(--deep);border:1px solid var(--line);border-radius:4px 16px 16px 16px;padding:9px 13px 7px;
+  font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+.bub .h{display:flex;gap:8px;align-items:baseline;font:600 12px var(--f-body);color:var(--glass);margin-bottom:3px}
+.bub .h .tm{margin-left:auto;font:500 11.5px var(--f-data);color:var(--mist)}
+.bub.alert{border-left:3px solid var(--sun)} .bub.alert .h{color:var(--sun)}
+.bub.alert.win{border-left-color:rgb(var(--up))} .bub.alert.loss{border-left-color:rgb(var(--down))}
+.bub.news .h{color:var(--coral)} .bub.changelog .h{color:var(--octo)}
+.bub .body.clip{max-height:15.5em;overflow:hidden;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}
+.bub .more{all:unset;cursor:pointer;font:600 12.5px var(--f-body);color:var(--glass);margin-top:4px;display:inline-block}
+.bub .pics{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-top:8px}
+.bub .pics img{width:100%;border-radius:8px;display:block;cursor:zoom-in}
+.bub pre{white-space:pre-wrap;font:12.5px/1.5 var(--f-data);margin:0}
+.chat .empty{color:var(--mist);text-align:center;padding:30px 0}
+
 footer{border-top:1px solid var(--line);margin-top:20px;padding-block:26px 40px;color:var(--mist);font-size:13.5px}
 .foot{display:grid;grid-template-columns:1fr 1fr;gap:24px}
 pre.cl{white-space:pre-wrap;font:13px/1.55 var(--f-data);color:#cfe3e0;margin:6px 0 0;background:var(--deep);border:1px solid var(--line);border-radius:12px;padding:12px 14px;max-height:260px;overflow:auto}
@@ -371,6 +394,12 @@ a.chip{text-decoration:none}
     <div class="sh"><h2>Archive</h2><span class="sub">All digests, reviews and recaps</span></div>
     <div class="arch" id="arch"></div>
   </div></section>
+
+  <section id="feed"><div class="wrap">
+    <div class="sh"><h2>Feed</h2><span class="sub">Everything the R3M Signals group got · last 7 days · alerts arrive with the next morning digest</span></div>
+    <div class="feedbar" id="feedbar" role="group" aria-label="Filter feed"></div>
+    <div class="chat" id="chat" aria-live="off"></div>
+  </div></section>
 </main>
 
 <footer><div class="wrap foot">
@@ -531,9 +560,49 @@ function render(D){
   $("dlg-x").onclick = () => $("dlg").close();
   $("dlg").onclick = e => { if (e.target === $("dlg")) $("dlg").close(); };
 
+  renderFeed(D, kinds);
   $("gen").textContent = new Intl.DateTimeFormat(de,{timeZone:BER,dateStyle:"short",timeStyle:"short"}).format(new Date(D.generated));
   if (D.changelog){ $("cl").textContent = D.changelog.text; $("cl-date").textContent = dshort(D.changelog.date, true); }
   tick();
+}
+
+function renderFeed(D, kinds){
+  const F = D.feed || [], byId = Object.fromEntries((D.digests || []).map(d => [d.id, d]));
+  const FL = {US:"🇺🇸",DE:"🇩🇪",EU:"🇪🇺",GB:"🇬🇧",JP:"🇯🇵",CH:"🇨🇭",CN:"🇨🇳",FR:"🇫🇷",IT:"🇮🇹",CA:"🇨🇦",AU:"🇦🇺",NZ:"🇳🇿"};
+  const types = [["all","All"],["report","Reports"],["alert","Alerts"],["news","News"],["changelog","Changelog"]];
+  let cur = "all"; try { cur = localStorage.getItem("r3m-feed") || "all"; } catch {}
+  if (!types.some(([k]) => k === cur)) cur = "all";
+  const tm = t => new Intl.DateTimeFormat(de,{timeZone:BER,hour:"2-digit",minute:"2-digit"}).format(new Date(t));
+  const dayOf = t => new Intl.DateTimeFormat(de,{timeZone:BER,weekday:"short",day:"numeric",month:"short"}).format(new Date(t));
+  const head = (label, t) => `<div class="h"><span>${label}</span><span class="tm">${tm(t)}</span></div>`;
+  const bubble = x => {
+    if (x.type === "report"){ const d = byId[x.id]; if (!d) return "";
+      const pics = (x.charts || []).length ? `<div class="pics">${x.charts.map(src => `<img src="${esc(src)}" alt="${esc(src.split("chart-")[1]?.replace(".png","") || "chart")} chart" loading="lazy">`).join("")}</div>` : "";
+      return `<div class="bub report">${head(kinds[x.kind] || "Report", x.t)}<div class="body clip">${d.html}</div><button class="more">Show more</button>${pics}</div>`; }
+    if (x.type === "alert"){ const win = / Hit/.test(x.line), loss = /Stopped/.test(x.line);
+      const meta = [x.tf, x.ses, x.script, x.grade].filter(Boolean).map(esc).join(" · ");
+      return `<div class="bub alert${win ? " win" : loss ? " loss" : ""}">${head(`🔔 ${tv(x.tv, esc(x.sym))} <span class="sub" style="font-weight:500">${meta}</span>`, x.t)}<div class="body">${esc(x.line)}</div></div>`; }
+    if (x.type === "news"){ const ex = [x.forecast && "fcst " + esc(x.forecast), x.previous && "prev " + esc(x.previous)].filter(Boolean).join(" · ");
+      const ttl = x.tv ? `<a class="tv" href="${tvUrl(x.tv)}" target="_blank" rel="noopener">${esc(x.title)}</a>` : esc(x.title);
+      return `<div class="bub news">${head("⚠️ News heads-up", x.t)}<div class="body">${FL[x.country] || "🌐"} ${ttl}${ex ? " · " + ex : ""}</div></div>`; }
+    if (x.type === "changelog") return `<div class="bub changelog">${head("📝 Changelog", x.t)}<div class="body clip"><pre>${esc(x.text)}</pre></div><button class="more">Show more</button></div>`;
+    return ""; };
+  const draw = () => {
+    $("feedbar").innerHTML = types.map(([k,l]) => `<button data-k="${k}" aria-pressed="${k === cur}">${l} <span class="num" style="opacity:.7">${k === "all" ? F.length : F.filter(x => x.type === k).length}</span></button>`).join("")
+      + `<span class="tg">newest at the bottom</span>`;
+    let last = "", h = "";
+    for (const x of F){ if (cur !== "all" && x.type !== cur) continue;
+      const d = dayOf(x.t); if (d !== last){ h += `<div class="day">${d}</div>`; last = d; } h += bubble(x); }
+    const chat = $("chat"); chat.innerHTML = h || `<div class="empty">Nothing here yet.</div>`;
+    chat.querySelectorAll(".bub").forEach(b => { const body = b.querySelector(".body.clip"), m = b.querySelector(".more");
+      if (body && m && body.scrollHeight <= body.clientHeight + 4){ body.classList.remove("clip"); m.remove(); } });
+    chat.scrollTop = chat.scrollHeight; };
+  $("feedbar").onclick = e => { const b = e.target.closest("button[data-k]"); if (!b) return; cur = b.dataset.k;
+    try { localStorage.setItem("r3m-feed", cur); } catch {} draw(); };
+  $("chat").onclick = e => { const m = e.target.closest(".more"); if (m){ const body = m.previousElementSibling; const open = body.classList.toggle("clip");
+      m.textContent = open ? "Show more" : "Show less"; return; }
+    const img = e.target.closest(".pics img"); if (img){ $("dlg-t").textContent = img.alt; $("dlg-b").innerHTML = `<img src="${img.src}" alt="" style="width:100%;height:auto;border-radius:10px">`; $("dlg").showModal(); } };
+  draw();
 }
 
 function drawCurve(c){
@@ -573,9 +642,9 @@ function bubbles(){
 
 /* Reorder sections */
 function orderTool(){
-  const main = document.querySelector("main"), names = {einschaetzung:"Outlook",termine:"Calendar",maerkte:"Markets",aktien:"Stocks",signale:"Signals",archiv:"Archive"};
+  const main = document.querySelector("main"), names = {einschaetzung:"Outlook",termine:"Calendar",maerkte:"Markets",aktien:"Stocks",signale:"Signals",archiv:"Archive",feed:"Feed"};
   const def = Object.keys(names); let cur = def;
-  try { const v = JSON.parse(localStorage.getItem("r3m-order") || "null"); if (Array.isArray(v) && v.length === def.length && def.every(k => v.includes(k))) cur = v; } catch {}
+  try { const v = JSON.parse(localStorage.getItem("r3m-order") || "null"); if (Array.isArray(v)) { const keep = v.filter(k => def.includes(k)); if (keep.length) cur = [...keep, ...def.filter(k => !keep.includes(k))]; } } catch {}
   const apply = () => { cur.forEach(id => main.appendChild($(id)));
     const nav = document.querySelector("nav"); nav.innerHTML = cur.filter(id => names[id]).map(id => `<a href="#${id}">${names[id]}</a>`).join("");
     $("order-list").innerHTML = cur.map((id,i) => `<li><span>${i+1}. ${names[id]}</span><button class="m" data-i="${i}" data-d="-1" aria-label="Move ${names[id]} up" ${i ? "" : "disabled"}>↑</button><button class="m" data-i="${i}" data-d="1" aria-label="Move ${names[id]} down" ${i < cur.length-1 ? "" : "disabled"}>↓</button></li>`).join("");
