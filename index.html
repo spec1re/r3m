@@ -137,11 +137,14 @@ h2{font:600 28px var(--f-display);margin:0;letter-spacing:-.2px}
 .ch img{display:block;width:100%;height:100%;object-fit:cover;object-position:left center}
 .ch:hover,.ch:focus-visible{border-color:var(--glass)}
 .ch.none{cursor:default;display:grid;place-items:center;font-size:12.5px;color:var(--mist);text-align:center;padding:8px}
-@media (max-width:1500px){.outlook{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .outlook>.oc:first-child{grid-column:span 2;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px;align-items:start}
-  .outlook>.oc:first-child .ch{margin:0}}
-@media (max-width:1000px){.outlook{grid-template-columns:repeat(2,minmax(0,1fr))}.outlook>.oc:first-child{grid-column:1/-1}}
-@media (max-width:640px){.outlook>.oc:first-child{display:flex}}
+@media (max-width:1500px){.outlook{grid-template-columns:repeat(6,minmax(0,1fr))}
+  .outlook>.oc{grid-column:span 2}
+  .outlook>.oc:nth-last-child(2):nth-child(3n+1),.outlook>.oc:nth-last-child(1):nth-child(3n+2){grid-column:span 3}
+  .outlook>.oc:last-child:nth-child(3n+1){grid-column:1/-1}}
+@media (max-width:1000px){.outlook{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .outlook>.oc,.outlook>.oc:nth-last-child(2):nth-child(3n+1),.outlook>.oc:nth-last-child(1):nth-child(3n+2){grid-column:auto}
+  .outlook>.oc:last-child:nth-child(odd){grid-column:1/-1}}
+@media (max-width:640px){.outlook{grid-template-columns:1fr}}
 @media (max-width:640px){.outlook{grid-template-columns:1fr}}
 .outlook .card p{margin:4px 0 0;color:#d4e6e3}
 .outlook .sym{color:var(--glass)}
