@@ -322,7 +322,7 @@ a.chip{text-decoration:none}
     </div>
     <div class="wrap hero-cards">
       <div class="card"><h3>Next event</h3><div class="count" id="next">–</div><div class="sub" id="next-sub"></div></div>
-      <div class="card"><h3>Sea state · <a class="tv" href="https://de.tradingview.com/symbols/TVC-VIX/" target="_blank" rel="noopener" title="VIX on TradingView">VIX</a></h3><div class="count num" id="vix">–</div>
+      <div class="card"><h3>Sea state · <a class="tv" href="https://www.tradingview.com/symbols/TVC-VIX/" target="_blank" rel="noopener" title="VIX on TradingView">VIX</a></h3><div class="count num" id="vix">–</div>
         <div class="sea" id="sea"><span></span><span></span><span></span><span></span><span></span></div><div class="sub" id="vix-sub"></div></div>
       <div class="card"><h3>Signals · 7 days</h3><div class="count num" id="sig-mini">–</div><div class="sub" id="sig-mini-sub"></div></div>
       <div class="card"><h3 id="tf-h">Top &amp; Flop</h3><div class="tf" id="topflop">–</div></div>
@@ -400,7 +400,7 @@ const STOCKX = Object.fromEntries([
   ["LLY","NYSE:LLY"], ["BRK.B","NYSE:BRK.B"]]);
 const linkTickers = html => html.replace(/\b([A-Z][A-Z0-9]{1,4}(?:\.B)?)\b/g, (m, t) => STOCKX[t] ? tv(STOCKX[t], t) : m);
 const LISTX = {"DAX Top 12":"XETR","S&P 500 Top 12":"NASDAQ","Nasdaq 100 Next 12":"NASDAQ"};
-const tvUrl = full => full ? "https://de.tradingview.com/symbols/" + encodeURIComponent(full.replace(":", "-")).replace(/%21/g, "!") + "/" : null;
+const tvUrl = full => full ? "https://www.tradingview.com/symbols/" + encodeURIComponent(full.replace(":", "-")).replace(/%21/g, "!") + "/" : null;
 const tvOf = (sym, ex) => sym.includes(":") ? sym : TVX[sym] || (ex ? ex + ":" + sym : "PEPPERSTONE:" + sym);
 const tv = (sym, text, ex, cls) => `<a class="tv${cls ? " " + cls : ""}" href="${tvUrl(tvOf(sym, ex))}" target="_blank" rel="noopener" title="${esc(sym)} on TradingView">${text ?? esc(sym)}</a>`;
 const heat = (el, v, span) => { el.style.setProperty("--h", Math.min(Math.abs(v) / span, 1).toFixed(2)); el.style.setProperty("--rgb", v >= 0 ? "var(--up)" : "var(--down)"); };
@@ -502,7 +502,7 @@ function render(D){
   $("stocks").innerHTML = (M.stocks || []).map(s => `<div class="card"><h3>${esc(s.flag)} ${esc(s.list)}</h3>
     <div class="chips">${[["strong","s",""],["weak","w",""],["hot","h","🔥 "],["cold","c","🧊 "]].map(([k,c,e]) => (s[k]||[]).map(x => { const t = x.split(" ")[0];
       return `<a class="chip ${c}" href="${tvUrl(tvOf(t, LISTX[s.list]))}" target="_blank" rel="noopener" title="${esc(t)} on TradingView">${e}${esc(x)}</a>`; }).join("")).join("")}</div></div>`).join("");
-  const CAL = "https://de.tradingview.com/economic-calendar/";
+  const CAL = "https://www.tradingview.com/economic-calendar/";
   const item = i => { const t = typeof i === "string" ? i : i.text, x = typeof i === "string" ? null : i.tv;
     if (x) return `<a class="tv" href="${tvUrl(x)}" target="_blank" rel="noopener" title="Indicator on TradingView">${esc(t)}</a>`;
     const h = linkTickers(esc(t));
