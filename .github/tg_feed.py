@@ -13,7 +13,7 @@ from telethon import TelegramClient
 from telethon.sessions import StringSession
 
 OUT = sys.argv[1] if len(sys.argv) > 1 else "live.json"
-DAYS, MAX = 7, 500
+DAYS, MAX = 7, 1500
 ALLOWED = {"b", "strong", "i", "em", "u", "s", "del", "code", "pre", "blockquote", "a"}
 NORM = {"strong": "b", "em": "i", "del": "s"}
 

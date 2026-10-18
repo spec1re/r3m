@@ -206,12 +206,17 @@ dialog::backdrop{background:rgba(3,12,18,.7);backdrop-filter:blur(3px)}
 .x:focus-visible{outline:2px solid var(--glass)}
 
 /* Feed (Telegram group, chat style) */
-.feedbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;max-width:980px}
+.feedgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+.feedbar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:12px;min-height:30px}
+.clhead{display:flex;gap:10px;align-items:center;min-height:30px;margin-bottom:12px;font-family:var(--f-display)}
+.clbox{height:min(760px,78vh);overflow:auto;overscroll-behavior:contain;background:var(--deep);border:1px solid var(--line);border-radius:18px;padding:14px 18px}
+.clbox .cd{font:600 12px var(--f-body);color:var(--mist);margin:14px 0 4px}.clbox .cd:first-child{margin-top:0}
+.clbox pre{white-space:pre-wrap;font:13px/1.6 var(--f-data);color:#cfe3e0;margin:0}.clbox pre b{color:var(--octo)}
 .feedbar button{all:unset;cursor:pointer;font:600 12.5px var(--f-body);color:var(--mist);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
 .feedbar button[aria-pressed="true"]{color:var(--abyss);background:var(--glass);border-color:var(--glass)}
 .feedbar button:focus-visible{outline:2px solid var(--glass);outline-offset:2px}
 .feedbar .tg{margin-left:auto;font-size:12.5px;color:var(--mist);align-self:center}
-.chat{max-width:980px;max-height:min(760px,78vh);overflow:auto;overscroll-behavior:contain;background:linear-gradient(180deg,rgba(10,36,48,.6),rgba(6,26,36,.9));
+.chat{height:min(760px,78vh);overflow:auto;overscroll-behavior:contain;background:linear-gradient(180deg,rgba(10,36,48,.6),rgba(6,26,36,.9));
   border:1px solid var(--line);border-radius:18px;padding:14px 14px 18px;display:flex;flex-direction:column;gap:8px}
 .chat .day{align-self:center;font:600 12px var(--f-body);color:var(--mist);background:var(--reef);border-radius:999px;padding:3px 12px;margin:8px 0 2px;position:sticky;top:0;z-index:1;box-shadow:0 2px 8px rgba(3,12,18,.6)}
 .bub{align-self:flex-start;max-width:min(640px,100%);background:var(--deep);border:1px solid var(--line);border-radius:4px 16px 16px 16px;padding:9px 13px 7px;
@@ -229,7 +234,7 @@ dialog::backdrop{background:rgba(3,12,18,.7);backdrop-filter:blur(3px)}
 .chat .empty{color:var(--mist);text-align:center;padding:30px 0}
 
 footer{border-top:1px solid var(--line);margin-top:20px;padding-block:26px 40px;color:var(--mist);font-size:13.5px}
-.foot{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.foot{display:grid;grid-template-columns:1fr;gap:24px}
 pre.cl{white-space:pre-wrap;font:13px/1.55 var(--f-data);color:#cfe3e0;margin:6px 0 0;background:var(--deep);border:1px solid var(--line);border-radius:12px;padding:12px 14px;max-height:260px;overflow:auto}
 :focus-visible{outline:2px solid var(--glass);outline-offset:2px}
 
@@ -251,7 +256,8 @@ pre.cl{white-space:pre-wrap;font:13px/1.55 var(--f-data);color:#cfe3e0;margin:6p
   .recent{grid-template-columns:1fr}
   .mascot{order:-1;grid-auto-flow:column;justify-content:start;align-items:center}
   .octo{width:110px}
-  .groups,.sig,.foot{grid-template-columns:1fr}
+  .groups,.sig,.foot,.feedgrid{grid-template-columns:1fr}
+  .clbox{height:auto;max-height:420px}
   .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
   .tile{padding:10px 11px}.price{font-size:17px}.rl{font-size:11px}
   nav{flex-wrap:nowrap;overflow-x:auto;max-width:100%}
@@ -397,8 +403,12 @@ a.chip{text-decoration:none}
 
   <section id="feed"><div class="wrap">
     <div class="sh"><h2>Feed</h2><span class="sub" id="feed-sub">Everything the R3M Signals group got · last 7 days</span></div>
-    <div class="feedbar" id="feedbar" role="group" aria-label="Filter feed"></div>
-    <div class="chat" id="chat" aria-live="off"></div>
+    <div class="feedgrid">
+      <div><div class="feedbar" id="feedbar" role="group" aria-label="Filter feed"></div>
+        <div class="chat" id="chat" aria-live="off"></div></div>
+      <div><div class="clhead"><strong>📝 Changelog</strong> <span class="num sub" id="cl-date"></span></div>
+        <div class="clbox" id="cl">–</div></div>
+    </div>
   </div></section>
 </main>
 
@@ -406,7 +416,6 @@ a.chip{text-decoration:none}
   <div><strong style="color:var(--foam)">R3M Riff</strong><br>Facts and levels to watch. Not financial advice.<br>
     Data: TradingView · updated <span class="num" id="gen">–</span><br>
     Guides: climax <a class="tv" href="docs/climax-guide.pdf" target="_blank" rel="noopener">EN</a> · <a class="tv" href="docs/climax-anleitung.pdf" target="_blank" rel="noopener">DE</a> · equinox <a class="tv" href="docs/equinox-guide.pdf" target="_blank" rel="noopener">EN</a> · <a class="tv" href="docs/equinox-anleitung.pdf" target="_blank" rel="noopener">DE</a></div>
-  <div><strong style="color:var(--foam)">Latest changelog</strong> <span class="num" id="cl-date"></span><pre class="cl" id="cl">–</pre></div>
 </div></footer>
 
 
@@ -562,7 +571,10 @@ function render(D){
 
   renderFeed(D, kinds);
   $("gen").textContent = new Intl.DateTimeFormat(de,{timeZone:BER,dateStyle:"short",timeStyle:"short"}).format(new Date(D.generated));
-  if (D.changelog){ $("cl").textContent = D.changelog.text; $("cl-date").textContent = dshort(D.changelog.date, true); }
+  if (D.changelog){ const cl = [D.changelog, ...(D.changelog.older || [])];
+    const fmtCl = s => esc(s).replace(/^(\S[^\n]*·)$/gm, "<b>$1</b>");
+    $("cl").innerHTML = cl.map((c,i) => `${i ? `<div class="cd">${dshort(c.date, true)}</div>` : ""}<pre>${fmtCl(c.text)}</pre>`).join("");
+    $("cl-date").textContent = "latest " + dshort(D.changelog.date, true); }
   tick();
 }
 
