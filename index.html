@@ -645,17 +645,15 @@ function renderFeed(D, kinds){
     const of = k => k === "all" ? F.length : F.filter(x => x.type === k || (k === "report" && x.type === "photos")).length;
     $("feedbar").innerHTML = (live ? `<span class="clmark"><span class="pill open" style="padding:2px 9px"><i></i>live</span> last message ${tm(L.items[L.items.length-1].t)}</span>` : "")
       + types.map(([k,l]) => `<button data-k="${k}" aria-pressed="${k === cur}">${l} <span class="num" style="opacity:.7">${of(k)}</span></button>`).join("")
-      + (live ? "" : `<span class="tg">newest at the bottom</span>`);
+      + (live ? "" : `<span class="tg">newest first</span>`);
     let last = "", h = "";
-    for (const x of F){ if (cur !== "all" && x.type !== cur && !(cur === "report" && x.type === "photos")) continue;
+    for (const x of F.slice().reverse()){ if (cur !== "all" && x.type !== cur && !(cur === "report" && x.type === "photos")) continue;
       const d = dayOf(x.t); if (d !== last){ h += `<div class="day">${d}</div>`; last = d; } h += bubble(x); }
-    const chat = $("chat"), atEnd = !chat.childElementCount || chat.scrollHeight - chat.scrollTop - chat.clientHeight < 60, keep = chat.scrollTop;
+    const chat = $("chat"), atTop = !chat.childElementCount || chat.scrollTop < 60, keep = chat.scrollTop;
     chat.innerHTML = h || `<div class="empty">Nothing here yet.</div>`;
     chat.querySelectorAll(".bub").forEach(b => { const body = b.querySelector(".body.clip"), m = b.querySelector(".more");
       if (body && m && body.scrollHeight <= body.clientHeight + 4){ body.classList.remove("clip"); m.remove(); } });
-    chat.scrollTop = atEnd ? chat.scrollHeight : keep;
-    if (atEnd){ const stick = () => { chat.scrollTop = chat.scrollHeight; };
-      chat.querySelectorAll("img").forEach(i => i.addEventListener("load", stick, {once: true})); setTimeout(stick, 400); }
+    chat.scrollTop = atTop ? 0 : keep;
     $("feed-sub").textContent = "Everything the R3M Signals group got · last 7 days · " + (live ? "live, refreshes every ~5–15 min" : "alerts arrive with the next morning digest"); };
   $("feedbar").onclick = e => { const b = e.target.closest("button[data-k]"); if (!b) return; cur = b.dataset.k;
     try { localStorage.setItem("r3m-feed", cur); } catch {} $("chat").innerHTML = ""; draw(); };
