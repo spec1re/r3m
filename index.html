@@ -10,10 +10,12 @@
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>R3M Riff</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<meta name="color-scheme" content="dark">
+<meta name="darkreader-lock">
 <meta name="description" content="R3M Riff – morning digest, markets, calendar and signal report in one place.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Noto+Color+Emoji&display=swap">
 <style>
 /* Layout: a calm night aquarium – header with clock and exchanges, hero with mood and mascot,
    below it sections like tanks: Markets · Outlook · Signals · Stocks · Calendar · Archive */
@@ -21,9 +23,9 @@
   --abyss:#061a24; --deep:#0a2430; --reef:#0e2f3d; --line:#1a4556;
   --foam:#e6f3f0; --mist:#8db0b5; --glass:#5fd3bf; --coral:#ff8577; --sun:#ffcf73; --octo:#ff7d93;
   --up:95,211,191; --down:255,133,119;
-  --f-display:"Fredoka","Nunito","Trebuchet MS",system-ui,sans-serif;
-  --f-body:"Figtree","Segoe UI",system-ui,sans-serif;
-  --f-data:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --f-display:"Fredoka","Noto Color Emoji","Nunito","Trebuchet MS",system-ui,sans-serif;
+  --f-body:"Figtree","Noto Color Emoji","Segoe UI",system-ui,sans-serif;
+  --f-data:"IBM Plex Mono","Noto Color Emoji",ui-monospace,"SFMono-Regular",Menlo,monospace;
   --r:14px;
   color-scheme:dark;
 }
@@ -542,7 +544,7 @@ function drawCurve(c){
     <path d="${line} L ${X(c.length)} ${Y(y0)} L ${X(0)} ${Y(y0)} Z" fill="url(#ga)"/>
     <path d="${line}" fill="none" stroke="${col}" stroke-width="2.4" stroke-linejoin="round"/>
     <circle cx="${X(c.length)}" cy="${Y(last)}" r="5" fill="${col}" stroke="#061a24" stroke-width="2"/>
-    <text x="${W-P.r}" y="${H-6}" text-anchor="end" fill="#8db0b5" font-size="11" font-family="Figtree,sans-serif">${c.length} closed trades</text>`;
+    <text x="${W-P.r}" y="${H-6}" text-anchor="end" fill="#8db0b5" font-size="11" font-family="Figtree,Noto Color Emoji,sans-serif">${c.length} closed trades</text>`;
 }
 
 /* Hero bubbles (calm, still with reduced motion) */
