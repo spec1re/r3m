@@ -1,22 +1,22 @@
 <!doctype html>
-<html lang="de">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#061a24">
 <meta property="og:title" content="R3M Riff">
-<meta property="og:description" content="Morning Digest, Märkte, Termine und Signal-Bilanz an einem Ort.">
+<meta property="og:description" content="Morning digest, markets, calendar and signal report in one place.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M32 6c-12 0-20 9-20 20 0 7 3 11 6 14l-6 14c-1 2 1 4 3 3l8-8 2 10c0 2 3 2 3 0l4-10 4 10c0 2 3 2 3 0l2-10 8 8c2 1 4-1 3-3l-6-14c3-3 6-7 6-14 0-11-8-20-20-20z' fill='%23ff7d93'/%3E%3Ccircle cx='25' cy='25' r='4' fill='%23061a24'/%3E%3Ccircle cx='39' cy='25' r='4' fill='%23061a24'/%3E%3C/svg%3E">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>R3M Riff</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="R3M Riff – Morning Digest, Märkte, Termine und Signal-Bilanz an einem Ort.">
+<meta name="description" content="R3M Riff – morning digest, markets, calendar and signal report in one place.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: ein ruhiges Nacht-Aquarium – Kopfzeile mit Uhr und Börsen, Hero mit Stimmung und Maskottchen,
-   darunter Abschnitte wie Becken: Märkte · Charts · Einschätzung · Signale · Aktien · Termine · Archiv */
+/* Layout: a calm night aquarium – header with clock and exchanges, hero with mood and mascot,
+   below it sections like tanks: Markets · Outlook · Signals · Stocks · Calendar · Archive */
 :root{
   --abyss:#061a24; --deep:#0a2430; --reef:#0e2f3d; --line:#1a4556;
   --foam:#e6f3f0; --mist:#8db0b5; --glass:#5fd3bf; --coral:#ff8577; --sun:#ffcf73; --octo:#ff7d93;
@@ -38,7 +38,7 @@ a{color:var(--glass)}
 .num{font-family:var(--f-data);font-variant-numeric:tabular-nums}
 .up{color:rgb(var(--up))}.down{color:rgb(var(--down))}.flat{color:var(--mist)}
 
-/* Kopfzeile */
+/* Header */
 header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:rgba(6,26,36,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .bar{display:flex;align-items:center;gap:18px;padding-block:10px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:8px;font:600 20px var(--f-display);color:var(--foam);text-decoration:none;letter-spacing:.2px}
@@ -100,7 +100,7 @@ h2{font:600 28px var(--f-display);margin:0;letter-spacing:-.2px}
 .sh .sub{flex:1;min-width:200px}
 .wave{height:18px;background:radial-gradient(circle at 10px -4px,transparent 12px,var(--line) 13px,transparent 14px) 0 0/20px 18px repeat-x;opacity:.55}
 
-/* Kacheln */
+/* Tiles */
 .groups{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
 .group.fx4 .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
 .fut{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
@@ -130,7 +130,7 @@ h2{font:600 28px var(--f-display);margin:0;letter-spacing:-.2px}
 .charts img{display:block;width:100%;height:auto}
 .charts figcaption{padding:8px 14px;font-size:13px;color:var(--mist)}
 
-/* Einschätzung */
+/* Outlook */
 .outlook{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
 .oc{display:flex;flex-direction:column;padding:10px 12px 14px}
 .ch{all:unset;cursor:zoom-in;display:block;border-radius:10px;overflow:hidden;border:1px solid var(--line);margin-bottom:10px;aspect-ratio:16/9;background:var(--abyss)}
@@ -156,7 +156,7 @@ h2{font:600 28px var(--f-display);margin:0;letter-spacing:-.2px}
 .sc p{margin:0;display:flex;gap:8px;color:#d4e6e3}
 .sc b{flex:0 0 auto;font-weight:600}
 
-/* Signale */
+/* Signals */
 .sig{display:grid;grid-template-columns:1.1fr 1fr;gap:16px}
 .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
 .stat{background:var(--deep);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
@@ -175,7 +175,7 @@ td{padding:8px 12px;border-bottom:1px solid rgba(26,69,86,.55);white-space:nowra
 tr:last-child td{border-bottom:0}
 .res{font-weight:600}
 
-/* Aktien + Termine */
+/* Stocks + calendar */
 .stocks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 .chip{font:500 12.5px var(--f-data);padding:3px 9px;border-radius:999px;border:1px solid var(--line)}
@@ -188,7 +188,7 @@ tr:last-child td{border-bottom:0}
 .agenda li{font-size:14px;color:#d4e6e3}
 .agenda .day{font:600 18px var(--f-display);color:var(--foam)}
 
-/* Archiv */
+/* Archive */
 .arch{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:10px}
 .arch button{all:unset;cursor:pointer;display:block;background:var(--deep);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
 .arch button:hover,.arch button:focus-visible{border-color:var(--glass)}
@@ -237,7 +237,7 @@ pre.cl{white-space:pre-wrap;font:13px/1.55 var(--f-data);color:#cfe3e0;margin:6p
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important}}
 
-/* Entwurf: Reihenfolge testen */
+/* Section order panel */
 .order-btn{position:fixed;right:max(16px,calc(env(safe-area-inset-right,0px) + 16px));bottom:calc(env(safe-area-inset-bottom,0px) + 16px);z-index:8;
   font:600 14px var(--f-body);color:var(--abyss);background:var(--glass);border:0;border-radius:999px;padding:10px 16px;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.35)}
 .order{position:fixed;right:max(16px,calc(env(safe-area-inset-right,0px) + 16px));bottom:calc(env(safe-area-inset-bottom,0px) + 66px);z-index:8;width:min(300px,calc(100vw - 32px));
@@ -270,18 +270,18 @@ a.chip{text-decoration:none}
 <body>
 <header>
   <div class="wrap bar">
-    <a class="brand" href="#top" aria-label="R3M Riff, nach oben">
+    <a class="brand" href="#top" aria-label="R3M Riff, back to top">
       <svg viewBox="0 0 64 64" aria-hidden="true"><use href="#octo-mini"/></svg>R3M Riff</a>
-    <nav aria-label="Abschnitte">
-      <a href="#maerkte">Märkte</a><a href="#signale">Signale</a><a href="#termine">Termine</a><a href="#archiv">Archiv</a>
+    <nav aria-label="Sections">
+      <a href="#maerkte">Markets</a><a href="#signale">Signals</a><a href="#termine">Calendar</a><a href="#archiv">Archive</a>
     </nav>
     <div class="clock">
       <span class="time" id="clock">--:--</span>
-      <span class="pill" id="s-tokyo"><i></i>Tokio</span>
+      <span class="pill" id="s-tokyo"><i></i>Tokyo</span>
       <span class="pill" id="s-london"><i></i>London</span>
       <span class="pill" id="s-ny"><i></i>New York</span>
-      <button class="pill snd" id="snd-music" aria-pressed="false" title="Lo-fi-Musik an oder aus">♪ Lo-fi <span class="eq" aria-hidden="true"><b></b><b></b><b></b></span></button>
-      <button class="pill snd" id="snd-sfx" aria-pressed="false" title="Sound-Effekte an oder aus">🫧 SFX</button>
+      <button class="pill snd" id="snd-music" aria-pressed="false" title="Lo-fi music on or off">♪ Lo-fi <span class="eq" aria-hidden="true"><b></b><b></b><b></b></span></button>
+      <button class="pill snd" id="snd-sfx" aria-pressed="false" title="Sound effects on or off">🫧 SFX</button>
     </div>
   </div>
 </header>
@@ -301,12 +301,12 @@ a.chip{text-decoration:none}
     <div class="wrap hero-grid">
       <div>
         <div class="eyebrow" id="eyebrow">R3M Riff</div>
-        <h1 id="mood">Lädt das Riff …</h1>
+        <h1 id="mood">Loading the reef …</h1>
         <ul class="big" id="big"></ul>
       </div>
       <div class="mascot">
         <div class="speech" id="greet">gm ☕</div>
-        <svg class="octo" viewBox="0 0 220 220" role="img" aria-label="Riffi, das R3M-Oktopus-Maskottchen">
+        <svg class="octo" viewBox="0 0 220 220" role="img" aria-label="Riffi, the R3M octopus mascot">
           <ellipse cx="110" cy="206" rx="64" ry="8" fill="#0e2f3d"/>
           <g fill="#ff7d93">
             <path d="M110 22c-42 0-66 30-66 66 0 22 9 36 20 46-6 18-22 34-34 40-6 3-3 11 4 10 18-3 32-14 42-28 2 22-4 38-12 48-4 5 2 11 7 7 16-12 24-30 26-50 4 20 14 38 30 50 5 4 11-2 7-7-8-10-14-26-12-48 10 14 24 25 42 28 7 1 10-7 4-10-12-6-28-22-34-40 11-10 20-24 20-46 0-36-24-66-66-66z"/>
@@ -318,78 +318,79 @@ a.chip{text-decoration:none}
           <path d="M66 54c8-14 22-20 34-21" stroke="#ffb3c1" stroke-width="6" stroke-linecap="round" fill="none" opacity=".7"/>
         </svg>
       </div>
-      <div class="recent" id="recent-arch" aria-label="Letzte Berichte"><div class="eyebrow">Zuletzt</div></div>
+      <div class="recent" id="recent-arch" aria-label="Latest reports"><div class="eyebrow">Latest</div></div>
     </div>
     <div class="wrap hero-cards">
-      <div class="card"><h3>Nächster Termin</h3><div class="count" id="next">–</div><div class="sub" id="next-sub"></div></div>
-      <div class="card"><h3>Seegang · <a class="tv" href="https://de.tradingview.com/symbols/TVC-VIX/" target="_blank" rel="noopener" title="VIX auf TradingView">VIX</a></h3><div class="count num" id="vix">–</div>
+      <div class="card"><h3>Next event</h3><div class="count" id="next">–</div><div class="sub" id="next-sub"></div></div>
+      <div class="card"><h3>Sea state · <a class="tv" href="https://de.tradingview.com/symbols/TVC-VIX/" target="_blank" rel="noopener" title="VIX on TradingView">VIX</a></h3><div class="count num" id="vix">–</div>
         <div class="sea" id="sea"><span></span><span></span><span></span><span></span><span></span></div><div class="sub" id="vix-sub"></div></div>
-      <div class="card"><h3>Signale · 7 Tage</h3><div class="count num" id="sig-mini">–</div><div class="sub" id="sig-mini-sub"></div></div>
+      <div class="card"><h3>Signals · 7 days</h3><div class="count num" id="sig-mini">–</div><div class="sub" id="sig-mini-sub"></div></div>
       <div class="card"><h3 id="tf-h">Top &amp; Flop</h3><div class="tf" id="topflop">–</div></div>
-      <div class="card notice" id="notice-card" hidden><h3>Hinweis</h3><div class="count" id="notice"></div></div>
+      <div class="card notice" id="notice-card" hidden><h3>Notice</h3><div class="count" id="notice"></div></div>
     </div>
   </div>
   <div class="wave" aria-hidden="true"></div>
 
   <section id="maerkte"><div class="wrap">
-    <div class="sh"><h2>Märkte</h2><span class="sub" id="m-sub">Custom Pepper · Pepperstone-CFDs</span></div>
+    <div class="sh"><h2>Markets</h2><span class="sub" id="m-sub">Custom Pepper · Pepperstone CFDs</span></div>
     <div class="groups" id="groups"></div>
   </div></section>
 
   <section id="einschaetzung"><div class="wrap">
-    <div class="sh"><h2>Einschätzung</h2><span class="sub">Chart (1h) · Levels · Szenarien – keine Empfehlungen</span></div>
+    <div class="sh"><h2>Outlook</h2><span class="sub">Chart (1h) · levels · scenarios – no recommendations</span></div>
     <div class="outlook" id="outlook"></div>
   </div></section>
 
   <section id="signale"><div class="wrap">
-    <div class="sh"><h2>Signale</h2><span class="sub" id="s-sub">Alert-Log der letzten 7 Tage · bestes Ziel je Trade · R bei Ausstieg komplett an TP1</span></div>
+    <div class="sh"><h2>Signals</h2><span class="sub" id="s-sub">Alert log of the last 7 days · best target per trade · R = full exit at TP1</span></div>
     <div class="sig">
       <div>
         <div class="stats" id="stats"></div>
-        <div class="curve"><h3 class="eyebrow" style="margin:0 0 6px">R-Kurve</h3><svg id="curve" viewBox="0 0 560 200" role="img" aria-label="Kumulierte R über die abgeschlossenen Trades"></svg>
+        <div class="curve"><h3 class="eyebrow" style="margin:0 0 6px">R curve</h3><svg id="curve" viewBox="0 0 560 200" role="img" aria-label="Cumulative R over closed trades"></svg>
           <div class="bars" id="byscript"></div></div>
       </div>
-      <div class="feed"><table><thead><tr><th>Zeit</th><th>Symbol</th><th>Skript</th><th>Setup</th><th>TP1</th><th>Ergebnis</th></tr></thead><tbody id="recent"></tbody></table></div>
+      <div class="feed"><table><thead><tr><th>Time</th><th>Symbol</th><th>Script</th><th>Setup</th><th>TP1</th><th>Result</th></tr></thead><tbody id="recent"></tbody></table></div>
     </div>
   </div></section>
 
   <section id="aktien"><div class="wrap">
-    <div class="sh"><h2>Aktien</h2><span class="sub">Auffälligste Werte deiner drei Listen</span></div>
+    <div class="sh"><h2>Stocks</h2><span class="sub">Standouts from your three lists</span></div>
     <div class="stocks" id="stocks"></div>
   </div></section>
 
   <section id="termine"><div class="wrap">
-    <div class="sh"><h2>Termine</h2><span class="sub">Berliner Zeit · die Gruppe wird ~10–40 Min vorher gewarnt</span></div>
+    <div class="sh"><h2>Calendar</h2><span class="sub">Berlin time · the group gets a heads-up ~10–40 min before</span></div>
     <div class="agenda" id="agenda"></div>
   </div></section>
 
   <section id="archiv"><div class="wrap">
-    <div class="sh"><h2>Archiv</h2><span class="sub">Alle Digests, Rückblicke und Recaps</span></div>
+    <div class="sh"><h2>Archive</h2><span class="sub">All digests, reviews and recaps</span></div>
     <div class="arch" id="arch"></div>
   </div></section>
 </main>
 
 <footer><div class="wrap foot">
-  <div><strong style="color:var(--foam)">R3M Riff</strong><br>Fakten und Levels zum Beobachten. Keine Anlageberatung.<br>
-    Daten: TradingView · aktualisiert <span class="num" id="gen">–</span></div>
-  <div><strong style="color:var(--foam)">Letzter Changelog</strong> <span class="num" id="cl-date"></span><pre class="cl" id="cl">–</pre></div>
+  <div><strong style="color:var(--foam)">R3M Riff</strong><br>Facts and levels to watch. Not financial advice.<br>
+    Data: TradingView · updated <span class="num" id="gen">–</span></div>
+  <div><strong style="color:var(--foam)">Latest changelog</strong> <span class="num" id="cl-date"></span><pre class="cl" id="cl">–</pre></div>
 </div></footer>
 
 
-<button class="order-btn" id="order-btn" aria-expanded="false" aria-controls="order">↕ Reihenfolge</button>
-<div class="order" id="order" hidden><strong>Abschnitte sortieren</strong><div class="sub">Deine Reihenfolge wird in diesem Browser gemerkt.</div><ol id="order-list"></ol><button class="r" id="order-reset">Standard wiederherstellen</button></div>
-<dialog id="dlg" aria-labelledby="dlg-t"><div class="dlg-h"><strong id="dlg-t"></strong><button class="x" id="dlg-x" aria-label="Schließen">×</button></div><div class="dlg-b" id="dlg-b"></div></dialog>
+<button class="order-btn" id="order-btn" aria-expanded="false" aria-controls="order">↕ Order</button>
+<div class="order" id="order" hidden><strong>Sort sections</strong><div class="sub">Your order is remembered in this browser.</div><ol id="order-list"></ol><button class="r" id="order-reset">Restore default</button></div>
+<dialog id="dlg" aria-labelledby="dlg-t"><div class="dlg-h"><strong id="dlg-t"></strong><button class="x" id="dlg-x" aria-label="Close">×</button></div><div class="dlg-b" id="dlg-b"></div></dialog>
 
 <script>
 (() => {
-const BER = "Europe/Berlin", de = "de-DE";
+const BER = "Europe/Berlin", de = "en-GB";
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const dec = v => Math.abs(v) >= 1000 ? 1 : Math.abs(v) >= 10 ? 2 : 4;
 const fmt = (v, d) => v == null ? "–" : new Intl.NumberFormat(de, {minimumFractionDigits: d ?? dec(v), maximumFractionDigits: d ?? dec(v)}).format(v);
-const pct = v => (v > 0 ? "+" : v < 0 ? "−" : "±") + fmt(Math.abs(v), 1) + " %";
+const pct = v => (v > 0 ? "+" : v < 0 ? "−" : "±") + fmt(Math.abs(v), 1) + "%";
+const dshort = (iso, y) => new Intl.DateTimeFormat(de, {weekday: y ? undefined : "short", day: "numeric", month: "short", year: y ? "numeric" : undefined}).format(new Date(iso + "T12:00:00"));
 const cls = v => v > 0.05 ? "up" : v < -0.05 ? "down" : "flat";
-/* TradingView-Infoseiten: genaue Börse je Symbol */
+/* TradingView symbol pages: exact exchange per symbol */
 const TVX = {FDAX:"EUREX:FDAX1!",FESX:"EUREX:FESX1!",ES:"CME_MINI:ES1!",NQ:"CME_MINI:NQ1!",YM:"CBOT_MINI:YM1!",RTY:"CME_MINI:RTY1!",
   "6E":"CME:6E1!","6J":"CME:6J1!",DX:"ICEUS:DX1!",GC:"COMEX:GC1!",SI:"COMEX:SI1!",CL:"NYMEX:CL1!",
   DAX:"XETR:DAX",SPX:"SP:SPX",NDX:"NASDAQ:NDX",VIX:"TVC:VIX",LLY:"NYSE:LLY","BRK.B":"NYSE:BRK.B"};
@@ -401,66 +402,66 @@ const linkTickers = html => html.replace(/\b([A-Z][A-Z0-9]{1,4}(?:\.B)?)\b/g, (m
 const LISTX = {"DAX Top 12":"XETR","S&P 500 Top 12":"NASDAQ","Nasdaq 100 Next 12":"NASDAQ"};
 const tvUrl = full => full ? "https://de.tradingview.com/symbols/" + encodeURIComponent(full.replace(":", "-")).replace(/%21/g, "!") + "/" : null;
 const tvOf = (sym, ex) => sym.includes(":") ? sym : TVX[sym] || (ex ? ex + ":" + sym : "PEPPERSTONE:" + sym);
-const tv = (sym, text, ex, cls) => `<a class="tv${cls ? " " + cls : ""}" href="${tvUrl(tvOf(sym, ex))}" target="_blank" rel="noopener" title="${esc(sym)} auf TradingView">${text ?? esc(sym)}</a>`;
+const tv = (sym, text, ex, cls) => `<a class="tv${cls ? " " + cls : ""}" href="${tvUrl(tvOf(sym, ex))}" target="_blank" rel="noopener" title="${esc(sym)} on TradingView">${text ?? esc(sym)}</a>`;
 const heat = (el, v, span) => { el.style.setProperty("--h", Math.min(Math.abs(v) / span, 1).toFixed(2)); el.style.setProperty("--rgb", v >= 0 ? "var(--up)" : "var(--down)"); };
 
-/* Uhr + Börsen (Ortszeiten der Börsen, Sommer-/Winterzeit automatisch) */
+/* Clock + exchanges (local exchange hours, DST handled automatically) */
 const sess = [["s-tokyo","Asia/Tokyo",9*60,15*60],["s-london","Europe/London",8*60,16*60+30],["s-ny","America/New_York",9*60+30,16*60]];
 function localMin(tz, d){ const p = new Intl.DateTimeFormat("en-GB",{timeZone:tz,hour:"2-digit",minute:"2-digit",weekday:"short",hourCycle:"h23"}).formatToParts(d);
   const g = t => p.find(x => x.type === t).value; return {m: +g("hour")*60 + +g("minute"), wd: g("weekday")}; }
 function tick(){ const d = new Date();
   $("clock").textContent = new Intl.DateTimeFormat(de,{timeZone:BER,hour:"2-digit",minute:"2-digit"}).format(d) + " Berlin";
   for (const [id,tz,a,b] of sess){ const {m,wd} = localMin(tz,d); const open = !["Sat","Sun"].includes(wd) && m >= a && m < b;
-    const el = $(id); el.classList.toggle("open", open); el.title = open ? "geöffnet" : "geschlossen"; }
+    const el = $(id); el.classList.toggle("open", open); el.title = open ? "open" : "closed"; }
   countdown(); }
 
 let EVENTS = [];
 function countdown(){ const now = Date.now(); const next = EVENTS.find(e => Date.parse(e.utc) > now - 5*60e3);
   if (!next) return; const ms = Date.parse(next.utc) - now;
   const h = Math.floor(ms/36e5), m = Math.max(0, Math.round((ms % 36e5)/6e4));
-  $("next").textContent = ms <= 0 ? "jetzt" : h >= 24 ? `in ${Math.floor(h/24)} T ${h%24} h` : h ? `in ${h} h ${m} min` : `in ${m} min`;
+  $("next").textContent = ms <= 0 ? "now" : h >= 24 ? `in ${Math.floor(h/24)} d ${h%24} h` : h ? `in ${h} h ${m} min` : `in ${m} min`;
   const t = new Intl.DateTimeFormat(de,{timeZone:BER,weekday:"short",hour:"2-digit",minute:"2-digit"}).format(new Date(next.utc));
   $("next-sub").innerHTML = `${t} · ${next.flag ?? ""} ` + (next.tv ? `<a class="tv" href="${tvUrl(next.tv)}" target="_blank" rel="noopener">${esc(next.title)}</a>` : esc(next.title)); }
 
 function greet(){ const h = +new Intl.DateTimeFormat("en-GB",{timeZone:BER,hour:"2-digit",hourCycle:"h23"}).format(new Date());
-  return h < 11 ? "gm! ☕" : h < 17 ? "Guten Tag 🫧" : h < 22 ? "Guten Abend 🌙" : "Gute Nacht 🌊"; }
+  return h < 11 ? "gm! ☕" : h < 17 ? "Good afternoon 🫧" : h < 22 ? "Good evening 🌙" : "Good night 🌊"; }
 
 function render(D){
   const M = D.market || {};
   $("greet").textContent = greet();
   const dt = M.date ? new Intl.DateTimeFormat(de,{weekday:"long",day:"numeric",month:"long"}).format(new Date(M.date+"T12:00:00")) : "";
   $("eyebrow").textContent = [dt, M.title].filter(Boolean).join(" · ");
-  $("mood").innerHTML = M.mood ? esc(M.mood).replace(/,\s*/, ",<br><em>") + "</em>" : "Heute noch kein Digest";
+  $("mood").innerHTML = M.mood ? esc(M.mood).replace(/,\s*/, ",<br><em>") + "</em>" : "No digest yet today";
   $("big").innerHTML = (M.bigPicture || []).map(t => `<li>${esc(t)}</li>`).join("");
-  $("m-sub").textContent = `Custom Pepper · Pepperstone-CFDs · ${M.chgLabel || "Tag"} · Stand ${M.asof || "–"}`;
+  $("m-sub").textContent = `Custom Pepper · Pepperstone CFDs · ${M.chgLabel || "Day"} · as of ${M.asof || "–"}`;
 
-  /* VIX als Seegang */
+  /* VIX as sea state */
   const vix = (M.indices || []).find(i => i.sym === "VIX");
   if (vix){ $("vix").innerHTML = `${fmt(vix.price,2)} <span class="${cls(vix.chg)}" style="font-size:15px">${pct(vix.chg)}</span>`;
     const lvl = vix.price < 13 ? 1 : vix.price < 17 ? 2 : vix.price < 22 ? 3 : vix.price < 30 ? 4 : 5;
     [...$("sea").children].forEach((s,i) => { s.className = i < lvl ? "on" + (lvl >= 5 ? " s" : lvl >= 4 ? " w" : "") : ""; });
-    $("vix-sub").textContent = ["","Spiegelglatt","Ruhige See","Leichte Dünung · größere Ranges","Seegang · Stopps weiter","Sturm · Vorsicht"][lvl]; }
+    $("vix-sub").textContent = ["","Glassy","Calm sea","Light swell · wider ranges","Rough sea · wider stops","Storm · take care"][lvl]; }
   if (M.notice){ $("notice").textContent = M.notice; $("notice-card").hidden = false; }
 
-  /* Termine: echte Events, sonst Agenda */
+  /* Calendar: real events, else agenda */
   EVENTS = (D.events || []).map(e => ({...e, flag: ({US:"🇺🇸",DE:"🇩🇪",EU:"🇪🇺",GB:"🇬🇧",JP:"🇯🇵",CH:"🇨🇭"})[e.country]}));
   if (!EVENTS.length && M.agenda?.length){ const a = M.agenda[0], i0 = a.items[0]; $("next").textContent = a.day;
     $("next-sub").innerHTML = typeof i0 === "string" ? esc(i0) : (i0.tv ? `<a class="tv" href="${tvUrl(i0.tv)}" target="_blank" rel="noopener">${esc(i0.text)}</a>` : esc(i0.text)); }
 
-  /* Kacheln */
+  /* Tiles */
   const groups = {}; (M.pepper || []).forEach(p => (groups[p.group] ||= []).push(p));
-  const span = (M.chgLabel === "Woche") ? 6 : 2.5;
+  const span = (M.chgLabel === "Week" || M.chgLabel === "Woche") ? 6 : 2.5;
   $("groups").innerHTML = Object.entries(groups).map(([g, list]) => `<div class="group"><h4>${esc(g)}</h4><div class="tiles">${list.map(p => {
     const pos = p.hi > p.lo ? Math.min(Math.max((p.price - p.lo) / (p.hi - p.lo), 0), 1) * 100 : 50;
     return `<article class="tile" data-chg="${p.chg}"><div class="top"><span class="sym">${tv(p.sym)}</span><span class="chg ${cls(p.chg)}">${pct(p.chg)}</span></div>
-      <div class="price num">${fmt(p.price)}</div><div class="range" title="Position zwischen Tief und Hoch"><b style="left:${pos.toFixed(1)}%"></b></div>
+      <div class="price num">${fmt(p.price)}</div><div class="range" title="Position between low and high"><b style="left:${pos.toFixed(1)}%"></b></div>
       <div class="rl"><span>${fmt(p.lo)}</span><span>${fmt(p.hi)}</span></div>${p.note ? `<div class="note">${esc(p.note)}</div>` : ""}</article>`; }).join("")}</div></div>`).join("");
   const pp = (M.pepper || []).slice().sort((a,b) => b.chg - a.chg);
-  if (pp.length){ $("tf-h").textContent = `Top & Flop · ${M.chgLabel || "Tag"}`;
+  if (pp.length){ $("tf-h").textContent = `Top & Flop · ${M.chgLabel || "Day"}`;
     $("topflop").innerHTML = [["🚀", pp[0]], ["🪨", pp[pp.length-1]]].map(([e,p]) => `<div><span class="sym">${e} ${tv(p.sym)}</span><span class="num ${cls(p.chg)}">${pct(p.chg)}</span></div>`).join("")
-      + `<div class="sub">aus ${pp.length} Custom-Pepper-Werten</div>`; }
+      + `<div class="sub">out of ${pp.length} Custom Pepper symbols</div>`; }
   const idx = (M.indices || []).filter(i => i.sym !== "VIX");
-  $("groups").insertAdjacentHTML("beforeend", `<div class="group fx4"><h4>Futures · Kassa</h4>
+  $("groups").insertAdjacentHTML("beforeend", `<div class="group fx4"><h4>Futures · Cash</h4>
     <div class="fut">${(M.futures || []).map(f => `<span class="fp" data-chg="${f.chg}"><span>${tv(f.sym)}</span><b class="${cls(f.chg)}">${pct(f.chg)}</b></span>`).join("")}</div>
     <div class="tiles" style="margin-top:10px">${idx.map(i => `<article class="tile" data-chg="${i.chg}"><div class="top"><span class="sym">${tv(i.sym)}</span><span class="chg ${cls(i.chg)}">${pct(i.chg)}</span></div>
       <div class="price num">${fmt(i.price,1)}</div><div class="rl"><span>RSI ${i.rsi ?? "–"}</span><span>SMA50 ${fmt(i.sma50,0)} ${i.price < i.sma50 ? "↓" : "↑"}</span></div></article>`).join("")}</div></div>`);
@@ -472,47 +473,47 @@ function render(D){
   $("outlook").innerHTML = (M.outlook || []).map(o => { const px = priceOf(o.sym);
     const lv = (o.levels || []).slice().sort((a,b) => b.value - a.value).map(l => { const d = px ? (l.value - px) / px * 100 : null;
       const c = d == null ? "" : d > 0.02 ? "res" : d < -0.02 ? "sup" : "now";
-      return `<span class="${c}" title="${c === "res" ? "über dem Kurs" : c === "sup" ? "unter dem Kurs" : "am Kurs"}">${esc(l.name)} ${fmt(l.value)}${d == null ? "" : ` · ${d > 0 ? "+" : d < 0 ? "−" : ""}${fmt(Math.abs(d),1)} %`}</span>`; }).join("");
+      return `<span class="${c}" title="${c === "res" ? "above price" : c === "sup" ? "below price" : "at price"}">${esc(l.name)} ${fmt(l.value)}${d == null ? "" : ` · ${d > 0 ? "+" : d < 0 ? "−" : ""}${fmt(Math.abs(d),1)}%`}</span>`; }).join("");
     const body = (o.up || o.down) ? `<div class="sc">${o.up ? `<p><b class="up">▲</b><span>${esc(o.up)}</span></p>` : ""}${o.down ? `<p><b class="down">▼</b><span>${esc(o.down)}</span></p>` : ""}</div>` : `<p>${esc(o.text)}</p>`;
     const ch = chartBy[o.sym];
-    const pic = ch ? `<button class="ch" data-src="${esc(ch.src)}" data-t="${esc(o.sym)} · 1h · Stand ${esc(ch.date.split("-").reverse().join("."))}" aria-label="${esc(o.sym)}-Chart vergrößern"><img src="${esc(ch.src)}" alt="${esc(o.sym)} 1h-Chart mit Levels" loading="lazy"></button>`
-      : `<div class="ch none">Chart kommt Mo–Fr mit dem Morning Digest</div>`;
+    const pic = ch ? `<button class="ch" data-src="${esc(ch.src)}" data-t="${esc(o.sym)} · 1h · as of ${dshort(ch.date)}" aria-label="Enlarge ${esc(o.sym)} chart"><img src="${esc(ch.src)}" alt="${esc(o.sym)} 1h chart with levels" loading="lazy"></button>`
+      : `<div class="ch none">Chart arrives Mon–Fri with the morning digest</div>`;
     return `<div class="card oc">${pic}<div class="ob"><span class="sym">${tv(o.sym)}</span>${px ? ` <span class="sub num">${fmt(px)}</span>` : ""}${lv ? `<div class="lv">${lv}</div>` : ""}${body}</div></div>`; }).join("");
 
-  /* Signale */
+  /* Signals */
   const S = D.signals || {}, T = S.total || {};
-  const q = (a,b) => b ? Math.round(100*a/b) + " %" : "–";
-  $("stats").innerHTML = [["Signale", T.n ?? 0, ""], ["TP1-Quote", q(T.tp1, T.done), "up"], ["Stopp-Quote", q(T.sl, T.done), "down"],
+  const q = (a,b) => b ? Math.round(100*a/b) + "%" : "–";
+  $("stats").innerHTML = [["Signals", T.n ?? 0, ""], ["TP1 rate", q(T.tp1, T.done), "up"], ["Stop rate", q(T.sl, T.done), "down"],
     ["Σ R", (T.r > 0 ? "+" : "") + fmt(T.r ?? 0, 1), T.r >= 0 ? "up" : "down"]].map(([k,v,c]) => `<div class="stat"><div class="v num ${c}">${v}</div><div class="k">${k}</div></div>`).join("");
   drawCurve(S.curve || []);
   $("sig-mini").innerHTML = T.done ? `<span class="${T.r >= 0 ? "up" : "down"}">${T.r > 0 ? "+" : ""}${fmt(T.r,1)} R</span>` : "–";
-  $("sig-mini-sub").textContent = T.n ? `${T.n} Signale · TP1 ${q(T.tp1, T.done)} · Stopp ${q(T.sl, T.done)}` : "Noch keine Signale";
+  $("sig-mini-sub").textContent = T.n ? `${T.n} signals · TP1 ${q(T.tp1, T.done)} · SL ${q(T.sl, T.done)}` : "No signals yet";
   const maxN = Math.max(1, ...(S.byScript || []).map(s => s.n));
   $("byscript").innerHTML = (S.byScript || []).map(s => `<div class="brow"><span><b>${esc(s.name)}</b> <span class="sub num">${s.n}</span></span>
-    <div class="btrack" title="TP1 · Stopp · offen"><i style="width:${100*s.tp1/maxN}%;background:rgb(var(--up))"></i><i style="width:${100*s.sl/maxN}%;background:rgb(var(--down))"></i><i style="width:${100*s.open/maxN}%;background:var(--mist);opacity:.5"></i></div>
-    <span class="num ${s.r >= 0 ? "up" : "down"}" style="text-align:right">${s.done ? (s.r > 0 ? "+" : "") + fmt(s.r,1) + " R" : "offen"}</span></div>`).join("");
-  const resI = {"TP2 Hit":"🏆 TP2","TP1 Hit":"✅ TP1","Stopped":"🛑 Stopp","offen":"⏳ offen"};
+    <div class="btrack" title="TP1 · SL · open"><i style="width:${100*s.tp1/maxN}%;background:rgb(var(--up))"></i><i style="width:${100*s.sl/maxN}%;background:rgb(var(--down))"></i><i style="width:${100*s.open/maxN}%;background:var(--mist);opacity:.5"></i></div>
+    <span class="num ${s.r >= 0 ? "up" : "down"}" style="text-align:right">${s.done ? (s.r > 0 ? "+" : "") + fmt(s.r,1) + " R" : "open"}</span></div>`).join("");
+  const resI = {"TP2 Hit":"🏆 TP2","TP1 Hit":"✅ TP1","Stopped":"🛑 SL","open":"⏳ open","offen":"⏳ open"};
   $("recent").innerHTML = (S.recent || []).map(r => `<tr><td class="num">${new Intl.DateTimeFormat(de,{timeZone:BER,weekday:"short",hour:"2-digit",minute:"2-digit"}).format(new Date(r.t))}</td>
     <td><b>${tv(r.tv || r.sym, esc(r.sym))}</b> <span class="${r.side === "LONG" ? "up" : "down"}">${r.side === "LONG" ? "▲" : "▼"}</span></td><td>${esc(r.script)}</td><td class="sub">${esc(r.setup)}</td>
-    <td class="num">${fmt(r.r1,1)} R</td><td class="res ${r.res === "Stopped" ? "down" : r.res === "offen" ? "flat" : "up"}">${resI[r.res] || esc(r.res)}</td></tr>`).join("")
-    || `<tr><td colspan="6" class="sub">Noch keine Signale gesammelt.</td></tr>`;
+    <td class="num">${fmt(r.r1,1)} R</td><td class="res ${r.res === "Stopped" ? "down" : (r.res === "open" || r.res === "offen") ? "flat" : "up"}">${resI[r.res] || esc(r.res)}</td></tr>`).join("")
+    || `<tr><td colspan="6" class="sub">No signals collected yet.</td></tr>`;
 
-  /* Aktien, Termine */
+  /* Stocks, calendar */
   $("stocks").innerHTML = (M.stocks || []).map(s => `<div class="card"><h3>${esc(s.flag)} ${esc(s.list)}</h3>
     <div class="chips">${[["strong","s",""],["weak","w",""],["hot","h","🔥 "],["cold","c","🧊 "]].map(([k,c,e]) => (s[k]||[]).map(x => { const t = x.split(" ")[0];
-      return `<a class="chip ${c}" href="${tvUrl(tvOf(t, LISTX[s.list]))}" target="_blank" rel="noopener" title="${esc(t)} auf TradingView">${e}${esc(x)}</a>`; }).join("")).join("")}</div></div>`).join("");
+      return `<a class="chip ${c}" href="${tvUrl(tvOf(t, LISTX[s.list]))}" target="_blank" rel="noopener" title="${esc(t)} on TradingView">${e}${esc(x)}</a>`; }).join("")).join("")}</div></div>`).join("");
   const CAL = "https://de.tradingview.com/economic-calendar/";
   const item = i => { const t = typeof i === "string" ? i : i.text, x = typeof i === "string" ? null : i.tv;
-    if (x) return `<a class="tv" href="${tvUrl(x)}" target="_blank" rel="noopener" title="Indikator auf TradingView">${esc(t)}</a>`;
+    if (x) return `<a class="tv" href="${tvUrl(x)}" target="_blank" rel="noopener" title="Indicator on TradingView">${esc(t)}</a>`;
     const h = linkTickers(esc(t));
-    return h !== esc(t) || !/[\u{1F1E6}-\u{1F1FF}]/u.test(t) ? h : `<a class="tv" href="${CAL}" target="_blank" rel="noopener" title="Wirtschaftskalender auf TradingView">${h}</a>`; };
+    return h !== esc(t) || !/[\u{1F1E6}-\u{1F1FF}]/u.test(t) ? h : `<a class="tv" href="${CAL}" target="_blank" rel="noopener" title="Economic calendar on TradingView">${h}</a>`; };
   $("agenda").innerHTML = (M.agenda || []).map(a => `<div class="card"><div class="day">${esc(a.day)}</div><ul>${a.items.map(i => `<li>${item(i)}</li>`).join("")}</ul></div>`).join("");
 
-  /* Archiv */
-  const kinds = {morning:"☕ Morning", abend:"🌙 US-Close", rueckblick:"🔁 Rückblick", ausblick:"🔭 Ausblick", bilanz:"📊 Bilanz", gap:"🌙 Gap-Check", mittag:"🕛 Halbzeit"};
-  $("arch").innerHTML = (D.digests || []).map((d,i) => `<button data-i="${i}"><div class="d">${d.date.split("-").reverse().join(".")} · ${kinds[d.kind] || ""}</div><div class="t">${esc(d.title.replace(/^\S+\s*R3M\s*/, ""))}</div></button>`).join("");
-  const card = (d,i) => `<button data-i="${i}"><div class="d">${d.date.split("-").reverse().join(".")} · ${kinds[d.kind] || ""}</div><div class="t">${esc(d.title.replace(/^\S+\s*R3M\s*/, ""))}</div></button>`;
-  $("recent-arch").insertAdjacentHTML("beforeend", (D.digests || []).slice(0,3).map(card).join("") + `<a class="more" href="#archiv">Ganzes Archiv →</a>`);
+  /* Archive */
+  const kinds = {morning:"☕ Morning", abend:"🌙 US Close", rueckblick:"🔁 Weekly Review", ausblick:"🔭 Weekly Outlook", bilanz:"📊 Signal Report", gap:"🌙 Gap Check", mittag:"🕛 Midday"};
+  $("arch").innerHTML = (D.digests || []).map((d,i) => `<button data-i="${i}"><div class="d">${dshort(d.date)} · ${kinds[d.kind] || ""}</div><div class="t">${esc(d.title.replace(/^\S+\s*R3M\s*/, ""))}</div></button>`).join("");
+  const card = (d,i) => `<button data-i="${i}"><div class="d">${dshort(d.date)} · ${kinds[d.kind] || ""}</div><div class="t">${esc(d.title.replace(/^\S+\s*R3M\s*/, ""))}</div></button>`;
+  $("recent-arch").insertAdjacentHTML("beforeend", (D.digests || []).slice(0,3).map(card).join("") + `<a class="more" href="#archiv">Full archive →</a>`);
   const open = e => { const b = e.target.closest("button[data-i]"); if (!b) return; const d = D.digests[+b.dataset.i];
     $("dlg-t").textContent = d.title; $("dlg-b").innerHTML = d.html; $("dlg").showModal(); };
   $("arch").onclick = open; $("recent-arch").onclick = open;
@@ -522,13 +523,13 @@ function render(D){
   $("dlg").onclick = e => { if (e.target === $("dlg")) $("dlg").close(); };
 
   $("gen").textContent = new Intl.DateTimeFormat(de,{timeZone:BER,dateStyle:"short",timeStyle:"short"}).format(new Date(D.generated));
-  if (D.changelog){ $("cl").textContent = D.changelog.text; $("cl-date").textContent = D.changelog.date.split("-").reverse().join("."); }
+  if (D.changelog){ $("cl").textContent = D.changelog.text; $("cl-date").textContent = dshort(D.changelog.date, true); }
   tick();
 }
 
 function drawCurve(c){
   const svg = $("curve"), W = 560, H = 200, P = {l:40, r:12, t:12, b:24};
-  if (!c.length){ svg.innerHTML = `<text x="${W/2}" y="${H/2}" text-anchor="middle" fill="#8db0b5" font-size="14">Noch keine abgeschlossenen Trades</text>`; return; }
+  if (!c.length){ svg.innerHTML = `<text x="${W/2}" y="${H/2}" text-anchor="middle" fill="#8db0b5" font-size="14">No closed trades yet</text>`; return; }
   const ys = [0, ...c.map(p => p.r)], lo = Math.min(...ys), hi = Math.max(...ys), pad = (hi - lo || 1) * .12;
   const y0 = lo - pad, y1 = hi + pad, X = i => P.l + (W - P.l - P.r) * (i / c.length), Y = v => P.t + (H - P.t - P.b) * (1 - (v - y0) / (y1 - y0));
   const pts = [[X(0), Y(0)], ...c.map((p,i) => [X(i+1), Y(p.r)])];
@@ -541,10 +542,10 @@ function drawCurve(c){
     <path d="${line} L ${X(c.length)} ${Y(y0)} L ${X(0)} ${Y(y0)} Z" fill="url(#ga)"/>
     <path d="${line}" fill="none" stroke="${col}" stroke-width="2.4" stroke-linejoin="round"/>
     <circle cx="${X(c.length)}" cy="${Y(last)}" r="5" fill="${col}" stroke="#061a24" stroke-width="2"/>
-    <text x="${W-P.r}" y="${H-6}" text-anchor="end" fill="#8db0b5" font-size="11" font-family="Figtree,sans-serif">${c.length} abgeschlossene Trades</text>`;
+    <text x="${W-P.r}" y="${H-6}" text-anchor="end" fill="#8db0b5" font-size="11" font-family="Figtree,sans-serif">${c.length} closed trades</text>`;
 }
 
-/* Blasen im Hero (ruhig, ohne bei reduzierter Bewegung) */
+/* Hero bubbles (calm, still with reduced motion) */
 function bubbles(){
   const cv = $("bubbles"), ctx = cv.getContext("2d"); if (!ctx) return;
   const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -561,14 +562,14 @@ function bubbles(){
   draw();
 }
 
-/* Entwurf: Abschnitte umsortieren */
+/* Reorder sections */
 function orderTool(){
-  const main = document.querySelector("main"), names = {einschaetzung:"Einschätzung",termine:"Termine",maerkte:"Märkte",aktien:"Aktien",signale:"Signale",archiv:"Archiv"};
+  const main = document.querySelector("main"), names = {einschaetzung:"Outlook",termine:"Calendar",maerkte:"Markets",aktien:"Stocks",signale:"Signals",archiv:"Archive"};
   const def = Object.keys(names); let cur = def;
   try { const v = JSON.parse(localStorage.getItem("r3m-order") || "null"); if (Array.isArray(v) && v.length === def.length && def.every(k => v.includes(k))) cur = v; } catch {}
   const apply = () => { cur.forEach(id => main.appendChild($(id)));
     const nav = document.querySelector("nav"); nav.innerHTML = cur.filter(id => names[id]).map(id => `<a href="#${id}">${names[id]}</a>`).join("");
-    $("order-list").innerHTML = cur.map((id,i) => `<li><span>${i+1}. ${names[id]}</span><button class="m" data-i="${i}" data-d="-1" aria-label="${names[id]} nach oben" ${i ? "" : "disabled"}>↑</button><button class="m" data-i="${i}" data-d="1" aria-label="${names[id]} nach unten" ${i < cur.length-1 ? "" : "disabled"}>↓</button></li>`).join("");
+    $("order-list").innerHTML = cur.map((id,i) => `<li><span>${i+1}. ${names[id]}</span><button class="m" data-i="${i}" data-d="-1" aria-label="Move ${names[id]} up" ${i ? "" : "disabled"}>↑</button><button class="m" data-i="${i}" data-d="1" aria-label="Move ${names[id]} down" ${i < cur.length-1 ? "" : "disabled"}>↓</button></li>`).join("");
     try { localStorage.setItem("r3m-order", JSON.stringify(cur)); } catch {} };
   $("order-list").onclick = e => { const b = e.target.closest("button"); if (!b) return; const i = +b.dataset.i, j = i + +b.dataset.d;
     cur = cur.slice(); [cur[i], cur[j]] = [cur[j], cur[i]]; apply(); const nb = $("order-list").querySelectorAll("button")[j*2 + (+b.dataset.d > 0 ? 1 : 0)]; nb?.focus(); };
@@ -576,7 +577,7 @@ function orderTool(){
   $("order-btn").onclick = () => { const o = $("order"); o.hidden = !o.hidden; $("order-btn").setAttribute("aria-expanded", String(!o.hidden)); };
   apply();
 }
-/* Sound: Lo-fi und Blubb-Effekte, im Browser erzeugt (Web Audio), startet nur auf Klick */
+/* Sound: lo-fi and blub effects, generated in the browser (Web Audio), starts on click only */
 const Sound = (() => {
   let ctx, master, music, pad, wobble, timer, step = 0, nextT = 0, musicOn = false, sfxOn = false;
   const BPM = 72, S16 = 60 / BPM / 4;
@@ -591,8 +592,8 @@ const Sound = (() => {
     music = ctx.createGain(); music.gain.value = 0;
     const lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 1800; lp.Q.value = .3;
     music.connect(lp); lp.connect(master);
-    pad = ctx.createGain(); pad.gain.value = 1; pad.connect(music);          // Akkord-Bus (atmet mit der Kick)
-    wobble = ctx.createGain(); wobble.gain.value = 5;                        // Band-Leiern ±5 Cent
+    pad = ctx.createGain(); pad.gain.value = 1; pad.connect(music);          // chord bus (breathes with the kick)
+    wobble = ctx.createGain(); wobble.gain.value = 5;                        // tape wobble ±5 cents
     const lfo = ctx.createOscillator(); lfo.frequency.value = .25; lfo.connect(wobble); lfo.start();
     return true;
   }
@@ -601,7 +602,7 @@ const Sound = (() => {
     const o = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain(), g2 = ctx.createGain(), trem = ctx.createGain(), tl = ctx.createOscillator(), td = ctx.createGain();
     o.type = "sine"; o.frequency.value = midi(n); o2.type = "sine"; o2.frequency.value = midi(n) * 2; g2.gain.value = .12;
     wobble.connect(o.detune); wobble.connect(o2.detune);
-    tl.frequency.value = 3; td.gain.value = .08; tl.connect(td); td.connect(trem.gain); trem.gain.value = .82;   // sanftes Tremolo
+    tl.frequency.value = 3; td.gain.value = .08; tl.connect(td); td.connect(trem.gain); trem.gain.value = .82;   // soft tremolo
     o.connect(trem); o2.connect(g2); g2.connect(trem); trem.connect(g); g.connect(pad);
     env(g, t, .045, .45, len);
     [o, o2, tl].forEach(x => { x.start(t); x.stop(t + len + .1); }); }); }
@@ -647,7 +648,7 @@ soundUI();
 orderTool();
 bubbles();
 setInterval(tick, 15000);
-fetch("data.json", {cache: "no-store"}).then(r => r.json()).then(render).catch(() => { $("mood").textContent = "Daten gerade nicht erreichbar"; tick(); });
+fetch("data.json", {cache: "no-store"}).then(r => r.json()).then(render).catch(() => { $("mood").textContent = "Data not reachable right now"; tick(); });
 })();
 </script>
 
