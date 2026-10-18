@@ -643,8 +643,9 @@ function renderFeed(D, kinds){
   const draw = () => {
     const live = L && (L.items || []).length, F = live ? fromLive(L.items) : (D.feed || []);
     const of = k => k === "all" ? F.length : F.filter(x => x.type === k || (k === "report" && x.type === "photos")).length;
-    $("feedbar").innerHTML = types.map(([k,l]) => `<button data-k="${k}" aria-pressed="${k === cur}">${l} <span class="num" style="opacity:.7">${of(k)}</span></button>`).join("")
-      + `<span class="tg">${live ? `<span class="pill open" style="padding:2px 9px"><i></i>live</span> last message ${tm(L.items[L.items.length-1].t)}` : "newest at the bottom"}</span>`;
+    $("feedbar").innerHTML = (live ? `<span class="clmark"><span class="pill open" style="padding:2px 9px"><i></i>live</span> last message ${tm(L.items[L.items.length-1].t)}</span>` : "")
+      + types.map(([k,l]) => `<button data-k="${k}" aria-pressed="${k === cur}">${l} <span class="num" style="opacity:.7">${of(k)}</span></button>`).join("")
+      + (live ? "" : `<span class="tg">newest at the bottom</span>`);
     let last = "", h = "";
     for (const x of F){ if (cur !== "all" && x.type !== cur && !(cur === "report" && x.type === "photos")) continue;
       const d = dayOf(x.t); if (d !== last){ h += `<div class="day">${d}</div>`; last = d; } h += bubble(x); }
