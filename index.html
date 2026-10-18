@@ -354,7 +354,7 @@ pre.cl{white-space:pre-wrap;font:13px/1.55 var(--f-data);color:#cfe3e0;margin:6p
 
 
 <button class="order-btn" id="order-btn" aria-expanded="false" aria-controls="order">↕ Reihenfolge</button>
-<div class="order" id="order" hidden><strong>Abschnitte sortieren</strong><div class="sub">Nur zum Ausprobieren, wird in deinem Browser gemerkt.</div><ol id="order-list"></ol><button class="r" id="order-reset">Zurücksetzen</button></div>
+<div class="order" id="order" hidden><strong>Abschnitte sortieren</strong><div class="sub">Deine Reihenfolge wird in diesem Browser gemerkt.</div><ol id="order-list"></ol><button class="r" id="order-reset">Standard wiederherstellen</button></div>
 <dialog id="dlg" aria-labelledby="dlg-t"><div class="dlg-h"><strong id="dlg-t"></strong><button class="x" id="dlg-x" aria-label="Schließen">×</button></div><div class="dlg-b" id="dlg-b"></div></dialog>
 
 <script>
@@ -511,7 +511,7 @@ function bubbles(){
 
 /* Entwurf: Abschnitte umsortieren */
 function orderTool(){
-  const main = document.querySelector("main"), names = {maerkte:"Märkte",charts:"Charts",einschaetzung:"Einschätzung",signale:"Signale",aktien:"Aktien",termine:"Termine",archiv:"Archiv"};
+  const main = document.querySelector("main"), names = {einschaetzung:"Einschätzung",charts:"Charts",termine:"Termine",maerkte:"Märkte",aktien:"Aktien",signale:"Signale",archiv:"Archiv"};
   const def = Object.keys(names); let cur = def;
   try { const v = JSON.parse(localStorage.getItem("r3m-order") || "null"); if (Array.isArray(v) && v.length === def.length && def.every(k => v.includes(k))) cur = v; } catch {}
   const apply = () => { cur.forEach(id => main.appendChild($(id)));
