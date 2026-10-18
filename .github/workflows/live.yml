@@ -1,6 +1,6 @@
 name: Live feed
 
-# Reads the R3M Signals group every ~5 min and updates live.json for the website.
+# Reads the R3M Signals group every ~5 min and updates live.json for the website. .
 # Source of truth: spec1re/r3m-digest/site-ci/ – changes here are overwritten by the next site deploy.
 on:
   schedule:
