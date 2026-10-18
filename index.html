@@ -216,6 +216,7 @@ dialog::backdrop{background:rgba(3,12,18,.7);backdrop-filter:blur(3px)}
 .feedbar button[aria-pressed="true"]{color:var(--abyss);background:var(--glass);border-color:var(--glass)}
 .feedbar button:focus-visible{outline:2px solid var(--glass);outline-offset:2px}
 .feedbar .tg{margin-left:auto;font-size:12.5px;color:var(--mist);align-self:center}
+.feedbar .clmark{font-size:12.5px;color:var(--mist);align-self:center;margin-right:6px}
 .chat{height:min(760px,78vh);overflow:auto;overscroll-behavior:contain;background:linear-gradient(180deg,rgba(10,36,48,.6),rgba(6,26,36,.9));
   border:1px solid var(--line);border-radius:18px;padding:14px 14px 18px;display:flex;flex-direction:column;gap:8px}
 .chat .day{align-self:center;font:600 12px var(--f-body);color:var(--mist);background:var(--reef);border-radius:999px;padding:3px 12px;margin:8px 0 2px;position:sticky;top:0;z-index:1;box-shadow:0 2px 8px rgba(3,12,18,.6)}
@@ -586,8 +587,8 @@ function renderCl(cl){
   let sel = "all"; try { sel = localStorage.getItem("r3m-cl") || "all"; } catch {}
   if (sel !== "all" && !scripts.includes(sel)) sel = "all";
   const draw = () => {
-    $("clbar").innerHTML = [["all","All"], ...scripts.map(s => [s, s])].map(([k,l]) => `<button data-k="${esc(k)}" aria-pressed="${k === sel}">${esc(l)} <span class="num" style="opacity:.7">${k === "all" ? blocks.length : blocks.filter(b => b.script === k).length}</span></button>`).join("")
-      + `<span class="tg">📝 latest ${dshort(cl[0].date, true)}</span>`;
+    $("clbar").innerHTML = `<span class="clmark"><span class="pill open" style="padding:2px 9px"><i style="animation:none"></i>latest</span> ${dshort(cl[0].date, true)}</span>`
+      + [["all","All"], ...scripts.map(s => [s, s])].map(([k,l]) => `<button data-k="${esc(k)}" aria-pressed="${k === sel}">${esc(l)} <span class="num" style="opacity:.7">${k === "all" ? blocks.length : blocks.filter(b => b.script === k).length}</span></button>`).join("");
     let last = "", h = "";
     for (const b of blocks){ if (sel !== "all" && b.script !== sel) continue;
       if (b.date !== last){ h += `<div class="cd">${dshort(b.date, true)}</div>`; last = b.date; }
