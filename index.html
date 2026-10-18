@@ -137,8 +137,11 @@ h2{font:600 28px var(--f-display);margin:0;letter-spacing:-.2px}
 .ch img{display:block;width:100%;height:100%;object-fit:cover;object-position:left center}
 .ch:hover,.ch:focus-visible{border-color:var(--glass)}
 .ch.none{cursor:default;display:grid;place-items:center;font-size:12.5px;color:var(--mist);text-align:center;padding:8px}
-@media (max-width:1500px){.outlook{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media (max-width:1000px){.outlook{grid-template-columns:repeat(2,minmax(0,1fr))}.outlook>.card:last-child:nth-child(odd){grid-column:1/-1}}
+@media (max-width:1500px){.outlook{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .outlook>.oc:first-child{grid-column:span 2;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px;align-items:start}
+  .outlook>.oc:first-child .ch{margin:0}}
+@media (max-width:1000px){.outlook{grid-template-columns:repeat(2,minmax(0,1fr))}.outlook>.oc:first-child{grid-column:1/-1}}
+@media (max-width:640px){.outlook>.oc:first-child{display:flex}}
 @media (max-width:640px){.outlook{grid-template-columns:1fr}}
 .outlook .card p{margin:4px 0 0;color:#d4e6e3}
 .outlook .sym{color:var(--glass)}
@@ -317,7 +320,7 @@ a.chip{text-decoration:none}
     </div>
     <div class="wrap hero-cards">
       <div class="card"><h3>Nächster Termin</h3><div class="count" id="next">–</div><div class="sub" id="next-sub"></div></div>
-      <div class="card"><h3>Seegang · VIX</h3><div class="count num" id="vix">–</div>
+      <div class="card"><h3>Seegang · <a class="tv" href="https://www.tradingview.com/symbols/TVC-VIX/" target="_blank" rel="noopener" title="VIX auf TradingView">VIX</a></h3><div class="count num" id="vix">–</div>
         <div class="sea" id="sea"><span></span><span></span><span></span><span></span><span></span></div><div class="sub" id="vix-sub"></div></div>
       <div class="card"><h3>Signale · 7 Tage</h3><div class="count num" id="sig-mini">–</div><div class="sub" id="sig-mini-sub"></div></div>
       <div class="card"><h3 id="tf-h">Top &amp; Flop</h3><div class="tf" id="topflop">–</div></div>
@@ -388,6 +391,11 @@ const cls = v => v > 0.05 ? "up" : v < -0.05 ? "down" : "flat";
 const TVX = {FDAX:"EUREX:FDAX1!",FESX:"EUREX:FESX1!",ES:"CME_MINI:ES1!",NQ:"CME_MINI:NQ1!",YM:"CBOT_MINI:YM1!",RTY:"CME_MINI:RTY1!",
   "6E":"CME:6E1!","6J":"CME:6J1!",DX:"ICEUS:DX1!",GC:"COMEX:GC1!",SI:"COMEX:SI1!",CL:"NYMEX:CL1!",
   DAX:"XETR:DAX",SPX:"SP:SPX",NDX:"NASDAQ:NDX",VIX:"TVC:VIX",LLY:"NYSE:LLY","BRK.B":"NYSE:BRK.B"};
+const STOCKX = Object.fromEntries([
+  ..."SAP SIE ALV AIR DTE ENR MUV2 IFX DHL MRK DBK DB1".split(" ").map(t => [t, "XETR:" + t]),
+  ..."NVDA AAPL GOOGL MSFT AMZN META AVGO TSLA MU WMT ASML INTC PLTR COST CSCO LRCX AMAT NFLX PANW ARM TXN AMGN".split(" ").map(t => [t, "NASDAQ:" + t]),
+  ["LLY","NYSE:LLY"], ["BRK.B","NYSE:BRK.B"]]);
+const linkTickers = html => html.replace(/\b([A-Z][A-Z0-9]{1,4}(?:\.B)?)\b/g, (m, t) => STOCKX[t] ? tv(STOCKX[t], t) : m);
 const LISTX = {"DAX Top 12":"XETR","S&P 500 Top 12":"NASDAQ","Nasdaq 100 Next 12":"NASDAQ"};
 const tvUrl = full => full ? "https://www.tradingview.com/symbols/" + encodeURIComponent(full.replace(":", "-")).replace(/%21/g, "!") + "/" : null;
 const tvOf = (sym, ex) => sym.includes(":") ? sym : TVX[sym] || (ex ? ex + ":" + sym : "PEPPERSTONE:" + sym);
@@ -410,7 +418,7 @@ function countdown(){ const now = Date.now(); const next = EVENTS.find(e => Date
   const h = Math.floor(ms/36e5), m = Math.max(0, Math.round((ms % 36e5)/6e4));
   $("next").textContent = ms <= 0 ? "jetzt" : h >= 24 ? `in ${Math.floor(h/24)} T ${h%24} h` : h ? `in ${h} h ${m} min` : `in ${m} min`;
   const t = new Intl.DateTimeFormat(de,{timeZone:BER,weekday:"short",hour:"2-digit",minute:"2-digit"}).format(new Date(next.utc));
-  $("next-sub").textContent = `${t} · ${next.flag ?? ""} ${next.title}`; }
+  $("next-sub").innerHTML = `${t} · ${next.flag ?? ""} ` + (next.tv ? `<a class="tv" href="${tvUrl(next.tv)}" target="_blank" rel="noopener">${esc(next.title)}</a>` : esc(next.title)); }
 
 function greet(){ const h = +new Intl.DateTimeFormat("en-GB",{timeZone:BER,hour:"2-digit",hourCycle:"h23"}).format(new Date());
   return h < 11 ? "gm! ☕" : h < 17 ? "Guten Tag 🫧" : h < 22 ? "Guten Abend 🌙" : "Gute Nacht 🌊"; }
@@ -434,7 +442,8 @@ function render(D){
 
   /* Termine: echte Events, sonst Agenda */
   EVENTS = (D.events || []).map(e => ({...e, flag: ({US:"🇺🇸",DE:"🇩🇪",EU:"🇪🇺",GB:"🇬🇧",JP:"🇯🇵",CH:"🇨🇭"})[e.country]}));
-  if (!EVENTS.length && M.agenda?.length){ const a = M.agenda[0]; $("next").textContent = a.day; $("next-sub").textContent = a.items[0]; }
+  if (!EVENTS.length && M.agenda?.length){ const a = M.agenda[0], i0 = a.items[0]; $("next").textContent = a.day;
+    $("next-sub").innerHTML = typeof i0 === "string" ? esc(i0) : (i0.tv ? `<a class="tv" href="${tvUrl(i0.tv)}" target="_blank" rel="noopener">${esc(i0.text)}</a>` : esc(i0.text)); }
 
   /* Kacheln */
   const groups = {}; (M.pepper || []).forEach(p => (groups[p.group] ||= []).push(p));
@@ -466,7 +475,7 @@ function render(D){
     const ch = chartBy[o.sym];
     const pic = ch ? `<button class="ch" data-src="${esc(ch.src)}" data-t="${esc(o.sym)} · 1h · Stand ${esc(ch.date.split("-").reverse().join("."))}" aria-label="${esc(o.sym)}-Chart vergrößern"><img src="${esc(ch.src)}" alt="${esc(o.sym)} 1h-Chart mit Levels" loading="lazy"></button>`
       : `<div class="ch none">Chart kommt Mo–Fr mit dem Morning Digest</div>`;
-    return `<div class="card oc">${pic}<span class="sym">${tv(o.sym)}</span>${px ? ` <span class="sub num">${fmt(px)}</span>` : ""}${lv ? `<div class="lv">${lv}</div>` : ""}${body}</div>`; }).join("");
+    return `<div class="card oc">${pic}<div class="ob"><span class="sym">${tv(o.sym)}</span>${px ? ` <span class="sub num">${fmt(px)}</span>` : ""}${lv ? `<div class="lv">${lv}</div>` : ""}${body}</div></div>`; }).join("");
 
   /* Signale */
   const S = D.signals || {}, T = S.total || {};
@@ -490,7 +499,12 @@ function render(D){
   $("stocks").innerHTML = (M.stocks || []).map(s => `<div class="card"><h3>${esc(s.flag)} ${esc(s.list)}</h3>
     <div class="chips">${[["strong","s",""],["weak","w",""],["hot","h","🔥 "],["cold","c","🧊 "]].map(([k,c,e]) => (s[k]||[]).map(x => { const t = x.split(" ")[0];
       return `<a class="chip ${c}" href="${tvUrl(tvOf(t, LISTX[s.list]))}" target="_blank" rel="noopener" title="${esc(t)} auf TradingView">${e}${esc(x)}</a>`; }).join("")).join("")}</div></div>`).join("");
-  $("agenda").innerHTML = (M.agenda || []).map(a => `<div class="card"><div class="day">${esc(a.day)}</div><ul>${a.items.map(i => `<li>${esc(i)}</li>`).join("")}</ul></div>`).join("");
+  const CAL = "https://www.tradingview.com/economic-calendar/";
+  const item = i => { const t = typeof i === "string" ? i : i.text, x = typeof i === "string" ? null : i.tv;
+    if (x) return `<a class="tv" href="${tvUrl(x)}" target="_blank" rel="noopener" title="Indikator auf TradingView">${esc(t)}</a>`;
+    const h = linkTickers(esc(t));
+    return h !== esc(t) || !/[\u{1F1E6}-\u{1F1FF}]/u.test(t) ? h : `<a class="tv" href="${CAL}" target="_blank" rel="noopener" title="Wirtschaftskalender auf TradingView">${h}</a>`; };
+  $("agenda").innerHTML = (M.agenda || []).map(a => `<div class="card"><div class="day">${esc(a.day)}</div><ul>${a.items.map(i => `<li>${item(i)}</li>`).join("")}</ul></div>`).join("");
 
   /* Archiv */
   const kinds = {morning:"☕ Morning", abend:"🌙 US-Close", rueckblick:"🔁 Rückblick", ausblick:"🔭 Ausblick", bilanz:"📊 Bilanz", gap:"🌙 Gap-Check", mittag:"🕛 Halbzeit"};
