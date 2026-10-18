@@ -23,9 +23,9 @@
   --abyss:#061a24; --deep:#0a2430; --reef:#0e2f3d; --line:#1a4556;
   --foam:#e6f3f0; --mist:#8db0b5; --glass:#5fd3bf; --coral:#ff8577; --sun:#ffcf73; --octo:#ff7d93;
   --up:95,211,191; --down:255,133,119;
-  --f-display:"Fredoka","Noto Color Emoji","Nunito","Trebuchet MS",system-ui,sans-serif;
-  --f-body:"Figtree","Noto Color Emoji","Segoe UI",system-ui,sans-serif;
-  --f-data:"IBM Plex Mono","Noto Color Emoji",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --f-display:"Fredoka","Nunito","Trebuchet MS",system-ui,sans-serif,"Noto Color Emoji";
+  --f-body:"Figtree","Segoe UI",system-ui,sans-serif,"Noto Color Emoji";
+  --f-data:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace,"Noto Color Emoji";
   --r:14px;
   color-scheme:dark;
 }
@@ -113,6 +113,8 @@ h2{font:600 28px var(--f-display);margin:0;letter-spacing:-.2px}
   background:linear-gradient(rgba(var(--rgb),calc(var(--h)*.20)),rgba(var(--rgb),calc(var(--h)*.06))),var(--deep)}
 .tile .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .sym{font:600 16px var(--f-display);letter-spacing:.3px}
+.fl{margin-right:6px;font-size:.92em;letter-spacing:1px}
+.tile .sym,.fp>span{white-space:nowrap}
 .chg{font:500 13.5px var(--f-data);padding:1px 8px;border-radius:999px;background:rgba(var(--rgb),.14)}
 .price{font:500 20px var(--f-data);margin:2px 0 8px}
 .range{position:relative;height:6px;border-radius:3px;background:linear-gradient(90deg,rgba(var(--down),.45),rgba(141,176,181,.25),rgba(var(--up),.45))}
@@ -279,9 +281,9 @@ a.chip{text-decoration:none}
     </nav>
     <div class="clock">
       <span class="time" id="clock">--:--</span>
-      <span class="pill" id="s-tokyo"><i></i>Tokyo</span>
-      <span class="pill" id="s-london"><i></i>London</span>
-      <span class="pill" id="s-ny"><i></i>New York</span>
+      <span class="pill" id="s-tokyo"><i></i>🇯🇵 Tokyo</span>
+      <span class="pill" id="s-london"><i></i>🇬🇧 London</span>
+      <span class="pill" id="s-ny"><i></i>🇺🇸 New York</span>
       <button class="pill snd" id="snd-music" aria-pressed="false" title="Lo-fi music on or off">♪ Lo-fi <span class="eq" aria-hidden="true"><b></b><b></b><b></b></span></button>
       <button class="pill snd" id="snd-sfx" aria-pressed="false" title="Sound effects on or off">🫧 SFX</button>
     </div>
@@ -405,6 +407,9 @@ const LISTX = {"DAX Top 12":"XETR","S&P 500 Top 12":"NASDAQ","Nasdaq 100 Next 12
 const tvUrl = full => full ? "https://www.tradingview.com/symbols/" + encodeURIComponent(full.replace(":", "-")).replace(/%21/g, "!") + "/" : null;
 const tvOf = (sym, ex) => sym.includes(":") ? sym : TVX[sym] || (ex ? ex + ":" + sym : "PEPPERSTONE:" + sym);
 const tv = (sym, text, ex, cls) => `<a class="tv${cls ? " " + cls : ""}" href="${tvUrl(tvOf(sym, ex))}" target="_blank" rel="noopener" title="${esc(sym)} on TradingView">${text ?? esc(sym)}</a>`;
+const FLAGS = {GER40:"🇩🇪",DAX:"🇩🇪",FDAX:"🇩🇪",UK100:"🇬🇧",EUSTX50:"🇪🇺",FESX:"🇪🇺","6E":"🇪🇺",US500:"🇺🇸",NAS100:"🇺🇸",US30:"🇺🇸",US2000:"🇺🇸",SPX:"🇺🇸",NDX:"🇺🇸",DJI:"🇺🇸",ES:"🇺🇸",NQ:"🇺🇸",YM:"🇺🇸",RTY:"🇺🇸",DX:"🇺🇸",USDX:"🇺🇸",VIX:"🇺🇸",JPN225:"🇯🇵","6J":"🇯🇵",
+  EURUSD:"🇪🇺🇺🇸",GBPUSD:"🇬🇧🇺🇸",USDCHF:"🇺🇸🇨🇭",USDJPY:"🇺🇸🇯🇵",EURJPY:"🇪🇺🇯🇵",GBPJPY:"🇬🇧🇯🇵",EURGBP:"🇪🇺🇬🇧",AUDUSD:"🇦🇺🇺🇸",USDCAD:"🇺🇸🇨🇦",NZDUSD:"🇳🇿🇺🇸",EURCHF:"🇪🇺🇨🇭"};
+const fl = sym => FLAGS[sym] ? `<span class="fl" aria-hidden="true">${FLAGS[sym]}</span>` : "";
 const heat = (el, v, span) => { el.style.setProperty("--h", Math.min(Math.abs(v) / span, 1).toFixed(2)); el.style.setProperty("--rgb", v >= 0 ? "var(--up)" : "var(--down)"); };
 
 /* Clock + exchanges (local exchange hours, DST handled automatically) */
@@ -455,17 +460,17 @@ function render(D){
   const span = (M.chgLabel === "Week" || M.chgLabel === "Woche") ? 6 : 2.5;
   $("groups").innerHTML = Object.entries(groups).map(([g, list]) => `<div class="group"><h4>${esc(g)}</h4><div class="tiles">${list.map(p => {
     const pos = p.hi > p.lo ? Math.min(Math.max((p.price - p.lo) / (p.hi - p.lo), 0), 1) * 100 : 50;
-    return `<article class="tile" data-chg="${p.chg}"><div class="top"><span class="sym">${tv(p.sym)}</span><span class="chg ${cls(p.chg)}">${pct(p.chg)}</span></div>
+    return `<article class="tile" data-chg="${p.chg}"><div class="top"><span class="sym">${fl(p.sym)}${tv(p.sym)}</span><span class="chg ${cls(p.chg)}">${pct(p.chg)}</span></div>
       <div class="price num">${fmt(p.price)}</div><div class="range" title="Position between low and high"><b style="left:${pos.toFixed(1)}%"></b></div>
       <div class="rl"><span>${fmt(p.lo)}</span><span>${fmt(p.hi)}</span></div>${p.note ? `<div class="note">${esc(p.note)}</div>` : ""}</article>`; }).join("")}</div></div>`).join("");
   const pp = (M.pepper || []).slice().sort((a,b) => b.chg - a.chg);
   if (pp.length){ $("tf-h").textContent = `Top & Flop · ${M.chgLabel || "Day"}`;
-    $("topflop").innerHTML = [["🚀", pp[0]], ["🪨", pp[pp.length-1]]].map(([e,p]) => `<div><span class="sym">${e} ${tv(p.sym)}</span><span class="num ${cls(p.chg)}">${pct(p.chg)}</span></div>`).join("")
+    $("topflop").innerHTML = [["🚀", pp[0]], ["🪨", pp[pp.length-1]]].map(([e,p]) => `<div><span class="sym">${e} ${fl(p.sym)}${tv(p.sym)}</span><span class="num ${cls(p.chg)}">${pct(p.chg)}</span></div>`).join("")
       + `<div class="sub">out of ${pp.length} Custom Pepper symbols</div>`; }
   const idx = (M.indices || []).filter(i => i.sym !== "VIX");
   $("groups").insertAdjacentHTML("beforeend", `<div class="group fx4"><h4>Futures · Cash</h4>
-    <div class="fut">${(M.futures || []).map(f => `<span class="fp" data-chg="${f.chg}"><span>${tv(f.sym)}</span><b class="${cls(f.chg)}">${pct(f.chg)}</b></span>`).join("")}</div>
-    <div class="tiles" style="margin-top:10px">${idx.map(i => `<article class="tile" data-chg="${i.chg}"><div class="top"><span class="sym">${tv(i.sym)}</span><span class="chg ${cls(i.chg)}">${pct(i.chg)}</span></div>
+    <div class="fut">${(M.futures || []).map(f => `<span class="fp" data-chg="${f.chg}"><span>${fl(f.sym)}${tv(f.sym)}</span><b class="${cls(f.chg)}">${pct(f.chg)}</b></span>`).join("")}</div>
+    <div class="tiles" style="margin-top:10px">${idx.map(i => `<article class="tile" data-chg="${i.chg}"><div class="top"><span class="sym">${fl(i.sym)}${tv(i.sym)}</span><span class="chg ${cls(i.chg)}">${pct(i.chg)}</span></div>
       <div class="price num">${fmt(i.price,1)}</div><div class="rl"><span>RSI ${i.rsi ?? "–"}</span><span>SMA50 ${fmt(i.sma50,0)} ${i.price < i.sma50 ? "↓" : "↑"}</span></div></article>`).join("")}</div></div>`);
   document.querySelectorAll(".tile,.fp").forEach(t => heat(t, +t.dataset.chg, span));
 
@@ -480,7 +485,7 @@ function render(D){
     const ch = chartBy[o.sym];
     const pic = ch ? `<button class="ch" data-src="${esc(ch.src)}" data-t="${esc(o.sym)} · 1h · as of ${dshort(ch.date)}" aria-label="Enlarge ${esc(o.sym)} chart"><img src="${esc(ch.src)}" alt="${esc(o.sym)} 1h chart with levels" loading="lazy"></button>`
       : `<div class="ch none">Chart arrives Mon–Fri with the morning digest</div>`;
-    return `<div class="card oc">${pic}<div class="ob"><span class="sym">${tv(o.sym)}</span>${px ? ` <span class="sub num">${fmt(px)}</span>` : ""}${lv ? `<div class="lv">${lv}</div>` : ""}${body}</div></div>`; }).join("");
+    return `<div class="card oc">${pic}<div class="ob"><span class="sym">${fl(o.sym)}${tv(o.sym)}</span>${px ? ` <span class="sub num">${fmt(px)}</span>` : ""}${lv ? `<div class="lv">${lv}</div>` : ""}${body}</div></div>`; }).join("");
 
   /* Signals */
   const S = D.signals || {}, T = S.total || {};
@@ -544,7 +549,7 @@ function drawCurve(c){
     <path d="${line} L ${X(c.length)} ${Y(y0)} L ${X(0)} ${Y(y0)} Z" fill="url(#ga)"/>
     <path d="${line}" fill="none" stroke="${col}" stroke-width="2.4" stroke-linejoin="round"/>
     <circle cx="${X(c.length)}" cy="${Y(last)}" r="5" fill="${col}" stroke="#061a24" stroke-width="2"/>
-    <text x="${W-P.r}" y="${H-6}" text-anchor="end" fill="#8db0b5" font-size="11" font-family="Figtree,Noto Color Emoji,sans-serif">${c.length} closed trades</text>`;
+    <text x="${W-P.r}" y="${H-6}" text-anchor="end" fill="#8db0b5" font-size="11" font-family="Figtree,sans-serif,Noto Color Emoji">${c.length} closed trades</text>`;
 }
 
 /* Hero bubbles (calm, still with reduced motion) */
