@@ -106,9 +106,9 @@ h2{font:600 28px var(--f-display);margin:0;letter-spacing:-.2px}
 .wave{height:18px;background:radial-gradient(circle at 10px -4px,transparent 12px,var(--line) 13px,transparent 14px) 0 0/20px 18px repeat-x;opacity:.55}
 
 /* Tiles */
-.groups{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.groups{display:flex;flex-direction:column;gap:18px}
 .group h4{margin:0 0 8px;font:600 13px var(--f-body);letter-spacing:1px;text-transform:uppercase;color:var(--mist)}
-.tiles{display:grid;gap:10px}
+.tiles{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr))}
 .tile{--h:0;--rgb:var(--up);position:relative;border-radius:12px;padding:12px 14px;border:1px solid var(--line);
   background:linear-gradient(rgba(var(--rgb),calc(var(--h)*.20)),rgba(var(--rgb),calc(var(--h)*.06))),var(--deep)}
 .tile .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
@@ -119,8 +119,13 @@ h2{font:600 28px var(--f-display);margin:0;letter-spacing:-.2px}
 .chg{font:500 13.5px var(--f-data);padding:1px 8px;border-radius:999px;background:rgba(var(--rgb),.14)}
 .price{font:500 20px var(--f-data);margin:2px 0 8px}
 .range{position:relative;height:6px;border-radius:3px;background:linear-gradient(90deg,rgba(var(--down),.45),rgba(141,176,181,.25),rgba(var(--up),.45))}
+.range::after{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:rgba(230,243,240,.4)}
 .range b{position:absolute;top:50%;width:12px;height:12px;border-radius:50%;background:var(--foam);border:2px solid var(--abyss);transform:translate(-50%,-50%)}
-.rl{display:flex;justify-content:space-between;font:12px var(--f-data);color:var(--mist);margin-top:5px}
+.rl{display:flex;justify-content:space-between;gap:6px;font:12px var(--f-data);color:var(--mist);margin-top:5px}
+.rl i{font:600 10.5px var(--f-body);font-style:normal;letter-spacing:.6px;margin-right:4px;opacity:.8}
+.zone{font:500 12px var(--f-body);margin-top:4px}.zone.pr{color:var(--sun)}.zone.di{color:var(--glass)}.zone.out{color:var(--coral)}
+.htf{font:12px var(--f-data);color:var(--mist);margin-top:2px}.htf .up,.htf .down{font-weight:600}
+@media (max-width:600px){.rl i{display:none}}
 .note{font-size:12.5px;color:#cfe3e0;margin-top:6px}
 .strip{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
 
@@ -185,8 +190,7 @@ tr:last-child td{border-bottom:0}
 .chip.c{color:#9ad7ff;border-color:rgba(154,215,255,.3)}
 .agenda{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 /* Futures overnight + cash indices: stocks-style cards below the tiles */
-.mk2{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:12px;margin-top:16px}
-@media (max-width:1100px){.mk2{grid-template-columns:1fr}}
+.mk2{display:flex;flex-direction:column;gap:18px;margin-top:18px}
 .crow{display:grid;grid-template-columns:104px minmax(0,1fr);gap:4px 10px;align-items:start;padding:7px 0}
 .crow+.crow{border-top:1px solid rgba(26,69,86,.55)}
 .crow .lab{font:600 11px var(--f-body);letter-spacing:1.2px;text-transform:uppercase;color:var(--mist);padding-top:5px;white-space:nowrap}
@@ -253,7 +257,6 @@ pre.cl{white-space:pre-wrap;font:13px/1.55 var(--f-data);color:#cfe3e0;margin:6p
   .hero-grid{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}
   .recent{grid-column:1/-1;grid-template-columns:repeat(3,minmax(0,1fr))}
   .recent .eyebrow,.recent .more{grid-column:1/-1}
-  .groups{grid-template-columns:repeat(3,minmax(0,1fr))}
   .hero-cards,.agenda{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (min-width:1600px){.agenda{grid-template-columns:repeat(4,minmax(0,1fr))}.stocks{grid-template-columns:repeat(3,minmax(0,1fr))}}
@@ -569,9 +572,11 @@ function render(D){
   const span = (M.chgLabel === "Week" || M.chgLabel === "Woche") ? 6 : 2.5;
   $("groups").innerHTML = Object.entries(groups).map(([g, list]) => `<div class="group"><h4>${esc(g)}</h4><div class="tiles">${list.map(p => {
     const pos = p.hi > p.lo ? Math.min(Math.max((p.price - p.lo) / (p.hi - p.lo), 0), 1) * 100 : 50;
+    const raw = p.hi > p.lo ? (p.price - p.lo) / (p.hi - p.lo) * 100 : 50, wkT = span > 3;
+    const zone = raw > 100 ? ["out", "above BSL"] : raw < 0 ? ["out", "below SSL"] : raw >= 50 ? ["pr", `premium · ${Math.round(raw)}%`] : ["di", `discount · ${Math.round(raw)}%`];
     return `<article class="tile" data-chg="${p.chg}"><div class="top"><span class="sym">${fl(p.sym)}${tv(p.sym)}</span><span class="chg ${cls(p.chg)}">${pct(p.chg)}</span></div>
-      <div class="price num">${fmt(p.price)}</div><div class="range" title="Position between low and high"><b style="left:${pos.toFixed(1)}%"></b></div>
-      <div class="rl"><span>${fmt(p.lo)}</span><span>${fmt(p.hi)}</span></div>${p.note ? `<div class="note">${esc(p.note)}</div>` : ""}</article>`; }).join("")}</div></div>`).join("");
+      <div class="price num">${fmt(p.price)}</div><div class="range" title="Where price sits between SSL (${wkT ? "week low" : "PDL"}) and BSL (${wkT ? "week high" : "PDH"}) · the tick is equilibrium (50%)"><b style="left:${pos.toFixed(1)}%"></b></div>
+      <div class="rl"><span><i>SSL</i>${fmt(p.lo)}</span><span><i>BSL</i>${fmt(p.hi)}</span></div><div class="zone ${zone[0]}">${zone[1]}</div>${p.note ? `<div class="note">${esc(p.note)}</div>` : ""}</article>`; }).join("")}</div></div>`).join("");
   const pp = (M.pepper || []).slice().sort((a,b) => b.chg - a.chg);
   if (pp.length){ $("tf-h").textContent = `Top & Flop · ${M.chgLabel || "Day"}`;
     $("topflop").innerHTML = [["🚀", pp[0]], ["🪨", pp[pp.length-1]]].map(([e,p]) => `<div><span class="sym">${e} ${fl(p.sym)}${tv(p.sym)}</span><span class="num ${cls(p.chg)}">${pct(p.chg)}</span></div>`).join("")
@@ -585,13 +590,15 @@ function render(D){
     const list = syms.map(x => fut.find(f => f.sym === x)).filter(Boolean); if (!list.length) return "";
     return `<div class="crow"><span class="lab">${esc(g)}</span><div class="chips">${list.map(f => chipA(f.sym, chipC(f.chg), `${FLAGS[f.sym] ? FLAGS[f.sym] + " " : ""}${esc(f.sym)} ${pct(f.chg)}`)).join("")}</div></div>`; }).join("");
   const wk = M.chgLabel === "Week" || M.chgLabel === "Woche";
-  const idxRows = (M.indices || []).map(i => {
-    const rsi = i.rsi == null ? "" : i.rsi >= 70 ? chipA(i.sym, "h", `🔥 RSI ${i.rsi}`, "RSI over 70") : i.rsi <= 30 ? chipA(i.sym, "c", `🧊 RSI ${i.rsi}`, "RSI under 30") : chipA(i.sym, "", `RSI ${i.rsi}`);
+  const idxTiles = (M.indices || []).map(i => {
     const d = i.sym === "VIX" ? 2 : 0, above = i.price >= i.sma50;
-    const sma = i.sma50 == null ? "" : chipA(i.sym, above ? "s" : "w", `${above ? "▲ above" : "▼ below"} SMA50 ${fmt(i.sma50, d)}`);
-    return `<div class="crow"><span class="lab">${fl(i.sym)}${tv(i.sym)}</span><div class="chips">${chipA(i.sym, chipC(i.chg), `${fmt(i.price, i.sym === "VIX" ? 2 : 1)} ${pct(i.chg)}`)}${rsi}${sma}</div></div>`; }).join("");
+    const rsi = i.rsi == null ? "" : i.rsi >= 70 ? `🔥 RSI ${i.rsi}` : i.rsi <= 30 ? `🧊 RSI ${i.rsi}` : `RSI ${i.rsi}`;
+    const sma = i.sma50 == null ? "" : ` · SMA50 ${fmt(i.sma50, d)}`;
+    return `<article class="tile" data-chg="${i.chg}"><div class="top"><span class="sym">${fl(i.sym)}${tv(i.sym)}</span><span class="chg ${cls(i.chg)}">${pct(i.chg)}</span></div>
+      <div class="price num">${fmt(i.price, i.sym === "VIX" ? 2 : 1)}</div><div class="htf">${rsi}${sma}</div>
+      ${i.sma50 == null ? "" : `<div class="zone ${above ? "di" : "out"}">${above ? "▲ above SMA50" : "▼ below SMA50"}</div>`}</article>`; }).join("");
   $("futidx").innerHTML = (futRows ? `<div class="card"><h3>${wk ? "📅 Futures · week" : "🌙 Futures overnight"}</h3>${futRows}</div>` : "")
-    + (idxRows ? `<div class="card"><h3>🏛️ Cash indices · ${wk ? "week" : "prior close"}</h3>${idxRows}</div>` : "");
+    + (idxTiles ? `<div class="group"><h4>Cash indices · HTF context${wk ? " · week" : ""}</h4><div class="tiles">${idxTiles}</div></div>` : "");
   document.querySelectorAll(".tile").forEach(t => heat(t, +t.dataset.chg, span));
 
   const chartBy = Object.fromEntries((D.charts || []).map(c => [c.sym, c]));
