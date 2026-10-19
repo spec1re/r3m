@@ -75,7 +75,10 @@ h1 em{font-style:normal;color:var(--octo)}
 .big li{display:flex;gap:10px;color:#cfe3e0}
 .big li::before{content:"";flex:0 0 8px;height:8px;margin-top:.55em;border-radius:50%;border:1.5px solid var(--glass)}
 .mascot{display:grid;justify-items:center;gap:14px}
-.speech{position:relative;background:var(--reef);border:1px solid var(--line);border-radius:18px;padding:10px 16px;font:500 17px var(--f-display);color:var(--foam)}
+.speech{position:relative;background:var(--reef);border:1px solid var(--line);border-radius:18px;padding:10px 16px;font:500 17px var(--f-display);color:var(--foam);
+  max-width:300px;text-align:center;cursor:pointer;line-height:1.35;transition:opacity .25s}
+.speech.tip{font:500 14.5px var(--f-body)}.speech.fade{opacity:0}
+.speech:hover{border-color:rgba(95,211,191,.55)}
 .speech::after{content:"";position:absolute;left:50%;bottom:-8px;width:14px;height:14px;background:var(--reef);border-right:1px solid var(--line);border-bottom:1px solid var(--line);transform:translateX(-50%) rotate(45deg)}
 .octo{width:min(220px,60vw);height:auto;animation:bob 6s ease-in-out infinite}
 @keyframes bob{50%{transform:translateY(-8px) rotate(-1.5deg)}}
@@ -315,7 +318,8 @@ a.chip{text-decoration:none}
       <span class="time" id="clock">--:--</span>
       <span class="pill" id="s-tokyo"><i></i>🇯🇵 Tokyo</span>
       <span class="pill" id="s-london"><i></i>🇬🇧 London</span>
-      <span class="pill" id="s-ny"><i></i>🇺🇸 New York</span>
+      <span class="pill" id="s-nyam"><i></i>🇺🇸 NY AM</span>
+      <span class="pill" id="s-nypm"><i></i>🇺🇸 NY PM</span>
       <button class="pill snd" id="snd-music" aria-pressed="false" title="Lo-fi music: click for track 1">♪ Lo-fi<span id="snd-n" class="num"></span> <span class="eq" aria-hidden="true"><b></b><b></b><b></b></span></button>
       <button class="pill snd" id="snd-sfx" aria-pressed="false" title="Sound effects on or off">🫧 SFX</button>
     </div>
@@ -341,7 +345,7 @@ a.chip{text-decoration:none}
         <ul class="big" id="big"></ul>
       </div>
       <div class="mascot">
-        <div class="speech" id="greet">gm ☕</div>
+        <button type="button" class="speech" id="greet" title="Octi's tips · click for the next one">gm ☕</button>
         <svg class="octo" viewBox="0 0 220 220" role="img" aria-label="Riffi, the R3M octopus mascot">
           <ellipse cx="110" cy="206" rx="64" ry="8" fill="#0e2f3d"/>
           <g fill="#ff7d93">
@@ -458,13 +462,19 @@ const fl = sym => FLAGS[sym] ? `<span class="fl" aria-hidden="true">${FLAGS[sym]
 const heat = (el, v, span) => { el.style.setProperty("--h", Math.min(Math.abs(v) / span, 1).toFixed(2)); el.style.setProperty("--rgb", v >= 0 ? "var(--up)" : "var(--down)"); };
 
 /* Clock + exchanges (local exchange hours, DST handled automatically) */
-const sess = [["s-tokyo","Asia/Tokyo",9*60,15*60],["s-london","Europe/London",8*60,16*60+30],["s-ny","America/New_York",9*60+30,16*60]];
+/* NY split like the ICT sessions: AM 09:30–12:00, lunch, PM 13:30–16:00 (New York time) */
+const sess = [["s-tokyo","Asia/Tokyo",9*60,15*60,"Tokyo"],["s-london","Europe/London",8*60,16*60+30,"London"],
+  ["s-nyam","America/New_York",9*60+30,12*60,"NY AM"],["s-nypm","America/New_York",13*60+30,16*60,"NY PM"]];
+const hhmm = m => { m = ((m % 1440) + 1440) % 1440; return String(Math.floor(m/60)).padStart(2,"0") + ":" + String(m%60).padStart(2,"0"); };
+let OPEN = new Set();
 function localMin(tz, d){ const p = new Intl.DateTimeFormat("en-GB",{timeZone:tz,hour:"2-digit",minute:"2-digit",weekday:"short",hourCycle:"h23"}).formatToParts(d);
   const g = t => p.find(x => x.type === t).value; return {m: +g("hour")*60 + +g("minute"), wd: g("weekday")}; }
 function tick(){ const d = new Date();
   $("clock").textContent = new Intl.DateTimeFormat(de,{timeZone:BER,hour:"2-digit",minute:"2-digit"}).format(d) + " Berlin";
-  for (const [id,tz,a,b] of sess){ const {m,wd} = localMin(tz,d); const open = !["Sat","Sun"].includes(wd) && m >= a && m < b;
-    const el = $(id); el.classList.toggle("open", open); el.title = open ? "open" : "closed"; }
+  const ber = localMin(BER, d).m; OPEN = new Set();
+  for (const [id,tz,a,b,name] of sess){ const {m,wd} = localMin(tz,d); const open = !["Sat","Sun"].includes(wd) && m >= a && m < b;
+    if (open) OPEN.add(name); const off = ber - m;
+    const el = $(id); el.classList.toggle("open", open); el.title = `${name} · ${hhmm(a+off)}–${hhmm(b+off)} Berlin · ${open ? "open" : "closed"}`; }
   countdown(); }
 
 let EVENTS = [];
@@ -478,9 +488,59 @@ function countdown(){ const now = Date.now(); const next = EVENTS.find(e => Date
 function greet(){ const h = +new Intl.DateTimeFormat("en-GB",{timeZone:BER,hour:"2-digit",hourCycle:"h23"}).format(new Date());
   return h < 11 ? "gm! ☕" : h < 17 ? "Good afternoon 🫧" : h < 22 ? "Good evening 🌙" : "Good night 🌊"; }
 
+/* Octi's tips: built fresh each time from the signal stats of the last 7 days, the clock and today's calendar.
+   Facts about his own alerts, never a trade call. Groups under 5 closed trades are left out. */
+let OCTI = {D: null, i: -1, timer: null};
+function octiTips(D){
+  const S = D.signals || {}, M = D.market || {}, out = [], now = Date.now();
+  const R = v => (v > 0 ? "+" : v < 0 ? "−" : "±") + fmt(Math.abs(v), 1) + "R", q = (a, b) => b ? Math.round(100 * a / b) + "%" : "–";
+  const ok = g => g && g.done >= 5, add = (p, t) => out.push({p, t});
+  const ev = EVENTS.find(e => Date.parse(e.utc) > now - 60e3);
+  if (ev){ const m = Math.round((Date.parse(ev.utc) - now) / 6e4);
+    if (m <= 60) add(10, `${ev.flag || "📰"} ${ev.title} ${m <= 0 ? "right now" : "in " + m + " min"}: spreads widen, spikes both ways ⚠️`); }
+  const lr = S.lastResults || []; let k = 0, w = 0;
+  for (let i = lr.length - 1; i >= 0 && lr[i] === "Stopped"; i--) k++;
+  for (let i = lr.length - 1; i >= 0 && lr[i] !== "Stopped"; i--) w++;
+  if (k >= 3) add(9, `${k} stops in a row on the tape. A breather is a position too 🫧`);
+  else if (w >= 4) add(6, `${w} winners in a row. Same size, same rules 🧘`);
+  const ses = OPEN.has("NY AM") || OPEN.has("NY PM") ? "New York" : OPEN.has("London") ? "London" : "";
+  if (ses){ const g = (S.bySession || []).find(x => x.name === ses);
+    if (ok(g)) add(7, `${ses} this week: ${g.done} closed · TP1 ${q(g.tp1, g.done)} · ${R(g.r)}`);
+    const best = (S.bySesSetup || []).filter(x => x.name.startsWith(ses + " · ") && ok(x)).sort((a, b) => b.r - a.r);
+    if (best.length && best[0].r > 0) add(7, `Best ${ses} model this week: ${best[0].name.split(" · ")[1]} ${R(best[0].r)} in ${best[0].done} trades`);
+    if (best.length > 1 && best[best.length - 1].r < 0){ const z = best[best.length - 1]; add(6, `Toughest in ${ses}: ${z.name.split(" · ")[1]} ${R(z.r)}, ${z.sl} of ${z.done} stopped`); } }
+  const hr = +new Intl.DateTimeFormat("en-GB",{timeZone:BER,hour:"2-digit",hourCycle:"h23"}).format(new Date());
+  const bh = (S.byHour || []).find(x => +x.name === hr);
+  if (ok(bh)) add(6, `${hhmm(hr * 60)}–${hhmm(hr * 60 + 60)} Berlin has ${bh.r >= 0 ? "paid" : "cost"} ${R(bh.r)} over 7 days (${bh.done} trades, TP1 ${q(bh.tp1, bh.done)})`);
+  const gA = (S.byGrade || []).find(x => x.name === "A+"), gR = (S.byGrade || []).find(x => x.name === "rev");
+  if (ok(gA) && ok(gR)) add(5, `Bias A+ ${R(gA.r)} (TP1 ${q(gA.tp1, gA.done)}) vs rev ${R(gR.r)} (TP1 ${q(gR.tp1, gR.done)}) this week 🧭`);
+  const sy = (S.bySymbol || []).filter(ok);
+  if (sy.length > 1){ const b = sy[0], z = sy[sy.length - 1];
+    if (b.r > 0) add(4, `${FLAGS[b.name] ? FLAGS[b.name] + " " : ""}${b.name} delivers: ${R(b.r)}, ${b.tp1} of ${b.done} hit TP1`);
+    if (z.r < 0) add(5, `${FLAGS[z.name] ? FLAGS[z.name] + " " : ""}${z.name} keeps running stops: ${z.sl} of ${z.done} stopped (${R(z.r)})`); }
+  const st = (S.bySetup || []).filter(x => x.name !== "–" && x.done >= 10);
+  if (st.length) add(4, `Model of the week: ${st[0].name} ${R(st[0].r)} in ${st[0].done} closed trades 🏆`);
+  const vix = (M.indices || []).find(i => i.sym === "VIX");
+  if (vix && vix.price >= 22) add(5, `VIX ${fmt(vix.price, 2)}: rough sea, wide ranges. Stops need room 🌊`);
+  else if (vix && vix.price < 14) add(3, `VIX ${fmt(vix.price, 2)}: glassy water, tight ranges. Targets sit closer 🪞`);
+  const today = new Intl.DateTimeFormat("en-US",{timeZone:BER,weekday:"short",month:"short",day:"numeric"}).format(new Date()).replace(",", "");
+  const day = (M.agenda || []).find(a => a.day === today);
+  (day ? day.items : []).map(i => typeof i === "string" ? i : i.text).filter(t => /^~\d/.test(t))
+    .forEach(t => add(6, `Earnings tonight: ${t} · gap risk for the next open 🌙`));
+  return out.sort((a, b) => b.p - a.p).map(x => x.t);
+}
+function octiSay(next){ const el = $("greet"); if (!OCTI.D) return;
+  const tips = octiTips(OCTI.D), all = [greet()].concat(tips);
+  OCTI.i = next ? (OCTI.i + 1) % all.length : 0;
+  el.classList.add("fade");
+  setTimeout(() => { el.textContent = all[OCTI.i]; el.classList.toggle("tip", OCTI.i > 0); el.classList.remove("fade"); }, 250); }
+function octiStart(D){ OCTI.D = D; if (OCTI.timer) return;
+  $("greet").onclick = () => { octiSay(true); clearInterval(OCTI.timer); OCTI.timer = setInterval(() => octiSay(true), 14000); };
+  OCTI.timer = setInterval(() => octiSay(true), 14000); }
+
 function render(D){
   const M = D.market || {};
-  $("greet").textContent = greet();
+  $("greet").textContent = greet(); octiStart(D);
   const dt = M.date ? new Intl.DateTimeFormat(de,{weekday:"long",day:"numeric",month:"long"}).format(new Date(M.date+"T12:00:00")) : "";
   $("eyebrow").textContent = [dt, (M.title || "").replace(/\s*·\s*(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b[^·]*$/, "")].filter(Boolean).join(" · ");   // the date is already in front
   $("mood").innerHTML = M.mood ? esc(M.mood).replace(/,\s*/, ",<br><em>") + "</em>" : "No digest yet today";
