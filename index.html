@@ -187,7 +187,8 @@ h2{font:600 28px var(--f-display);margin:0;letter-spacing:-.2px}
 .btrack{height:10px;border-radius:5px;background:var(--line);overflow:hidden;display:flex}
 .btrack i{display:block;height:100%}
 .feed{background:var(--deep);border:1px solid var(--line);border-radius:var(--r);overflow-x:auto}
-#pane-models{overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--line) transparent}#pane-models th{position:sticky;top:0;background:var(--deep)}
+#pane-models,#pane-conf{overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--line) transparent}#pane-models th,#pane-conf th{position:sticky;top:0;background:var(--deep)}
+#conf b{font:600 14px var(--f-body)}#conf .ms{font-size:12px;color:var(--mist)}.edge{display:flex;align-items:center;gap:8px}.edge i{display:block;height:8px;border-radius:4px}
 #models .ms{font-size:12px;color:var(--mist)}#models b{font:600 14.5px var(--f-display)}.tier.hi{color:var(--sun)}.tier.lo{color:var(--mist)}
 table{width:100%;border-collapse:collapse;font-size:13.5px}
 th{text-align:left;font-weight:600;color:var(--mist);font-size:11.5px;letter-spacing:.8px;text-transform:uppercase;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
@@ -414,10 +415,11 @@ a.chip{text-decoration:none}
       </div>
       <div class="sigpanel">
         <div class="feedbar sigtabs" role="tablist" aria-label="Latest trades or models">
-          <button type="button" role="tab" id="tab-trades" aria-controls="pane-trades">Latest trades</button><button type="button" role="tab" id="tab-models" aria-controls="pane-models">Models</button>
+          <button type="button" role="tab" id="tab-trades" aria-controls="pane-trades">Latest trades</button><button type="button" role="tab" id="tab-models" aria-controls="pane-models">Models</button><button type="button" role="tab" id="tab-conf" aria-controls="pane-conf">Confluence</button>
           <span class="tg" id="tab-note"></span></div>
         <div class="feed" id="pane-trades" role="tabpanel" aria-labelledby="tab-trades"><table><thead><tr><th>Time</th><th>Symbol</th><th>Script</th><th>Setup</th><th>TP1</th><th>Result</th></tr></thead><tbody id="recent"></tbody></table></div>
         <div class="feed" id="pane-models" role="tabpanel" aria-labelledby="tab-models" hidden><table><thead><tr><th>#</th><th>Model</th><th>Tier</th><th>Rating</th><th>TP1 / SL</th><th>TP2</th><th>Σ R</th></tr></thead><tbody id="models"></tbody></table></div>
+        <div class="feed" id="pane-conf" role="tabpanel" aria-labelledby="tab-conf" hidden><table><thead><tr><th>Confluence</th><th>n</th><th>TP1 with</th><th>without</th><th>Edge</th><th>Σ R with</th></tr></thead><tbody id="conf"></tbody></table></div>
       </div>
     </div>
   </div></section>
@@ -723,14 +725,23 @@ function render(D){
     <td class="tier ${m.ranked && m.tier !== "LTF" ? "hi" : "lo"}">${m.tier}</td><td class="num">${m.rating}</td><td class="num">${m.tp1} / ${m.sl}</td>
     <td class="num">${q(m.tp2, m.done)}</td><td class="num ${m.r >= 0 ? "up" : "down"}">${sR(m.r)}</td></tr>`).join("")
     || `<tr><td colspan="7" class="sub">No models yet.</td></tr>`;
-  { const tabs = [["trades", ""], ["models", "ranked after 10 closed · rating 1000 + 25 × R"]];
+  /* Confluence tab: TP1 rate of trades with a confluence vs. the same script's trades without it (5+ closed each side) */
+  const conf = (S.byTag || []).filter(g => g.with.done >= 5 && g.without.done >= 5).map(g => {
+    const a = g.with.tp1 / g.with.done, b = g.without.tp1 / g.without.done; return {...g, edge: Math.round(100 * (a - b))}; }).sort((x, y) => y.edge - x.edge);
+  const maxE = Math.max(1, ...conf.map(g => Math.abs(g.edge)));
+  $("conf").innerHTML = conf.map(g => `<tr><td><b>${esc(g.name)}</b><div class="ms">${esc(g.script)}</div></td><td class="num">${g.with.done}</td>
+    <td class="num">${q(g.with.tp1, g.with.done)}</td><td class="num sub">${q(g.without.tp1, g.without.done)}</td>
+    <td><span class="edge"><i style="width:${Math.round(44 * Math.abs(g.edge) / maxE)}px;background:rgb(var(${g.edge >= 0 ? "--up" : "--down"}))"></i><span class="num ${g.edge >= 0 ? "up" : "down"}">${g.edge > 0 ? "+" : g.edge < 0 ? "−" : "±"}${Math.abs(g.edge)} pp</span></span></td>
+    <td class="num ${g.with.r >= 0 ? "up" : "down"}">${sR(g.with.r)}</td></tr>`).join("")
+    || `<tr><td colspan="6" class="sub">Not enough closed trades per confluence yet.</td></tr>`;
+  { const tabs = [["trades", ""], ["models", "ranked after 10 closed · rating 1000 + 25 × R"], ["conf", "TP1 with vs. without · same script · 5+ closed each"]];
     const show = k => { const tp = $("pane-trades");
-      if (k === "models" && !tp.hidden) $("pane-models").style.height = tp.offsetHeight + "px";   // same height, scrolls inside
+      if (k !== "trades" && !tp.hidden) tabs.forEach(([t]) => { if (t !== "trades") $("pane-" + t).style.height = tp.offsetHeight + "px"; });   // same height, scrolls inside
       tabs.forEach(([t]) => { const on = t === k; $("tab-" + t).setAttribute("aria-pressed", String(on)); $("tab-" + t).setAttribute("aria-selected", String(on)); $("pane-" + t).hidden = !on; });
       $("tab-note").textContent = tabs.find(t => t[0] === k)[1]; try { localStorage.setItem("r3m-sigtab", k); } catch {} };
     tabs.forEach(([t]) => { $("tab-" + t).onclick = () => show(t); });
-    let k0 = "trades"; try { k0 = localStorage.getItem("r3m-sigtab") === "models" ? "models" : "trades"; } catch {}
-    show("trades"); if (k0 === "models") requestAnimationFrame(() => show("models")); }
+    let k0 = "trades"; try { const v = localStorage.getItem("r3m-sigtab"); if (tabs.some(t => t[0] === v)) k0 = v; } catch {}
+    show("trades"); if (k0 !== "trades") requestAnimationFrame(() => show(k0)); }
   const resI = {"TP2 Hit":"🏆 TP2","TP1 Hit":"✅ TP1","Stopped":"🛑 SL","open":"⏳ open","offen":"⏳ open"};
   $("recent").innerHTML = (S.recent || []).map(r => `<tr><td class="num">${new Intl.DateTimeFormat(de,{timeZone:BER,weekday:"short",hour:"2-digit",minute:"2-digit"}).format(new Date(r.t))}</td>
     <td><b>${tv(r.tv || r.sym, esc(r.sym))}</b> <span class="${r.side === "LONG" ? "up" : "down"}">${r.side === "LONG" ? "▲" : "▼"}</span></td><td>${esc(r.script)}</td><td class="sub">${esc(r.setup)}</td>
