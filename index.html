@@ -63,6 +63,8 @@ nav a:hover,nav a:focus-visible{color:var(--foam)}
 .hero-grid{position:relative;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(200px,.8fr) minmax(260px,1fr);gap:32px;padding-block:44px 30px;align-items:center}
 .recent{display:grid;gap:10px;align-content:center}
 .recent .eyebrow{margin-bottom:2px}
+.rhead{grid-column:1/-1;display:flex;justify-content:space-between;align-items:baseline;gap:4px 12px;flex-wrap:wrap}
+.nextrep{font:500 12.5px var(--f-data);color:var(--mist)}.nextrep b{font:600 13px var(--f-body);color:var(--glass)}.nextrep.due b{color:var(--sun)}
 .recent button{all:unset;cursor:pointer;display:block;background:rgba(10,36,48,.82);border:1px solid var(--line);border-radius:12px;padding:12px 14px;backdrop-filter:blur(4px)}
 .recent button:hover,.recent button:focus-visible{border-color:var(--glass)}
 .recent .d{font:500 12.5px var(--f-data);color:var(--mist)}
@@ -369,7 +371,7 @@ a.chip{text-decoration:none}
           <path d="M66 54c8-14 22-20 34-21" stroke="#ffb3c1" stroke-width="6" stroke-linecap="round" fill="none" opacity=".7"/>
         </svg>
       </div>
-      <div class="recent" id="recent-arch" aria-label="Latest reports"><div class="eyebrow">Latest</div></div>
+      <div class="recent" id="recent-arch" aria-label="Latest reports"><div class="rhead"><span class="eyebrow">Latest</span><span class="nextrep" id="next-rep"></span></div></div>
     </div>
     <div class="wrap hero-cards">
       <div class="card"><h3>Next event</h3><div class="count" id="next">–</div><div class="sub" id="next-sub"></div></div>
@@ -486,7 +488,32 @@ function tick(){ const d = new Date();
   for (const [id,tz,a,b,name] of sess){ const {m,wd} = localMin(tz,d); const open = !["Sat","Sun"].includes(wd) && m >= a && m < b;
     if (open) OPEN.add(name); const off = ber - m;
     const el = $(id); el.classList.toggle("open", open); el.title = `${name} · ${hhmm(a+off)}–${hhmm(b+off)} Berlin · ${open ? "open" : "closed"}`; }
+  nextReport();
   countdown(); }
+
+/* Next report: the schedule of the scheduled tasks and Actions (arrival ≈ a few minutes after they start) */
+const REPORTS = [
+  {k:"gap", name:"🌙 Gap Check", d:[1], hm:"01:25"}, {k:"morning", name:"☕ Morning", d:[1,2,3,4,5], hm:"05:40"},
+  {k:"rueckblick", name:"🔁 Weekly Review", d:[6], hm:"05:40"}, {k:"ausblick", name:"🔭 Weekly Outlook", d:[0], hm:"05:40"},
+  {k:"bilanz", name:"📊 Signal Report", d:[6], hm:"06:18", tz:"UTC"}, {k:"mittag", name:"🕛 Midday", d:[1,2,3,4,5], hm:"13:20"},
+  {k:"abend", name:"🌙 US Close", d:[1,2,3,4,5], hm:"22:20"}];
+const DOW = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+let DIGESTS = [];
+function nextReport(){ const el = $("next-rep"); if (!el) return; const d = new Date(), b = localMin(BER, d), u = localMin("UTC", d);
+  const off = ((b.m - u.m) % 1440 + 1440) % 1440, nowW = DOW.indexOf(b.wd) * 1440 + b.m;
+  const today = new Intl.DateTimeFormat("en-CA",{timeZone:BER}).format(d);
+  let best = null;
+  for (const r of REPORTS) for (const day of r.d){ let [h, m] = r.hm.split(":").map(Number), w = day * 1440 + h * 60 + m;
+    if (r.tz === "UTC") w += off;   // the Action runs on UTC
+    w = ((w % 10080) + 10080) % 10080; let delta = (w - nowW + 10080) % 10080;
+    const bm = ((w % 1440) + 1440) % 1440, label = `${String(Math.floor(bm/60)).padStart(2,"0")}:${String(bm%60).padStart(2,"0")}`;
+    const late = 10080 - delta;   // minutes since the slot
+    if (late <= 40 && r.k !== "bilanz" && !DIGESTS.some(x => x.kind === r.k && x.date === today)) delta = -1;   // due, not in yet
+    if (!best || delta < best.delta) best = {r, delta, label, day: Math.floor(w / 1440)}; }
+  if (!best) return; const {r, delta, label, day} = best, isToday = DOW[day] === b.wd;
+  const inT = delta < 0 ? "due now" : delta < 60 ? `in ${delta} min` : delta < 1440 ? `in ${Math.floor(delta/60)}h ${String(delta%60).padStart(2,"0")}m` : `in ${Math.floor(delta/1440)}d ${Math.floor(delta%1440/60)}h`;
+  el.classList.toggle("due", delta < 0);
+  el.innerHTML = `Next · <b>${r.name}</b> ${isToday ? "" : DOW[day] + " "}~${label} · ${inT}`; }
 
 let EVENTS = [];
 function countdown(){ const now = Date.now(); const next = EVENTS.find(e => Date.parse(e.utc) > now - 5*60e3);
@@ -663,6 +690,7 @@ function render(D){
   const kinds = {morning:"☕ Morning", abend:"🌙 US Close", rueckblick:"🔁 Weekly Review", ausblick:"🔭 Weekly Outlook", bilanz:"📊 Signal Report", gap:"🌙 Gap Check", mittag:"🕛 Midday"};
   $("arch").innerHTML = (D.digests || []).map((d,i) => `<button data-i="${i}"><div class="d">${dshort(d.date)} · ${kinds[d.kind] || ""}</div><div class="t">${esc(d.title.replace(/^\S+\s*R3M\s*/, ""))}</div></button>`).join("");
   const card = (d,i) => `<button data-i="${i}"><div class="d">${dshort(d.date)} · ${kinds[d.kind] || ""}</div><div class="t">${esc(d.title.replace(/^\S+\s*R3M\s*/, ""))}</div></button>`;
+  DIGESTS = D.digests || []; nextReport();
   $("recent-arch").insertAdjacentHTML("beforeend", (D.digests || []).slice(0,3).map(card).join("") + `<a class="more" href="#archiv">Full archive →</a>`);
   const open = e => { const b = e.target.closest("button[data-i]"); if (!b) return; const d = D.digests[+b.dataset.i];
     $("dlg-t").textContent = d.title; $("dlg-b").innerHTML = d.html; $("dlg").showModal(); };
