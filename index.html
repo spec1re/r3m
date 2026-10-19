@@ -167,6 +167,14 @@ h2{font:600 28px var(--f-display);margin:0;letter-spacing:-.2px}
 .stat{background:var(--deep);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
 .stat .v{font:600 24px var(--f-display)}
 .stat .k{font-size:12px;color:var(--mist);text-transform:uppercase;letter-spacing:.8px}
+.stat .s{font-size:12px;color:var(--mist);margin-top:2px}
+.ch3{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:6px}.ch3 .num{font-size:14px;font-weight:600}
+.splits{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:14px}
+.split h4{margin:0 0 10px;font:600 12px var(--f-body);letter-spacing:1px;text-transform:uppercase;color:var(--mist)}
+.srow{display:grid;gap:5px;margin-bottom:12px}.srow:last-child{margin-bottom:0}
+.srow .t{display:flex;justify-content:space-between;gap:8px;font-size:13.5px}.srow .t b{font:600 14px var(--f-display)}
+.srow .m{font-size:12px;color:var(--mist)}
+@media (max-width:700px){.splits{grid-template-columns:1fr}}
 .curve{background:var(--deep);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
 .curve svg{width:100%;height:auto;display:block}
 .bars{display:grid;gap:8px;margin-top:12px}
@@ -386,12 +394,12 @@ a.chip{text-decoration:none}
   </div></section>
 
   <section id="signale"><div class="wrap">
-    <div class="sh"><h2>Signals</h2><span class="sub" id="s-sub">Alert log of the last 7 days · best target per trade · R = full exit at TP1</span></div>
+    <div class="sh"><h2>Signals</h2><span class="sub" id="s-sub">Every entry alert of the last 7 days · best target per trade · R = full exit at TP1, stop = −1R</span></div>
     <div class="sig">
       <div>
         <div class="stats" id="stats"></div>
-        <div class="curve"><h3 class="eyebrow" style="margin:0 0 6px">R curve</h3><svg id="curve" viewBox="0 0 560 200" role="img" aria-label="Cumulative R over closed trades"></svg>
-          <div class="bars" id="byscript"></div></div>
+        <div class="curve"><div class="ch3"><h3 class="eyebrow" style="margin:0">R curve · closed trades</h3><span class="num" id="curve-end"></span></div><svg id="curve" viewBox="0 0 560 200" role="img" aria-label="Cumulative R over closed trades"></svg></div>
+        <div class="curve splits" id="splits"></div>
       </div>
       <div class="feed"><table><thead><tr><th>Time</th><th>Symbol</th><th>Script</th><th>Setup</th><th>TP1</th><th>Result</th></tr></thead><tbody id="recent"></tbody></table></div>
     </div>
@@ -618,15 +626,22 @@ function render(D){
   /* Signals */
   const S = D.signals || {}, T = S.total || {};
   const q = (a,b) => b ? Math.round(100*a/b) + "%" : "–";
-  $("stats").innerHTML = [["Signals", T.n ?? 0, ""], ["TP1 rate", q(T.tp1, T.done), "up"], ["Stop rate", q(T.sl, T.done), "down"],
-    ["Σ R", (T.r > 0 ? "+" : "") + fmt(T.r ?? 0, 1), T.r >= 0 ? "up" : "down"]].map(([k,v,c]) => `<div class="stat"><div class="v num ${c}">${v}</div><div class="k">${k}</div></div>`).join("");
+  const sR = r => (r > 0 ? "+" : r < 0 ? "−" : "±") + fmt(Math.abs(r ?? 0), 1) + "R";
+  $("stats").innerHTML = [["Trades", T.n ?? 0, "", `${T.done ?? 0} closed · ${T.open ?? 0} open`], ["TP1 rate", q(T.tp1, T.done), "up", `${T.tp1 ?? 0} of ${T.done ?? 0}`],
+    ["TP2 rate", q(T.tp2, T.done), "", `${T.tp2 ?? 0} full runs`], ["Σ R", sR(T.r), T.r >= 0 ? "up" : "down", "stop = −1R"]]
+    .map(([k,v,c,sub]) => `<div class="stat"><div class="v num ${c}">${v}</div><div class="k">${k}</div><div class="s">${sub}</div></div>`).join("");
+  $("curve-end").innerHTML = T.done ? `<span class="${T.r >= 0 ? "up" : "down"}">${sR(T.r)}</span>` : "";
   drawCurve(S.curve || []);
   $("sig-mini").innerHTML = T.done ? `<span class="${T.r >= 0 ? "up" : "down"}">${T.r > 0 ? "+" : ""}${fmt(T.r,1)} R</span>` : "–";
   $("sig-mini-sub").textContent = T.n ? `${T.n} signals · TP1 ${q(T.tp1, T.done)} · SL ${q(T.sl, T.done)}` : "No signals yet";
-  const maxN = Math.max(1, ...(S.byScript || []).map(s => s.n));
-  $("byscript").innerHTML = (S.byScript || []).map(s => `<div class="brow"><span><b>${esc(s.name)}</b> <span class="sub num">${s.n}</span></span>
-    <div class="btrack" title="TP1 · SL · open"><i style="width:${100*s.tp1/maxN}%;background:rgb(var(--up))"></i><i style="width:${100*s.sl/maxN}%;background:rgb(var(--down))"></i><i style="width:${100*s.open/maxN}%;background:var(--mist);opacity:.5"></i></div>
-    <span class="num ${s.r >= 0 ? "up" : "down"}" style="text-align:right">${s.done ? (s.r > 0 ? "+" : "") + fmt(s.r,1) + " R" : "open"}</span></div>`).join("");
+  /* splits: by script, by session, by bias grade · bar = TP1 · SL · open, scaled to the biggest group of that column */
+  const split = (title, list) => { if (!list.length) return ""; const maxN = Math.max(1, ...list.map(g => g.n));
+    return `<div class="split"><h4>${title}</h4>${list.map(g => `<div class="srow"><div class="t"><b>${esc(g.name)}</b><span class="num ${g.r >= 0 ? "up" : "down"}">${g.done ? sR(g.r) : "open"}</span></div>
+      <div class="btrack" title="TP1 ${g.tp1} · SL ${g.sl} · open ${g.open}"><i style="width:${100*g.tp1/maxN}%;background:rgb(var(--up))"></i><i style="width:${100*g.sl/maxN}%;background:rgb(var(--down))"></i><i style="width:${100*g.open/maxN}%;background:var(--mist);opacity:.5"></i></div>
+      <div class="m">${g.n} trades · TP1 ${q(g.tp1, g.done)}</div></div>`).join("")}</div>`; };
+  const grades = (S.byGrade || []).filter(g => !/^\d+\/\d+$/.test(g.name) && g.n >= 5).sort((a, b) => b.r - a.r).slice(0, 4);
+  $("splits").innerHTML = split("By script", S.byScript || []) + split("By session", (S.bySession || []).filter(g => g.name !== "–"))
+    + split("By HTF bias grade", grades);
   const resI = {"TP2 Hit":"🏆 TP2","TP1 Hit":"✅ TP1","Stopped":"🛑 SL","open":"⏳ open","offen":"⏳ open"};
   $("recent").innerHTML = (S.recent || []).map(r => `<tr><td class="num">${new Intl.DateTimeFormat(de,{timeZone:BER,weekday:"short",hour:"2-digit",minute:"2-digit"}).format(new Date(r.t))}</td>
     <td><b>${tv(r.tv || r.sym, esc(r.sym))}</b> <span class="${r.side === "LONG" ? "up" : "down"}">${r.side === "LONG" ? "▲" : "▼"}</span></td><td>${esc(r.script)}</td><td class="sub">${esc(r.setup)}</td>
