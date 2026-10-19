@@ -103,10 +103,7 @@ h2{font:600 28px var(--f-display);margin:0;letter-spacing:-.2px}
 .wave{height:18px;background:radial-gradient(circle at 10px -4px,transparent 12px,var(--line) 13px,transparent 14px) 0 0/20px 18px repeat-x;opacity:.55}
 
 /* Tiles */
-.groups{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
-.group.fx4 .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
-.fut{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-.fut .fp{display:flex;justify-content:space-between}
+.groups{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
 .group h4{margin:0 0 8px;font:600 13px var(--f-body);letter-spacing:1px;text-transform:uppercase;color:var(--mist)}
 .tiles{display:grid;gap:10px}
 .tile{--h:0;--rgb:var(--up);position:relative;border-radius:12px;padding:12px 14px;border:1px solid var(--line);
@@ -114,7 +111,7 @@ h2{font:600 28px var(--f-display);margin:0;letter-spacing:-.2px}
 .tile .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .sym{font:600 16px var(--f-display);letter-spacing:.3px}
 .fl{margin-right:6px;font-size:.92em;letter-spacing:1px}
-.tile .sym,.fp>span{white-space:nowrap}
+.tile .sym{white-space:nowrap}
 .tile .top .sym{min-width:0;overflow:hidden;text-overflow:ellipsis}.tile .top .chg{flex:0 0 auto}
 .chg{font:500 13.5px var(--f-data);padding:1px 8px;border-radius:999px;background:rgba(var(--rgb),.14)}
 .price{font:500 20px var(--f-data);margin:2px 0 8px}
@@ -123,11 +120,6 @@ h2{font:600 28px var(--f-display);margin:0;letter-spacing:-.2px}
 .rl{display:flex;justify-content:space-between;font:12px var(--f-data);color:var(--mist);margin-top:5px}
 .note{font-size:12.5px;color:#cfe3e0;margin-top:6px}
 .strip{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
-.fp{--h:0;--rgb:var(--up);font:500 13px var(--f-data);padding:6px 11px;border-radius:10px;border:1px solid var(--line);
-  background:linear-gradient(rgba(var(--rgb),calc(var(--h)*.22)),rgba(var(--rgb),calc(var(--h)*.08))),var(--deep)}
-.fp span{color:var(--mist);margin-right:6px;font-family:var(--f-body);font-weight:600}
-.idx{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:12px}
-.idx .card{padding:12px 14px}
 
 /* Charts */
 .charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:16px}
@@ -189,6 +181,16 @@ tr:last-child td{border-bottom:0}
 .chip.h{color:var(--sun);border-color:rgba(255,207,115,.3)}
 .chip.c{color:#9ad7ff;border-color:rgba(154,215,255,.3)}
 .agenda{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+/* Futures overnight + cash indices: stocks-style cards below the tiles */
+.mk2{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:12px;margin-top:16px}
+@media (max-width:1100px){.mk2{grid-template-columns:1fr}}
+.crow{display:grid;grid-template-columns:104px minmax(0,1fr);gap:4px 10px;align-items:start;padding:7px 0}
+.crow+.crow{border-top:1px solid rgba(26,69,86,.55)}
+.crow .lab{font:600 11px var(--f-body);letter-spacing:1.2px;text-transform:uppercase;color:var(--mist);padding-top:5px;white-space:nowrap}
+.crow .lab a{color:inherit}.crow .lab .fl{font-size:14px;letter-spacing:0}
+.crow .chips{margin-top:0}
+a.chip{color:var(--foam)}a.chip.s{color:rgb(var(--up))}a.chip.w{color:rgb(var(--down))}a.chip.h{color:var(--sun)}a.chip.c{color:#9ad7ff}
+@media (max-width:600px){.crow{grid-template-columns:1fr;gap:6px}.crow .lab{padding-top:0}}
 .agenda ul{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:6px}
 .agenda li{font-size:14px;color:#d4e6e3}
 .agenda .day{font:600 18px var(--f-display);color:var(--foam)}
@@ -249,15 +251,10 @@ pre.cl{white-space:pre-wrap;font:13px/1.55 var(--f-data);color:#cfe3e0;margin:6p
   .recent{grid-column:1/-1;grid-template-columns:repeat(3,minmax(0,1fr))}
   .recent .eyebrow,.recent .more{grid-column:1/-1}
   .groups{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .group.fx4{grid-column:1/-1}
-  .group.fx4 .tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
-  .fut{grid-template-columns:repeat(6,minmax(0,1fr))}
   .hero-cards,.agenda{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
-@media (min-width:1600px){.groups{grid-template-columns:repeat(4,minmax(0,1fr))}.agenda{grid-template-columns:repeat(4,minmax(0,1fr))}.stocks{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (min-width:1600px){.agenda{grid-template-columns:repeat(4,minmax(0,1fr))}.stocks{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:900px){
-  .fut{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .group.fx4 .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
   .hero-grid{grid-template-columns:1fr;padding-block:28px 18px}
   .recent{grid-template-columns:1fr}
   .mascot{order:-1;grid-auto-flow:column;justify-content:start;align-items:center}
@@ -373,6 +370,7 @@ a.chip{text-decoration:none}
   <section id="maerkte"><div class="wrap">
     <div class="sh"><h2>Markets</h2><span class="sub" id="m-sub">Custom Pepper · Pepperstone CFDs</span></div>
     <div class="groups" id="groups"></div>
+    <div class="mk2" id="futidx"></div>
   </div></section>
 
   <section id="einschaetzung"><div class="wrap">
@@ -518,12 +516,23 @@ function render(D){
   if (pp.length){ $("tf-h").textContent = `Top & Flop · ${M.chgLabel || "Day"}`;
     $("topflop").innerHTML = [["🚀", pp[0]], ["🪨", pp[pp.length-1]]].map(([e,p]) => `<div><span class="sym">${e} ${fl(p.sym)}${tv(p.sym)}</span><span class="num ${cls(p.chg)}">${pct(p.chg)}</span></div>`).join("")
       + `<div class="sub">out of ${pp.length} Custom Pepper symbols</div>`; }
-  const idx = (M.indices || []).filter(i => i.sym !== "VIX");
-  $("groups").insertAdjacentHTML("beforeend", `<div class="group fx4"><h4>Futures · Cash</h4>
-    <div class="fut">${(M.futures || []).map(f => `<span class="fp" data-chg="${f.chg}"><span>${fl(f.sym)}${tv(f.sym)}</span><b class="${cls(f.chg)}">${pct(f.chg)}</b></span>`).join("")}</div>
-    <div class="tiles" style="margin-top:10px">${idx.map(i => `<article class="tile" data-chg="${i.chg}"><div class="top"><span class="sym">${fl(i.sym)}${tv(i.sym)}</span><span class="chg ${cls(i.chg)}">${pct(i.chg)}</span></div>
-      <div class="price num">${fmt(i.price,1)}</div><div class="rl"><span>RSI ${i.rsi ?? "–"}</span><span>SMA50 ${fmt(i.sma50,0)} ${i.price < i.sma50 ? "↓" : "↑"}</span></div></article>`).join("")}</div></div>`);
-  document.querySelectorAll(".tile,.fp").forEach(t => heat(t, +t.dataset.chg, span));
+  /* Futures overnight + cash indices, stocks-style chips */
+  const chipC = v => v > 0.05 ? "s" : v < -0.05 ? "w" : "";
+  const chipA = (sym, c, text, title) => `<a class="chip ${c}" href="${tvUrl(tvOf(sym))}" target="_blank" rel="noopener" title="${esc(title || sym + " on TradingView")}">${text}</a>`;
+  const FG = [["Indices", ["FDAX","FESX","ES","NQ","YM","RTY"]], ["FX", ["6E","6J","DX"]], ["Commodities", ["GC","SI","CL"]]];
+  const fut = M.futures || [], known = FG.flatMap(g => g[1]), rest = fut.filter(f => !known.includes(f.sym)).map(f => f.sym);
+  const futRows = FG.concat(rest.length ? [["Other", rest]] : []).map(([g, syms]) => {
+    const list = syms.map(x => fut.find(f => f.sym === x)).filter(Boolean); if (!list.length) return "";
+    return `<div class="crow"><span class="lab">${esc(g)}</span><div class="chips">${list.map(f => chipA(f.sym, chipC(f.chg), `${FLAGS[f.sym] ? FLAGS[f.sym] + " " : ""}${esc(f.sym)} ${pct(f.chg)}`)).join("")}</div></div>`; }).join("");
+  const wk = M.chgLabel === "Week" || M.chgLabel === "Woche";
+  const idxRows = (M.indices || []).map(i => {
+    const rsi = i.rsi == null ? "" : i.rsi >= 70 ? chipA(i.sym, "h", `🔥 RSI ${i.rsi}`, "RSI over 70") : i.rsi <= 30 ? chipA(i.sym, "c", `🧊 RSI ${i.rsi}`, "RSI under 30") : chipA(i.sym, "", `RSI ${i.rsi}`);
+    const d = i.sym === "VIX" ? 2 : 0, above = i.price >= i.sma50;
+    const sma = i.sma50 == null ? "" : chipA(i.sym, above ? "s" : "w", `${above ? "▲ above" : "▼ below"} SMA50 ${fmt(i.sma50, d)}`);
+    return `<div class="crow"><span class="lab">${fl(i.sym)}${tv(i.sym)}</span><div class="chips">${chipA(i.sym, chipC(i.chg), `${fmt(i.price, i.sym === "VIX" ? 2 : 1)} ${pct(i.chg)}`)}${rsi}${sma}</div></div>`; }).join("");
+  $("futidx").innerHTML = (futRows ? `<div class="card"><h3>${wk ? "📅 Futures · week" : "🌙 Futures overnight"}</h3>${futRows}</div>` : "")
+    + (idxRows ? `<div class="card"><h3>🏛️ Cash indices · ${wk ? "week" : "prior close"}</h3>${idxRows}</div>` : "");
+  document.querySelectorAll(".tile").forEach(t => heat(t, +t.dataset.chg, span));
 
   const chartBy = Object.fromEntries((D.charts || []).map(c => [c.sym, c]));
 
@@ -813,7 +822,7 @@ function soundUI(){
   if (pref !== "0") { Sound.setSfx(true); sb.setAttribute("aria-pressed", "true"); }
   let last = null, lastT = 0;
   document.addEventListener("pointerover", e => { if (e.pointerType !== "mouse") return;
-    const el = e.target.closest(".tile,.fp,.arch button,.recent button,.stat,nav a,.chip"); if (!el || el === last) return;
+    const el = e.target.closest(".tile,.arch button,.recent button,.stat,nav a,.chip"); if (!el || el === last) return;
     last = el; const now = performance.now(); if (now - lastT < 70) return; lastT = now; Sound.blub("hover"); });
   document.addEventListener("click", e => { if (e.target.closest("button:not(#snd-sfx),a,.arch button")) Sound.blub("click"); });
 }
