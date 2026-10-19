@@ -34,8 +34,18 @@ jobs:
         run: python3 .github/tg_feed.py live.json
       - name: Publish
         run: |
+          git config user.name "R3M Live"
+          git config user.email "noreply@github.com"
           git add live.json 2>/dev/null || exit 0
           git diff --cached --quiet && exit 0
-          git -c user.name="R3M Live" -c user.email="noreply@github.com" commit -qm "live feed"
-          for i in 1 2 3; do git push -q && exit 0; git pull -q --rebase origin main; done
+          git commit -qm "live feed"
+          cp live.json "$RUNNER_TEMP/live.json"
+          # a site deploy can land in the same second: take its state, put live.json back on top, retry
+          for i in 1 2 3 4 5; do
+            git push -q origin HEAD:main && exit 0
+            sleep $((i * 3))
+            git fetch -q origin main && git reset -q --hard origin/main
+            cp "$RUNNER_TEMP/live.json" live.json
+            git add live.json && { git diff --cached --quiet && exit 0; git commit -qm "live feed"; }
+          done
           exit 1
