@@ -187,6 +187,8 @@ h2{font:600 28px var(--f-display);margin:0;letter-spacing:-.2px}
 .btrack{height:10px;border-radius:5px;background:var(--line);overflow:hidden;display:flex}
 .btrack i{display:block;height:100%}
 .feed{background:var(--deep);border:1px solid var(--line);border-radius:var(--r);overflow-x:auto}
+#pane-models{overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--line) transparent}#pane-models th{position:sticky;top:0;background:var(--deep)}
+#models .ms{font-size:12px;color:var(--mist)}#models b{font:600 14.5px var(--f-display)}.tier.hi{color:var(--sun)}.tier.lo{color:var(--mist)}
 table{width:100%;border-collapse:collapse;font-size:13.5px}
 th{text-align:left;font-weight:600;color:var(--mist);font-size:11.5px;letter-spacing:.8px;text-transform:uppercase;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
 td{padding:8px 12px;border-bottom:1px solid rgba(26,69,86,.55);white-space:nowrap}
@@ -406,7 +408,13 @@ a.chip{text-decoration:none}
         <div class="curve"><div class="ch3"><h3 class="eyebrow" style="margin:0">R curve · closed trades</h3><span class="num" id="curve-end"></span></div><svg id="curve" viewBox="0 0 560 200" role="img" aria-label="Cumulative R over closed trades"></svg></div>
         <div class="curve splits" id="splits"></div>
       </div>
-      <div class="feed"><table><thead><tr><th>Time</th><th>Symbol</th><th>Script</th><th>Setup</th><th>TP1</th><th>Result</th></tr></thead><tbody id="recent"></tbody></table></div>
+      <div class="sigpanel">
+        <div class="feedbar sigtabs" role="tablist" aria-label="Latest trades or models">
+          <button type="button" role="tab" id="tab-trades" aria-controls="pane-trades">Latest trades</button><button type="button" role="tab" id="tab-models" aria-controls="pane-models">Models</button>
+          <span class="tg" id="tab-note"></span></div>
+        <div class="feed" id="pane-trades" role="tabpanel" aria-labelledby="tab-trades"><table><thead><tr><th>Time</th><th>Symbol</th><th>Script</th><th>Setup</th><th>TP1</th><th>Result</th></tr></thead><tbody id="recent"></tbody></table></div>
+        <div class="feed" id="pane-models" role="tabpanel" aria-labelledby="tab-models" hidden><table><thead><tr><th>#</th><th>Model</th><th>Tier</th><th>Rating</th><th>TP1 / SL</th><th>TP2</th><th>Σ R</th></tr></thead><tbody id="models"></tbody></table></div>
+      </div>
     </div>
   </div></section>
 
@@ -434,12 +442,12 @@ a.chip{text-decoration:none}
         <div class="clbox" id="cl">–</div></div>
     </div>
   </div></section>
-</main>
 
-<section id="awards" hidden><div class="wrap">
-  <div class="sh"><h2>Awards</h2><span class="sub">Discipline earns points, volume doesn't · from the signals of the last 7 days, groups with 5+ closed trades</span></div>
-  <div class="awards" id="award-list"></div>
-</div></section>
+  <section id="awards" hidden><div class="wrap">
+    <div class="sh"><h2>Awards</h2><span class="sub">Discipline earns points, volume doesn't · from the signals of the last 7 days, groups with 5+ closed trades</span></div>
+    <div class="awards" id="award-list"></div>
+  </div></section>
+</main>
 
 <footer><div class="wrap foot">
   <div><strong style="color:var(--foam)">R3M Riff</strong><br>Facts and levels to watch. Not financial advice.<br>
@@ -692,6 +700,23 @@ function render(D){
   const grades = (S.byGrade || []).filter(g => !/^\d+\/\d+$/.test(g.name) && g.n >= 5).sort((a, b) => b.r - a.r).slice(0, 4);
   $("splits").innerHTML = split("By script", S.byScript || []) + split("By session", (S.bySession || []).filter(g => g.name !== "–"))
     + split("By HTF bias grade", grades);
+  /* Models tab: ranked after 10 closed trades, rating = 1000 + 25 × R, tiers LTF → ITF → HTF */
+  const models = (S.models || []).map(g => { const rating = Math.round(1000 + 25 * g.r), ranked = g.done >= 10;
+    const tier = !ranked ? `Forward test ${g.done} / 10` : rating >= 1250 ? "HTF" : rating >= 1100 ? "ITF" : "LTF";
+    return {...g, rating, ranked, tier}; }).sort((a, b) => (b.ranked - a.ranked) || (b.rating - a.rating));
+  let rank = 0;
+  $("models").innerHTML = models.map(m => `<tr><td class="num sub">${m.ranked ? ++rank : "–"}</td><td><b>${esc(m.name)}</b><div class="ms">${esc(m.script)}</div></td>
+    <td class="tier ${m.ranked && m.tier !== "LTF" ? "hi" : "lo"}">${m.tier}</td><td class="num">${m.rating}</td><td class="num">${m.tp1} / ${m.sl}</td>
+    <td class="num">${q(m.tp2, m.done)}</td><td class="num ${m.r >= 0 ? "up" : "down"}">${sR(m.r)}</td></tr>`).join("")
+    || `<tr><td colspan="7" class="sub">No models yet.</td></tr>`;
+  { const tabs = [["trades", ""], ["models", "ranked after 10 closed · rating 1000 + 25 × R"]];
+    const show = k => { const tp = $("pane-trades");
+      if (k === "models" && !tp.hidden) $("pane-models").style.height = tp.offsetHeight + "px";   // same height, scrolls inside
+      tabs.forEach(([t]) => { const on = t === k; $("tab-" + t).setAttribute("aria-pressed", String(on)); $("tab-" + t).setAttribute("aria-selected", String(on)); $("pane-" + t).hidden = !on; });
+      $("tab-note").textContent = tabs.find(t => t[0] === k)[1]; try { localStorage.setItem("r3m-sigtab", k); } catch {} };
+    tabs.forEach(([t]) => { $("tab-" + t).onclick = () => show(t); });
+    let k0 = "trades"; try { k0 = localStorage.getItem("r3m-sigtab") === "models" ? "models" : "trades"; } catch {}
+    show("trades"); if (k0 === "models") requestAnimationFrame(() => show("models")); }
   const resI = {"TP2 Hit":"🏆 TP2","TP1 Hit":"✅ TP1","Stopped":"🛑 SL","open":"⏳ open","offen":"⏳ open"};
   $("recent").innerHTML = (S.recent || []).map(r => `<tr><td class="num">${new Intl.DateTimeFormat(de,{timeZone:BER,weekday:"short",hour:"2-digit",minute:"2-digit"}).format(new Date(r.t))}</td>
     <td><b>${tv(r.tv || r.sym, esc(r.sym))}</b> <span class="${r.side === "LONG" ? "up" : "down"}">${r.side === "LONG" ? "▲" : "▼"}</span></td><td>${esc(r.script)}</td><td class="sub">${esc(r.setup)}</td>
@@ -860,11 +885,11 @@ function bubbles(){
 
 /* Reorder sections */
 function orderTool(){
-  const main = document.querySelector("main"), names = {einschaetzung:"Outlook",termine:"Calendar",maerkte:"Markets",aktien:"Stocks",signale:"Signals",archiv:"Archive",feed:"Feed"};
+  const main = document.querySelector("main"), names = {einschaetzung:"Outlook",termine:"Calendar",maerkte:"Markets",aktien:"Stocks",signale:"Signals",archiv:"Archive",feed:"Feed",awards:"Awards"}, noNav = ["awards"];
   const def = Object.keys(names); let cur = def;
   try { const v = JSON.parse(localStorage.getItem("r3m-order") || "null"); if (Array.isArray(v)) { const keep = v.filter(k => def.includes(k)); if (keep.length) cur = [...keep, ...def.filter(k => !keep.includes(k))]; } } catch {}
   const apply = () => { cur.forEach(id => main.appendChild($(id)));
-    const nav = document.querySelector("nav"); nav.innerHTML = cur.filter(id => names[id]).map(id => `<a href="#${id}">${names[id]}</a>`).join("");
+    const nav = document.querySelector("nav"); nav.innerHTML = cur.filter(id => names[id] && !noNav.includes(id)).map(id => `<a href="#${id}">${names[id]}</a>`).join("");
     $("order-list").innerHTML = cur.map((id,i) => `<li><span>${i+1}. ${names[id]}</span><button class="m" data-i="${i}" data-d="-1" aria-label="Move ${names[id]} up" ${i ? "" : "disabled"}>↑</button><button class="m" data-i="${i}" data-d="1" aria-label="Move ${names[id]} down" ${i < cur.length-1 ? "" : "disabled"}>↓</button></li>`).join("");
     try { localStorage.setItem("r3m-order", JSON.stringify(cur)); } catch {} };
   $("order-list").onclick = e => { const b = e.target.closest("button"); if (!b) return; const i = +b.dataset.i, j = i + +b.dataset.d;
