@@ -407,6 +407,7 @@ a.chip{text-decoration:none}
 
   <section id="signale"><div class="wrap">
     <div class="sh"><h2>Signals</h2><span class="sub" id="s-sub">Every entry alert of the last 7 days · best target per trade · R = full exit at TP1, stop = −1R</span></div>
+    <div class="feedbar sigsrc" role="group" aria-label="Live alerts or replay"><button type="button" id="src-live">Live · 7 days</button><button type="button" id="src-rep">Replay</button></div>
     <div class="sig">
       <div>
         <div class="stats" id="stats"></div>
@@ -419,7 +420,7 @@ a.chip{text-decoration:none}
           <span class="tg" id="tab-note"></span></div>
         <div class="feed" id="pane-trades" role="tabpanel" aria-labelledby="tab-trades"><table><thead><tr><th>Time</th><th>Symbol</th><th>Script</th><th>Setup</th><th>TP1</th><th>Result</th></tr></thead><tbody id="recent"></tbody></table></div>
         <div class="feed" id="pane-models" role="tabpanel" aria-labelledby="tab-models" hidden><table><thead><tr><th>#</th><th>Model</th><th>Tier</th><th>Rating</th><th>TP1 / SL</th><th>TP2</th><th>Σ R</th></tr></thead><tbody id="models"></tbody></table></div>
-        <div class="feed" id="pane-conf" role="tabpanel" aria-labelledby="tab-conf" hidden><table><thead><tr><th>Confluence</th><th>n</th><th>TP1 with</th><th>without</th><th>Edge</th><th>Σ R with</th></tr></thead><tbody id="conf"></tbody></table></div>
+        <div class="feed" id="pane-conf" role="tabpanel" aria-labelledby="tab-conf" hidden><table><thead><tr><th>Confluence</th><th>n</th><th>Ø R with</th><th>without</th><th>Edge</th><th>TP1 with</th></tr></thead><tbody id="conf"></tbody></table></div>
       </div>
     </div>
   </div></section>
@@ -686,28 +687,13 @@ function render(D){
   const S = D.signals || {}, T = S.total || {};
   const q = (a,b) => b ? Math.round(100*a/b) + "%" : "–";
   const sR = r => (r > 0 ? "+" : r < 0 ? "−" : "±") + fmt(Math.abs(r ?? 0), 1) + "R";
+  /* the signals view, filled from the live alerts (7 days) or the replay (chart history) */
+  const sigView = (S, rep) => { const T = S.total || {};
   $("stats").innerHTML = [["Trades", T.n ?? 0, "", `${T.done ?? 0} closed · ${T.open ?? 0} open`], ["TP1 rate", q(T.tp1, T.done), "up", `${T.tp1 ?? 0} of ${T.done ?? 0}`],
     ["TP2 rate", q(T.tp2, T.done), "", `${T.tp2 ?? 0} full runs`], ["Σ R", sR(T.r), T.r >= 0 ? "up" : "down", "stop = −1R"]]
     .map(([k,v,c,sub]) => `<div class="stat"><div class="v num ${c}">${v}</div><div class="k">${k}</div><div class="s">${sub}</div></div>`).join("");
   $("curve-end").innerHTML = T.done ? `<span class="${T.r >= 0 ? "up" : "down"}">${sR(T.r)}</span>` : "";
   drawCurve(S.curve || []);
-
-  /* Awards: discipline over volume, only groups with 5+ closed trades */
-  { const okA = g => g && g.done >= 5 && g.name !== "–", setups = (S.bySetup || []).filter(okA), syms = (S.bySymbol || []).filter(okA), aw = [];
-    const top = (list, f) => list.length ? list.slice().sort((a, b) => f(b) - f(a))[0] : null, plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
-    const fd = top(setups, g => g.tp2);
-    if (fd && fd.tp2) aw.push(["--glass", "Full delivery", fd.name, `${plural(fd.tp2, "run")} to TP2 this week, the most of any model`]);
-    const un = top(syms, g => -g.sl / g.done + g.done / 1e4);
-    if (un) aw.push(["--glass", "Unmitigated", `${FLAGS[un.name] ? FLAGS[un.name] + " " : ""}${un.name}`, `${plural(un.sl, "stop")} in ${un.done} closed trades`]);
-    const pa = top(setups, g => g.r / g.done);
-    if (pa && pa.r > 0) aw.push(["--sun", "Patience", pa.name, `${sR(pa.r / pa.done)} per closed trade in only ${pa.done} trades · quality over quantity`]);
-    const sa = top(syms, g => g.sl / g.done);
-    if (sa && sa.sl / sa.done >= 0.6) aw.push(["--coral", "Stand aside", `${FLAGS[sa.name] ? FLAGS[sa.name] + " " : ""}${sa.name}`, `${sa.sl} stops in ${sa.done} closed trades: no trade is a position too`]);
-    $("award-list").innerHTML = aw.map(([c, t, w, y]) => `<div class="card award"><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="16" r="11" fill="none" stroke="var(${c})" stroke-width="2.5"/><path d="M13 25l-3 12 10-5 10 5-3-12" fill="none" stroke="var(${c})" stroke-width="2.5" stroke-linejoin="round"/></svg>
-      <div><div class="at" style="color:var(${c})">${t}</div><div class="aw">${esc(w)}</div><div class="ay">${esc(y)}</div></div></div>`).join("");
-    $("awards").hidden = !aw.length; }
-  $("sig-mini").innerHTML = T.done ? `<span class="${T.r >= 0 ? "up" : "down"}">${T.r > 0 ? "+" : ""}${fmt(T.r,1)} R</span>` : "–";
-  $("sig-mini-sub").textContent = T.n ? `${T.n} signals · TP1 ${q(T.tp1, T.done)} · SL ${q(T.sl, T.done)}` : "No signals yet";
   /* splits: by script, by session, by bias grade · bar = TP1 · SL · open, scaled to the biggest group of that column */
   const split = (title, list) => { if (!list.length) return ""; const maxN = Math.max(1, ...list.map(g => g.n));
     return `<div class="split"><h4>${title}</h4>${list.map(g => `<div class="srow"><div class="t"><b>${esc(g.name)}</b><span class="num ${g.r >= 0 ? "up" : "down"}">${g.done ? sR(g.r) : "open"}</span></div>
@@ -725,16 +711,50 @@ function render(D){
     <td class="tier ${m.ranked && m.tier !== "LTF" ? "hi" : "lo"}">${m.tier}</td><td class="num">${m.rating}</td><td class="num">${m.tp1} / ${m.sl}</td>
     <td class="num">${q(m.tp2, m.done)}</td><td class="num ${m.r >= 0 ? "up" : "down"}">${sR(m.r)}</td></tr>`).join("")
     || `<tr><td colspan="7" class="sub">No models yet.</td></tr>`;
-  /* Confluence tab: TP1 rate of trades with a confluence vs. the same script's trades without it (5+ closed each side) */
-  const conf = (S.byTag || []).filter(g => g.with.done >= 5 && g.without.done >= 5).map(g => {
-    const a = g.with.tp1 / g.with.done, b = g.without.tp1 / g.without.done; return {...g, edge: Math.round(100 * (a - b))}; }).sort((x, y) => y.edge - x.edge);
-  const maxE = Math.max(1, ...conf.map(g => Math.abs(g.edge)));
+  /* Confluence tab: Ø R per closed trade with a confluence vs. the same script's trades without it (TP1 rate alone misleads:
+     a farther target hits less often but pays more) · live 5+ closed each side, replay 20+ */
+  const minN = rep ? 20 : 5, avg = x => x.done ? x.r / x.done : 0;
+  const conf = (S.byTag || []).filter(g => g.with.done >= minN && g.without.done >= minN).map(g => ({...g, edge: avg(g.with) - avg(g.without)}))
+    .sort((x, y) => y.edge - x.edge);
+  const maxE = Math.max(0.01, ...conf.map(g => Math.abs(g.edge))), aR = v => (v > 0 ? "+" : v < 0 ? "−" : "±") + fmt(Math.abs(v), 2) + "R";
   $("conf").innerHTML = conf.map(g => `<tr><td><b>${esc(g.name)}</b><div class="ms">${esc(g.script)}</div></td><td class="num">${g.with.done}</td>
-    <td class="num">${q(g.with.tp1, g.with.done)}</td><td class="num sub">${q(g.without.tp1, g.without.done)}</td>
-    <td><span class="edge"><i style="width:${Math.round(44 * Math.abs(g.edge) / maxE)}px;background:rgb(var(${g.edge >= 0 ? "--up" : "--down"}))"></i><span class="num ${g.edge >= 0 ? "up" : "down"}">${g.edge > 0 ? "+" : g.edge < 0 ? "−" : "±"}${Math.abs(g.edge)} pp</span></span></td>
-    <td class="num ${g.with.r >= 0 ? "up" : "down"}">${sR(g.with.r)}</td></tr>`).join("")
+    <td class="num ${avg(g.with) >= 0 ? "up" : "down"}">${aR(avg(g.with))}</td><td class="num sub">${aR(avg(g.without))}</td>
+    <td><span class="edge"><i style="width:${Math.round(44 * Math.abs(g.edge) / maxE)}px;background:rgb(var(${g.edge >= 0 ? "--up" : "--down"}))"></i><span class="num ${g.edge >= 0 ? "up" : "down"}">${aR(g.edge)}</span></span></td>
+    <td class="num">${q(g.with.tp1, g.with.done)}</td></tr>`).join("")
     || `<tr><td colspan="6" class="sub">Not enough closed trades per confluence yet.</td></tr>`;
-  { const tabs = [["trades", ""], ["models", "ranked after 10 closed · rating 1000 + 25 × R"], ["conf", "TP1 with vs. without · same script · 5+ closed each"]];
+  const resI = {"TP2 Hit":"🏆 TP2","TP1 Hit":"✅ TP1","Stopped":"🛑 SL","open":"⏳ open","offen":"⏳ open"};
+  $("recent").innerHTML = (S.recent || []).map(r => `<tr><td class="num">${new Intl.DateTimeFormat(de,{timeZone:BER,...(rep ? {day:"numeric",month:"short"} : {weekday:"short"}),hour:"2-digit",minute:"2-digit"}).format(new Date(r.t))}</td>
+    <td><b>${tv(r.tv || r.sym, esc(r.sym))}</b> <span class="${r.side === "LONG" ? "up" : "down"}">${r.side === "LONG" ? "▲" : "▼"}</span></td><td>${esc(r.script)}</td><td class="sub">${esc(r.setup)}</td>
+    <td class="num">${fmt(r.r1,1)} R</td><td class="res ${r.res === "Stopped" ? "down" : (r.res === "open" || r.res === "offen") ? "flat" : "up"}">${resI[r.res] || esc(r.res)}</td></tr>`).join("")
+    || `<tr><td colspan="6" class="sub">No signals collected yet.</td></tr>`;
+  };
+  { const R = D.replay, bl = $("src-live"), br = $("src-rep"), sub0 = $("s-sub").textContent;
+    const dd = t => new Intl.DateTimeFormat(de,{timeZone:BER,day:"numeric",month:"short"}).format(new Date(t));
+    if (!R) br.hidden = true; else br.textContent = `Replay · ${Math.max(1, Math.round((Date.parse(R.to) - Date.parse(R.from)) / 6048e5))} weeks`;
+    const set = rp => { sigView(rp ? R : S, rp); bl.setAttribute("aria-pressed", String(!rp)); br.setAttribute("aria-pressed", String(rp));
+      $("s-sub").textContent = rp ? `Replay of climax and equinox on chart history · ${R.symbols.length} Pepper symbols · ${dd(R.from)} – ${dd(R.to)} · the same logic as the live alerts · R = full exit at TP1, stop = −1R` : sub0;
+      try { localStorage.setItem("r3m-sigsrc", rp ? "rep" : "live"); } catch {} };
+    bl.onclick = () => set(false); br.onclick = () => set(true);
+    let r0 = false; try { r0 = !!R && localStorage.getItem("r3m-sigsrc") === "rep"; } catch {}
+    set(r0); }
+
+  /* Awards: discipline over volume, only groups with 5+ closed trades */
+  { const okA = g => g && g.done >= 5 && g.name !== "–", setups = (S.bySetup || []).filter(okA), syms = (S.bySymbol || []).filter(okA), aw = [];
+    const top = (list, f) => list.length ? list.slice().sort((a, b) => f(b) - f(a))[0] : null, plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+    const fd = top(setups, g => g.tp2);
+    if (fd && fd.tp2) aw.push(["--glass", "Full delivery", fd.name, `${plural(fd.tp2, "run")} to TP2 this week, the most of any model`]);
+    const un = top(syms, g => -g.sl / g.done + g.done / 1e4);
+    if (un) aw.push(["--glass", "Unmitigated", `${FLAGS[un.name] ? FLAGS[un.name] + " " : ""}${un.name}`, `${plural(un.sl, "stop")} in ${un.done} closed trades`]);
+    const pa = top(setups, g => g.r / g.done);
+    if (pa && pa.r > 0) aw.push(["--sun", "Patience", pa.name, `${sR(pa.r / pa.done)} per closed trade in only ${pa.done} trades · quality over quantity`]);
+    const sa = top(syms, g => g.sl / g.done);
+    if (sa && sa.sl / sa.done >= 0.6) aw.push(["--coral", "Stand aside", `${FLAGS[sa.name] ? FLAGS[sa.name] + " " : ""}${sa.name}`, `${sa.sl} stops in ${sa.done} closed trades: no trade is a position too`]);
+    $("award-list").innerHTML = aw.map(([c, t, w, y]) => `<div class="card award"><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="16" r="11" fill="none" stroke="var(${c})" stroke-width="2.5"/><path d="M13 25l-3 12 10-5 10 5-3-12" fill="none" stroke="var(${c})" stroke-width="2.5" stroke-linejoin="round"/></svg>
+      <div><div class="at" style="color:var(${c})">${t}</div><div class="aw">${esc(w)}</div><div class="ay">${esc(y)}</div></div></div>`).join("");
+    $("awards").hidden = !aw.length; }
+  $("sig-mini").innerHTML = T.done ? `<span class="${T.r >= 0 ? "up" : "down"}">${T.r > 0 ? "+" : ""}${fmt(T.r,1)} R</span>` : "–";
+  $("sig-mini-sub").textContent = T.n ? `${T.n} signals · TP1 ${q(T.tp1, T.done)} · SL ${q(T.sl, T.done)}` : "No signals yet";
+  { const tabs = [["trades", ""], ["models", "ranked after 10 closed · rating 1000 + 25 × R"], ["conf", "Ø R per closed trade with vs. without · same script"]];
     const show = k => { const tp = $("pane-trades");
       if (k !== "trades" && !tp.hidden) tabs.forEach(([t]) => { if (t !== "trades") $("pane-" + t).style.height = tp.offsetHeight + "px"; });   // same height, scrolls inside
       tabs.forEach(([t]) => { const on = t === k; $("tab-" + t).setAttribute("aria-pressed", String(on)); $("tab-" + t).setAttribute("aria-selected", String(on)); $("pane-" + t).hidden = !on; });
@@ -742,11 +762,6 @@ function render(D){
     tabs.forEach(([t]) => { $("tab-" + t).onclick = () => show(t); });
     let k0 = "trades"; try { const v = localStorage.getItem("r3m-sigtab"); if (tabs.some(t => t[0] === v)) k0 = v; } catch {}
     show("trades"); if (k0 !== "trades") requestAnimationFrame(() => show(k0)); }
-  const resI = {"TP2 Hit":"🏆 TP2","TP1 Hit":"✅ TP1","Stopped":"🛑 SL","open":"⏳ open","offen":"⏳ open"};
-  $("recent").innerHTML = (S.recent || []).map(r => `<tr><td class="num">${new Intl.DateTimeFormat(de,{timeZone:BER,weekday:"short",hour:"2-digit",minute:"2-digit"}).format(new Date(r.t))}</td>
-    <td><b>${tv(r.tv || r.sym, esc(r.sym))}</b> <span class="${r.side === "LONG" ? "up" : "down"}">${r.side === "LONG" ? "▲" : "▼"}</span></td><td>${esc(r.script)}</td><td class="sub">${esc(r.setup)}</td>
-    <td class="num">${fmt(r.r1,1)} R</td><td class="res ${r.res === "Stopped" ? "down" : (r.res === "open" || r.res === "offen") ? "flat" : "up"}">${resI[r.res] || esc(r.res)}</td></tr>`).join("")
-    || `<tr><td colspan="6" class="sub">No signals collected yet.</td></tr>`;
 
   /* Stocks, calendar */
   $("stocks").innerHTML = (M.stocks || []).map(s => `<div class="card"><h3>${esc(s.flag)} ${esc(s.list)}</h3>
