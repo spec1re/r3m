@@ -707,7 +707,7 @@ function render(D){
     const tier = !ranked ? `Forward test ${g.done} / 10` : rating >= 1250 ? "HTF" : rating >= 1100 ? "ITF" : "LTF";
     return {...g, rating, ranked, tier}; }).sort((a, b) => (b.ranked - a.ranked) || (b.rating - a.rating));
   let rank = 0;
-  $("models").innerHTML = models.map(m => `<tr><td class="num sub">${m.ranked ? ++rank : "–"}</td><td><b>${esc(m.name)}</b><div class="ms">${esc(m.script)}</div></td>
+  $("models").innerHTML = models.map(m => `<tr><td class="num sub">${m.ranked ? ++rank : "–"}</td><td><b>${esc(m.name)}</b><div class="ms">${esc(m.script)}${m.script === "lava" && m.name === "accept·VA" ? " · LVA London Value Acceptance" : ""}</div></td>
     <td class="tier ${m.ranked && m.tier !== "LTF" ? "hi" : "lo"}">${m.tier}</td><td class="num">${m.rating}</td><td class="num">${m.tp1} / ${m.sl}</td>
     <td class="num">${q(m.tp2, m.done)}</td><td class="num ${m.r >= 0 ? "up" : "down"}">${sR(m.r)}</td></tr>`).join("")
     || `<tr><td colspan="7" class="sub">No models yet.</td></tr>`;
