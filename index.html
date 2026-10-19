@@ -203,7 +203,11 @@ tr:last-child td{border-bottom:0}
 .chip.w{background:rgba(var(--down),.12);color:rgb(var(--down));border-color:rgba(var(--down),.3)}
 .chip.h{color:var(--sun);border-color:rgba(255,207,115,.3)}
 .chip.c{color:#9ad7ff;border-color:rgba(154,215,255,.3)}
-.agenda{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.agenda{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x proximity;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:var(--line) transparent;padding-bottom:6px}
+.agenda>.card{flex:1 0 210px;min-width:0;scroll-snap-align:start}
+.agenda>.card.today{border-color:rgba(95,211,191,.6)}
+.agenda .tday{font:600 10.5px var(--f-body);letter-spacing:1px;text-transform:uppercase;color:var(--abyss);background:var(--glass);border-radius:999px;padding:2px 7px;margin-left:8px;vertical-align:3px}
+@media (max-width:600px){.agenda>.card{flex-basis:78%}}
 /* Futures overnight + cash indices: stocks-style cards below the tiles */
 .mk2{display:flex;flex-direction:column;gap:18px;margin-top:18px}
 .crow{display:grid;grid-template-columns:104px minmax(0,1fr);gap:4px 10px;align-items:start;padding:7px 0}
@@ -272,9 +276,9 @@ pre.cl{white-space:pre-wrap;font:13px/1.55 var(--f-data);color:#cfe3e0;margin:6p
   .hero-grid{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}
   .recent{grid-column:1/-1;grid-template-columns:repeat(3,minmax(0,1fr))}
   .recent .eyebrow,.recent .more{grid-column:1/-1}
-  .hero-cards,.agenda{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hero-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
-@media (min-width:1600px){.agenda{grid-template-columns:repeat(4,minmax(0,1fr))}.stocks{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (min-width:1600px){.stocks{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:900px){
   .hero-grid{grid-template-columns:1fr;padding-block:28px 18px}
   .recent{grid-template-columns:1fr}
@@ -289,7 +293,7 @@ pre.cl{white-space:pre-wrap;font:13px/1.55 var(--f-data);color:#cfe3e0;margin:6p
   .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (max-width:600px){
-  .hero-cards,.agenda{grid-template-columns:1fr}
+  .hero-cards{grid-template-columns:1fr}
   .clock{margin-left:0}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important}}
@@ -531,13 +535,22 @@ function nextReport(){ const el = $("next-rep"); if (!el) return; const d = new 
   el.classList.toggle("due", delta < 0);
   el.innerHTML = `Next · <b>${r.name}</b> ${isToday ? "" : DOW[day] + " "}~${label} · ${inT}`; }
 
-let EVENTS = [];
-function countdown(){ const now = Date.now(); const next = EVENTS.find(e => Date.parse(e.utc) > now - 5*60e3);
-  if (!next) return; const ms = Date.parse(next.utc) - now;
+let EVENTS = [], NEXTEV = [];
+const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function berlinUtc(y, mo, d, h, mi){ const t = Date.UTC(y, mo, d, h, mi), x = new Date(t);   // Berlin wall time → UTC ms (DST-safe)
+  return t - (((localMin(BER, x).m - localMin("UTC", x).m) % 1440 + 1440) % 1440) * 60e3; }
+function buildNext(M){ const yr = +((M.date || "").slice(0, 4)) || new Date().getFullYear(), out = [];
+  for (const a of M.agenda || []){ const m = a.day.match(/^\w+\s+(\w{3})\s+(\d{1,2})$/); if (!m || MON.indexOf(m[1]) < 0) continue;
+    for (const i of a.items){ const txt = typeof i === "string" ? i : i.text, t = txt.match(/^~?(\d{1,2}):(\d{2})\s+(.*)$/); if (!t) continue;
+      out.push({utc: berlinUtc(yr, MON.indexOf(m[1]), +m[2], +t[1], +t[2]), title: t[3], flag: "", tv: typeof i === "string" ? null : i.tv, approx: txt.startsWith("~")}); } }
+  const hi = EVENTS.map(e => ({utc: Date.parse(e.utc), title: e.title, flag: e.flag, tv: e.tv}));
+  NEXTEV = hi.concat(out.filter(o => !hi.some(h => Math.abs(h.utc - o.utc) < 60e3))).sort((a, b) => a.utc - b.utc); }
+function countdown(){ const now = Date.now(); const next = NEXTEV.find(e => e.utc > now - 5*60e3);
+  if (!next) return; const ms = next.utc - now;
   const h = Math.floor(ms/36e5), m = Math.max(0, Math.round((ms % 36e5)/6e4));
   $("next").textContent = ms <= 0 ? "now" : h >= 24 ? `in ${Math.floor(h/24)} d ${h%24} h` : h ? `in ${h} h ${m} min` : `in ${m} min`;
-  const t = new Intl.DateTimeFormat(de,{timeZone:BER,weekday:"short",hour:"2-digit",minute:"2-digit"}).format(new Date(next.utc));
-  $("next-sub").innerHTML = `${t} · ${next.flag ?? ""} ` + (next.tv ? `<a class="tv" href="${tvUrl(next.tv)}" target="_blank" rel="noopener">${esc(next.title)}</a>` : esc(next.title)); }
+  const t = (next.approx ? "~" : "") + new Intl.DateTimeFormat(de,{timeZone:BER,weekday:"short",hour:"2-digit",minute:"2-digit"}).format(new Date(next.utc));
+  $("next-sub").innerHTML = `${t} · ${next.flag ? next.flag + " " : ""}` + (next.tv ? `<a class="tv" href="${tvUrl(next.tv)}" target="_blank" rel="noopener">${esc(next.title)}</a>` : esc(next.title)); }
 
 function greet(){ const h = +new Intl.DateTimeFormat("en-GB",{timeZone:BER,hour:"2-digit",hourCycle:"h23"}).format(new Date());
   return h < 11 ? "gm! ☕" : h < 17 ? "Good afternoon 🫧" : h < 22 ? "Good evening 🌙" : "Good night 🌊"; }
@@ -618,6 +631,7 @@ function render(D){
     const timed = M.agenda.flatMap(a => a.items.map(i => [a, i])).find(([a, i]) => { const t = when(a, typeof i === "string" ? i : i.text); return t > now - 5 * 60e3; });
     const [a, i0] = timed || [M.agenda[0], M.agenda[0].items[0]]; $("next").textContent = a.day;
     $("next-sub").innerHTML = typeof i0 === "string" ? esc(i0) : (i0.tv ? `<a class="tv" href="${tvUrl(i0.tv)}" target="_blank" rel="noopener">${esc(i0.text)}</a>` : esc(i0.text)); }
+  buildNext(M); countdown();
 
   /* Tiles */
   const groups = {}; (M.pepper || []).forEach(p => (groups[p.group] ||= []).push(p));
@@ -732,7 +746,8 @@ function render(D){
     if (x) return `<a class="tv" href="${tvUrl(x)}" target="_blank" rel="noopener" title="Indicator on TradingView">${esc(t)}</a>`;
     const h = linkTickers(esc(t));
     return h !== esc(t) || !/[\u{1F1E6}-\u{1F1FF}]/u.test(t) ? h : `<a class="tv" href="${CAL}" target="_blank" rel="noopener" title="Economic calendar on TradingView">${h}</a>`; };
-  $("agenda").innerHTML = (M.agenda || []).map(a => `<div class="card"><div class="day">${esc(a.day)}</div><ul>${a.items.map(i => `<li>${item(i)}</li>`).join("")}</ul></div>`).join("");
+  const todayL = new Intl.DateTimeFormat("en-US",{timeZone:BER,weekday:"short",month:"short",day:"numeric"}).format(new Date()).replace(",", "");
+  $("agenda").innerHTML = (M.agenda || []).map(a => `<div class="card${a.day === todayL ? " today" : ""}"><div class="day">${esc(a.day)}${a.day === todayL ? '<span class="tday">today</span>' : ""}</div><ul>${a.items.map(i => `<li>${item(i)}</li>`).join("")}</ul></div>`).join("");
 
   /* Archive */
   const kinds = {morning:"☕ Morning", abend:"🌙 US Close", rueckblick:"🔁 Weekly Review", ausblick:"🔭 Weekly Outlook", bilanz:"📊 Signal Report", gap:"🌙 Gap Check", mittag:"🕛 Midday"};
@@ -885,7 +900,7 @@ function bubbles(){
 
 /* Reorder sections */
 function orderTool(){
-  const main = document.querySelector("main"), names = {einschaetzung:"Outlook",termine:"Calendar",maerkte:"Markets",aktien:"Stocks",signale:"Signals",archiv:"Archive",feed:"Feed",awards:"Awards"}, noNav = ["awards"];
+  const main = document.querySelector("main"), names = {einschaetzung:"Outlook",termine:"Calendar",maerkte:"Markets",aktien:"Stocks",signale:"Signals",awards:"Awards",feed:"Feed",archiv:"Archive"}, noNav = ["awards"];
   const def = Object.keys(names); let cur = def;
   try { const v = JSON.parse(localStorage.getItem("r3m-order") || "null"); if (Array.isArray(v)) { const keep = v.filter(k => def.includes(k)); if (keep.length) cur = [...keep, ...def.filter(k => !keep.includes(k))]; } } catch {}
   const apply = () => { cur.forEach(id => main.appendChild($(id)));
