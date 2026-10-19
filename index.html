@@ -115,6 +115,7 @@ h2{font:600 28px var(--f-display);margin:0;letter-spacing:-.2px}
 .sym{font:600 16px var(--f-display);letter-spacing:.3px}
 .fl{margin-right:6px;font-size:.92em;letter-spacing:1px}
 .tile .sym,.fp>span{white-space:nowrap}
+.tile .top .sym{min-width:0;overflow:hidden;text-overflow:ellipsis}.tile .top .chg{flex:0 0 auto}
 .chg{font:500 13.5px var(--f-data);padding:1px 8px;border-radius:999px;background:rgba(var(--rgb),.14)}
 .price{font:500 20px var(--f-data);margin:2px 0 8px}
 .range{position:relative;height:6px;border-radius:3px;background:linear-gradient(90deg,rgba(var(--down),.45),rgba(141,176,181,.25),rgba(var(--up),.45))}
@@ -207,7 +208,10 @@ dialog::backdrop{background:rgba(3,12,18,.7);backdrop-filter:blur(3px)}
 
 /* Feed (Telegram group, chat style) */
 .feedgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
-.feedbar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:12px;min-height:30px}
+.feedgrid>div{min-width:0}
+.feedbar{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;align-items:center;margin-bottom:12px;min-height:30px;white-space:nowrap}
+.feedbar::-webkit-scrollbar{display:none}
+.feedbar>*{flex:0 0 auto}
 .clbox{height:min(760px,78vh);overflow:auto;overscroll-behavior:contain;background:var(--deep);border:1px solid var(--line);border-radius:18px;padding:14px 18px}
 .clbox{display:flex;flex-direction:column;gap:12px}
 .clbox .cd{align-self:center;font:600 12px var(--f-body);color:var(--mist);background:var(--reef);border-radius:999px;padding:3px 12px}
@@ -480,7 +484,7 @@ function render(D){
   const M = D.market || {};
   $("greet").textContent = greet();
   const dt = M.date ? new Intl.DateTimeFormat(de,{weekday:"long",day:"numeric",month:"long"}).format(new Date(M.date+"T12:00:00")) : "";
-  $("eyebrow").textContent = [dt, M.title].filter(Boolean).join(" · ");
+  $("eyebrow").textContent = [dt, (M.title || "").replace(/\s*·\s*(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b[^·]*$/, "")].filter(Boolean).join(" · ");   // the date is already in front
   $("mood").innerHTML = M.mood ? esc(M.mood).replace(/,\s*/, ",<br><em>") + "</em>" : "No digest yet today";
   $("big").innerHTML = (M.bigPicture || []).map(t => `<li>${esc(t)}</li>`).join("");
   $("m-sub").textContent = `Custom Pepper · Pepperstone CFDs · ${M.chgLabel || "Day"} · as of ${M.asof || "–"}`;
@@ -495,7 +499,9 @@ function render(D){
 
   /* Calendar: real events, else agenda */
   EVENTS = (D.events || []).map(e => ({...e, flag: ({US:"🇺🇸",DE:"🇩🇪",EU:"🇪🇺",GB:"🇬🇧",JP:"🇯🇵",CH:"🇨🇭"})[e.country]}));
-  if (!EVENTS.length && M.agenda?.length){ const a = M.agenda[0], i0 = a.items[0]; $("next").textContent = a.day;
+  if (!EVENTS.length && M.agenda?.length){   // no timed event left today: the first agenda line with a clock, else the first line
+    const timed = M.agenda.flatMap(a => a.items.map(i => [a, i])).find(([, i]) => /^~?\d{1,2}:\d{2}/.test(typeof i === "string" ? i : i.text));
+    const [a, i0] = timed || [M.agenda[0], M.agenda[0].items[0]]; $("next").textContent = a.day;
     $("next-sub").innerHTML = typeof i0 === "string" ? esc(i0) : (i0.tv ? `<a class="tv" href="${tvUrl(i0.tv)}" target="_blank" rel="noopener">${esc(i0.text)}</a>` : esc(i0.text)); }
 
   /* Tiles */
