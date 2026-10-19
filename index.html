@@ -500,7 +500,9 @@ function render(D){
   /* Calendar: real events, else agenda */
   EVENTS = (D.events || []).map(e => ({...e, flag: ({US:"🇺🇸",DE:"🇩🇪",EU:"🇪🇺",GB:"🇬🇧",JP:"🇯🇵",CH:"🇨🇭"})[e.country]}));
   if (!EVENTS.length && M.agenda?.length){   // no timed event left today: the first agenda line with a clock, else the first line
-    const timed = M.agenda.flatMap(a => a.items.map(i => [a, i])).find(([, i]) => /^~?\d{1,2}:\d{2}/.test(typeof i === "string" ? i : i.text));
+    const yr = (M.date || "").slice(0, 4) || new Date().getFullYear(), now = Date.now();
+    const when = (a, txt) => { const m = txt.match(/^~?(\d{1,2}:\d{2})/); if (!m) return NaN; return Date.parse(`${a.day.replace(/^\w+\s+/, "")} ${yr} ${m[1]}`); };
+    const timed = M.agenda.flatMap(a => a.items.map(i => [a, i])).find(([a, i]) => { const t = when(a, typeof i === "string" ? i : i.text); return t > now - 5 * 60e3; });
     const [a, i0] = timed || [M.agenda[0], M.agenda[0].items[0]]; $("next").textContent = a.day;
     $("next-sub").innerHTML = typeof i0 === "string" ? esc(i0) : (i0.tv ? `<a class="tv" href="${tvUrl(i0.tv)}" target="_blank" rel="noopener">${esc(i0.text)}</a>` : esc(i0.text)); }
 
