@@ -548,7 +548,8 @@ function render(D){
   $("eyebrow").textContent = [dt, (M.title || "").replace(/\s*·\s*(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b[^·]*$/, "")].filter(Boolean).join(" · ");   // the date is already in front
   $("mood").innerHTML = M.mood ? esc(M.mood).replace(/,\s*/, ",<br><em>") + "</em>" : "No digest yet today";
   $("big").innerHTML = (M.bigPicture || []).map(t => `<li>${esc(t)}</li>`).join("");
-  $("m-sub").textContent = `Custom Pepper · Pepperstone CFDs · ${M.chgLabel || "Day"} · as of ${M.asof || "–"}`;
+  { const wkS = M.chgLabel === "Week" || M.chgLabel === "Woche";
+    $("m-sub").textContent = `Custom Pepper · Pepperstone CFDs · the bar shows where price sits between SSL (${wkS ? "week low" : "PDL"}) and BSL (${wkS ? "week high" : "PDH"}) · as of ${M.asof || "–"}`; }
 
   /* VIX as sea state */
   const vix = (M.indices || []).find(i => i.sym === "VIX");
