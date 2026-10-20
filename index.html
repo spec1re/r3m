@@ -228,6 +228,9 @@ a.chip{color:var(--foam)}a.chip.s{color:rgb(var(--up))}a.chip.w{color:rgb(var(--
 .arch button:hover,.arch button:focus-visible{border-color:var(--glass)}
 .arch .d{font:500 12.5px var(--f-data);color:var(--mist)}
 .arch .t{font-weight:600;margin-top:2px}
+dialog.wide{max-width:min(1260px,96vw)}
+dialog.wide .dlg-b{max-height:none;padding:12px 14px 14px}
+dialog.wide .dlg-b img{display:block;max-height:84vh;object-fit:contain}
 dialog{max-width:min(720px,94vw);width:100%;background:var(--deep);color:var(--foam);border:1px solid var(--line);border-radius:18px;padding:0}
 dialog::backdrop{background:rgba(3,12,18,.7);backdrop-filter:blur(3px)}
 .dlg-h{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line)}
@@ -782,10 +785,10 @@ function render(D){
   DIGESTS = D.digests || []; nextReport();
   $("recent-arch").insertAdjacentHTML("beforeend", (D.digests || []).slice(0,3).map(card).join("") + `<a class="more" href="#archiv">Full archive →</a>`);
   const open = e => { const b = e.target.closest("button[data-i]"); if (!b) return; const d = D.digests[+b.dataset.i];
-    $("dlg-t").textContent = d.title; $("dlg-b").innerHTML = d.html; $("dlg").showModal(); };
+    $("dlg-t").textContent = d.title; $("dlg-b").innerHTML = d.html; $("dlg").classList.remove("wide"); $("dlg").showModal(); };
   $("arch").onclick = open; $("recent-arch").onclick = open;
   $("outlook").onclick = e => { const b = e.target.closest("button.ch"); if (!b) return;
-    $("dlg-t").textContent = b.dataset.t; $("dlg-b").innerHTML = `<img src="${b.dataset.src}" alt="" style="width:100%;height:auto;border-radius:10px">`; $("dlg").showModal(); };
+    $("dlg-t").textContent = b.dataset.t; $("dlg-b").innerHTML = `<img src="${b.dataset.src}" alt="" style="width:100%;height:auto;border-radius:10px">`; $("dlg").classList.add("wide"); $("dlg").showModal(); };
   $("dlg-x").onclick = () => $("dlg").close();
   $("dlg").onclick = e => { if (e.target === $("dlg")) $("dlg").close(); };
 
@@ -882,7 +885,7 @@ function renderFeed(D, kinds){
     try { localStorage.setItem("r3m-feed", cur); } catch {} $("chat").innerHTML = ""; draw(); };
   $("chat").onclick = e => { const m = e.target.closest(".more"); if (m){ const body = m.previousElementSibling; const open = body.classList.toggle("clip");
       m.textContent = open ? "Show more" : "Show less"; return; }
-    const img = e.target.closest(".pics img"); if (img){ $("dlg-t").textContent = img.alt; $("dlg-b").innerHTML = `<img src="${img.src}" alt="" style="width:100%;height:auto;border-radius:10px">`; $("dlg").showModal(); } };
+    const img = e.target.closest(".pics img"); if (img){ $("dlg-t").textContent = img.alt; $("dlg-b").innerHTML = `<img src="${img.src}" alt="" style="width:100%;height:auto;border-radius:10px">`; $("dlg").classList.add("wide"); $("dlg").showModal(); } };
   feedLive = nl => { if (nl && nl.updated !== L?.updated){ L = nl; draw(); } };
   draw();
 }
