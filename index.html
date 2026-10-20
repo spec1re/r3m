@@ -809,7 +809,7 @@ function renderCl(cl){
   let sel = "all"; try { sel = localStorage.getItem("r3m-cl") || "all"; } catch {}
   if (sel !== "all" && !scripts.includes(sel)) sel = "all";
   const draw = () => {
-    $("clbar").innerHTML = `<span class="clmark"><span class="pill open" style="padding:2px 9px"><i style="animation:none"></i>latest</span> ${dshort(cl[0].date, true)}</span>`
+    $("clbar").innerHTML = `<span class="clmark"><span class="pill open" style="padding:2px 9px"><i style="animation:none"></i>latest</span></span>`
       + [["all","All"], ...scripts.map(s => [s, s])].map(([k,l]) => `<button data-k="${esc(k)}" aria-pressed="${k === sel}">${esc(l)} <span class="num" style="opacity:.7">${k === "all" ? blocks.length : blocks.filter(b => b.script === k).length}</span></button>`).join("");
     let last = "", h = "";
     for (const b of blocks){ if (sel !== "all" && b.script !== sel) continue;
