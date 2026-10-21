@@ -49,7 +49,7 @@ nav{display:flex;gap:14px;flex-wrap:wrap}
 nav a{color:var(--mist);text-decoration:none;font-weight:500;font-size:14px}
 nav a:hover,nav a:focus-visible{color:var(--foam)}
 .clock{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.time{font:500 15px var(--f-data);color:var(--foam)}
+.time{font:500 15px var(--f-data);color:var(--foam);background:none;border:0;padding:0;cursor:pointer}
 .pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;
   padding:3px 9px;border-radius:999px;border:1px solid var(--line);color:var(--mist)}
 .pill i{width:7px;height:7px;border-radius:50%;background:var(--line)}
@@ -341,7 +341,7 @@ a.chip{text-decoration:none}
       <a href="#markets">Markets</a><a href="#signals">Signals</a><a href="#calendar">Calendar</a><a href="#archive">Archive</a>
     </nav>
     <div class="clock">
-      <span class="time" id="clock">--:--</span>
+      <button class="time" id="clock" title="Times in your local zone · click for Berlin time">--:--</button>
       <span class="pill" id="s-tokyo"><i></i>🇯🇵 Tokyo</span>
       <span class="pill" id="s-london"><i></i>🇬🇧 London</span>
       <span class="pill" id="s-nyam"><i></i>🇺🇸 NY AM</span>
@@ -434,7 +434,7 @@ a.chip{text-decoration:none}
   </div></section>
 
   <section id="calendar"><div class="wrap">
-    <div class="sh"><h2>Calendar</h2><span class="sub">Berlin time · the group gets a heads-up ~10–40 min before</span></div>
+    <div class="sh"><h2>Calendar</h2><span class="sub" id="cal-sub">Berlin time · the group gets a heads-up ~10–40 min before</span></div>
     <div class="agenda" id="agenda"></div>
   </div></section>
 
@@ -474,6 +474,11 @@ a.chip{text-decoration:none}
 <script>
 (() => {
 const BER = "Europe/Berlin", de = "en-GB";
+/* Display zone · the visitor's own by default (the browser knows it), Berlin on a click of the clock · the logic stays on Berlin */
+const LOCTZ = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || BER; } catch { return BER; } })();
+let TZD = LOCTZ; try { if (localStorage.getItem("r3m-tz") === "berlin") TZD = BER; } catch {}
+const tzLabel = () => TZD === BER ? "Berlin" : (TZD.split("/").pop() || TZD).replace(/_/g, " ");
+const dispOff = d => { const a = localMin(TZD, d).m - localMin(BER, d).m; return ((a + 720) % 1440 + 1440) % 1440 - 720; };   // display − Berlin, minutes
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const dec = v => Math.abs(v) >= 1000 ? 1 : Math.abs(v) >= 10 ? 2 : 4;
@@ -508,12 +513,15 @@ const hhmm = m => { m = ((m % 1440) + 1440) % 1440; return String(Math.floor(m/6
 let OPEN = new Set();
 function localMin(tz, d){ const p = new Intl.DateTimeFormat("en-GB",{timeZone:tz,hour:"2-digit",minute:"2-digit",weekday:"short",hourCycle:"h23"}).formatToParts(d);
   const g = t => p.find(x => x.type === t).value; return {m: +g("hour")*60 + +g("minute"), wd: g("weekday")}; }
+{ const c = document.getElementById("clock");
+  if (c) { if (LOCTZ === BER) c.title = "Berlin time"; else { c.title = TZD === BER ? "Berlin time · click for your local time" : "Your local time · click for Berlin time";
+    c.onclick = () => { try { localStorage.setItem("r3m-tz", TZD === BER ? "local" : "berlin"); } catch {} location.reload(); }; } } }
 function tick(){ const d = new Date();
-  $("clock").textContent = new Intl.DateTimeFormat(de,{timeZone:BER,hour:"2-digit",minute:"2-digit"}).format(d) + " Berlin";
-  const ber = localMin(BER, d).m; OPEN = new Set();
+  $("clock").textContent = new Intl.DateTimeFormat(de,{timeZone:TZD,hour:"2-digit",minute:"2-digit"}).format(d) + " " + tzLabel();
+  const ber = localMin(TZD, d).m; OPEN = new Set();
   for (const [id,tz,a,b,name] of sess){ const {m,wd} = localMin(tz,d); const open = !["Sat","Sun"].includes(wd) && m >= a && m < b;
     if (open) OPEN.add(name); const off = ber - m;
-    const el = $(id); el.classList.toggle("open", open); el.title = `${name} · ${hhmm(a+off)}–${hhmm(b+off)} Berlin · ${open ? "open" : "closed"}`; }
+    const el = $(id); el.classList.toggle("open", open); el.title = `${name} · ${hhmm(a+off)}–${hhmm(b+off)} ${tzLabel()} · ${open ? "open" : "closed"}`; }
   nextReport();
   countdown(); }
 
@@ -532,11 +540,11 @@ function nextReport(){ const el = $("next-rep"); if (!el) return; const d = new 
   for (const r of REPORTS) for (const day of r.d){ let [h, m] = r.hm.split(":").map(Number), w = day * 1440 + h * 60 + m;
     if (r.tz === "UTC") w += off;   // the Action runs on UTC
     w = ((w % 10080) + 10080) % 10080; let delta = (w - nowW + 10080) % 10080;
-    const bm = ((w % 1440) + 1440) % 1440, label = `${String(Math.floor(bm/60)).padStart(2,"0")}:${String(bm%60).padStart(2,"0")}`;
+    const wD = w + dispOff(d), bm = ((wD % 1440) + 1440) % 1440, label = `${String(Math.floor(bm/60)).padStart(2,"0")}:${String(bm%60).padStart(2,"0")}`;
     const late = 10080 - delta;   // minutes since the slot
     if (late <= 40 && r.k !== "report" && !DIGESTS.some(x => x.kind === r.k && x.date === today)) delta = -1;   // due, not in yet
-    if (!best || delta < best.delta) best = {r, delta, label, day: Math.floor(w / 1440)}; }
-  if (!best) return; const {r, delta, label, day} = best, isToday = DOW[day] === b.wd;
+    if (!best || delta < best.delta) best = {r, delta, label, day: Math.floor((((wD % 10080) + 10080) % 10080) / 1440)}; }
+  if (!best) return; const {r, delta, label, day} = best, isToday = DOW[day] === localMin(TZD, d).wd;
   const inT = delta < 0 ? "due now" : delta < 60 ? `in ${delta} min` : delta < 1440 ? `in ${Math.floor(delta/60)}h ${String(delta%60).padStart(2,"0")}m` : `in ${Math.floor(delta/1440)}d ${Math.floor(delta%1440/60)}h`;
   el.classList.toggle("due", delta < 0);
   el.innerHTML = `Next · <b>${r.name}</b> ${isToday ? "" : DOW[day] + " "}~${label} · ${inT}`; }
@@ -555,10 +563,10 @@ function countdown(){ const now = Date.now(); const next = NEXTEV.find(e => e.ut
   if (!next) return; const ms = next.utc - now;
   const h = Math.floor(ms/36e5), m = Math.max(0, Math.round((ms % 36e5)/6e4));
   $("next").textContent = ms <= 0 ? "now" : h >= 24 ? `in ${Math.floor(h/24)} d ${h%24} h` : h ? `in ${h} h ${m} min` : `in ${m} min`;
-  const t = (next.approx ? "~" : "") + new Intl.DateTimeFormat(de,{timeZone:BER,weekday:"short",hour:"2-digit",minute:"2-digit"}).format(new Date(next.utc));
+  const t = (next.approx ? "~" : "") + new Intl.DateTimeFormat(de,{timeZone:TZD,weekday:"short",hour:"2-digit",minute:"2-digit"}).format(new Date(next.utc));
   $("next-sub").innerHTML = `${t} · ${next.flag ? next.flag + " " : ""}` + (next.tv ? `<a class="tv" href="${tvUrl(next.tv)}" target="_blank" rel="noopener">${esc(next.title)}</a>` : esc(next.title)); }
 
-function greet(){ const h = +new Intl.DateTimeFormat("en-GB",{timeZone:BER,hour:"2-digit",hourCycle:"h23"}).format(new Date());
+function greet(){ const h = +new Intl.DateTimeFormat("en-GB",{timeZone:TZD,hour:"2-digit",hourCycle:"h23"}).format(new Date());
   return h < 11 ? "gm! ☕" : h < 17 ? "Good afternoon 🫧" : h < 22 ? "Good evening 🌙" : "Good night 🌊"; }
 
 /* Octi's tips: built fresh each time from the signal stats of the last 7 days, the clock and today's calendar.
@@ -726,13 +734,13 @@ function render(D){
     <td class="num">${q(g.with.tp1, g.with.done)}</td></tr>`).join("")
     || `<tr><td colspan="6" class="sub">Not enough closed trades per confluence yet.</td></tr>`;
   const resI = {"TP2 Hit":"🏆 TP2","TP1 Hit":"✅ TP1","Stopped":"🛑 SL","open":"⏳ open","offen":"⏳ open"};
-  $("recent").innerHTML = (S.recent || []).map(r => `<tr><td class="num">${new Intl.DateTimeFormat(de,{timeZone:BER,...(rep ? {day:"numeric",month:"short"} : {weekday:"short"}),hour:"2-digit",minute:"2-digit"}).format(new Date(r.t))}</td>
+  $("recent").innerHTML = (S.recent || []).map(r => `<tr><td class="num">${new Intl.DateTimeFormat(de,{timeZone:TZD,...(rep ? {day:"numeric",month:"short"} : {weekday:"short"}),hour:"2-digit",minute:"2-digit"}).format(new Date(r.t))}</td>
     <td><b>${tv(r.tv || r.sym, esc(r.sym))}</b> <span class="${r.side === "LONG" ? "up" : "down"}">${r.side === "LONG" ? "▲" : "▼"}</span></td><td>${esc(r.script)}</td><td class="sub">${esc(r.setup)}</td>
     <td class="num">${fmt(r.r1,1)} R</td><td class="res ${r.res === "Stopped" ? "down" : (r.res === "open" || r.res === "offen") ? "flat" : "up"}">${resI[r.res] || esc(r.res)}</td></tr>`).join("")
     || `<tr><td colspan="6" class="sub">No signals collected yet.</td></tr>`;
   };
   { const R = D.replay, bl = $("src-live"), br = $("src-rep"), sub0 = $("s-sub").textContent;
-    const dd = t => new Intl.DateTimeFormat(de,{timeZone:BER,day:"numeric",month:"short"}).format(new Date(t));
+    const dd = t => new Intl.DateTimeFormat(de,{timeZone:TZD,day:"numeric",month:"short"}).format(new Date(t));
     if (!R) br.hidden = true; else br.textContent = `Replay · ${Math.max(1, Math.round((Date.parse(R.to) - Date.parse(R.from)) / 6048e5))} weeks`;
     const set = rp => { sigView(rp ? R : S, rp); bl.setAttribute("aria-pressed", String(!rp)); br.setAttribute("aria-pressed", String(rp));
       $("s-sub").textContent = rp ? `Replay of climax and equinox on chart history · ${R.symbols.length} Pepper symbols · ${dd(R.from)} – ${dd(R.to)} · the same logic as the live alerts · R = full exit at TP1, stop = −1R` : sub0;
@@ -771,12 +779,20 @@ function render(D){
     <div class="chips">${[["strong","s",""],["weak","w",""],["hot","h","🔥 "],["cold","c","🧊 "]].map(([k,c,e]) => (s[k]||[]).map(x => { const t = x.split(" ")[0];
       return `<a class="chip ${c}" href="${tvUrl(tvOf(t, LISTX[s.list]))}" target="_blank" rel="noopener" title="${esc(t)} on TradingView">${e}${esc(x)}</a>`; }).join("")).join("")}</div></div>`).join("");
   const CAL = "https://www.tradingview.com/economic-calendar/";
-  const item = i => { const t = typeof i === "string" ? i : i.text, x = typeof i === "string" ? null : i.tv;
+  const yrA = +((M.date || "").slice(0, 4)) || new Date().getFullYear();
+  const shift = (txt, day) => { if (TZD === BER) return txt; const m = day.match(/^\w+\s+(\w{3})\s+(\d{1,2})$/), t = txt.match(/^(~?)(\d{1,2}):(\d{2})(\s.*)$/);
+    if (!m || !t || MON.indexOf(m[1]) < 0) return txt;
+    const u = new Date(berlinUtc(yrA, MON.indexOf(m[1]), +m[2], +t[2], +t[3]));
+    const loc = new Intl.DateTimeFormat("en-US",{timeZone:TZD,weekday:"short",month:"short",day:"numeric"}).format(u).replace(",", "");
+    const hm = new Intl.DateTimeFormat(de,{timeZone:TZD,hour:"2-digit",minute:"2-digit"}).format(u);
+    return t[1] + (loc === day ? "" : loc.split(" ")[0] + " ") + hm + t[4]; };
+  $("cal-sub").textContent = `${tzLabel()} time · the group gets a heads-up ~10–40 min before`;
+  const item = (i, day) => { const t = shift(typeof i === "string" ? i : i.text, day), x = typeof i === "string" ? null : i.tv;
     if (x) return `<a class="tv" href="${tvUrl(x)}" target="_blank" rel="noopener" title="Indicator on TradingView">${esc(t)}</a>`;
     const h = linkTickers(esc(t));
     return h !== esc(t) || !/[\u{1F1E6}-\u{1F1FF}]/u.test(t) ? h : `<a class="tv" href="${CAL}" target="_blank" rel="noopener" title="Economic calendar on TradingView">${h}</a>`; };
   const todayL = new Intl.DateTimeFormat("en-US",{timeZone:BER,weekday:"short",month:"short",day:"numeric"}).format(new Date()).replace(",", "");
-  $("agenda").innerHTML = (M.agenda || []).map(a => `<div class="card${a.day === todayL ? " today" : ""}"><div class="day">${esc(a.day)}${a.day === todayL ? '<span class="tday">today</span>' : ""}</div><ul>${a.items.map(i => `<li>${item(i)}</li>`).join("")}</ul></div>`).join("");
+  $("agenda").innerHTML = (M.agenda || []).map(a => `<div class="card${a.day === todayL ? " today" : ""}"><div class="day">${esc(a.day)}${a.day === todayL ? '<span class="tday">today</span>' : ""}</div><ul>${a.items.map(i => `<li>${item(i, a.day)}</li>`).join("")}</ul></div>`).join("");
 
   /* Archive */
   const kinds = {morning:"☕ Morning", close:"🌙 US Close", review:"🔁 Weekly Review", outlook:"🔭 Weekly Outlook", report:"📊 Signal Report", gap:"🌙 Gap Check", midday:"🕛 Midday"};
@@ -793,7 +809,7 @@ function render(D){
   $("dlg").onclick = e => { if (e.target === $("dlg")) $("dlg").close(); };
 
   renderFeed(D, kinds);
-  $("gen").textContent = new Intl.DateTimeFormat(de,{timeZone:BER,dateStyle:"short",timeStyle:"short"}).format(new Date(D.generated));
+  $("gen").textContent = new Intl.DateTimeFormat(de,{timeZone:TZD,dateStyle:"short",timeStyle:"short"}).format(new Date(D.generated));
   if (D.changelog){ renderCl([D.changelog, ...(D.changelog.older || [])]); }
   tick();
 }
@@ -826,8 +842,8 @@ function renderFeed(D, kinds){
   const types = [["all","All"],["alert","Alerts"],["screener","Screener"],["news","News"],["report","Reports"],["wisdom","Wisdom"]];
   let cur = "all", L = D.live; try { cur = localStorage.getItem("r3m-feed") || "all"; } catch {}
   if (!types.some(([k]) => k === cur)) cur = "all";
-  const tm = t => new Intl.DateTimeFormat(de,{timeZone:BER,hour:"2-digit",minute:"2-digit"}).format(new Date(t));
-  const dayOf = t => new Intl.DateTimeFormat(de,{timeZone:BER,weekday:"short",day:"numeric",month:"short"}).format(new Date(t));
+  const tm = t => new Intl.DateTimeFormat(de,{timeZone:TZD,hour:"2-digit",minute:"2-digit"}).format(new Date(t));
+  const dayOf = t => new Intl.DateTimeFormat(de,{timeZone:TZD,weekday:"short",day:"numeric",month:"short"}).format(new Date(t));
   const head = (label, t) => `<div class="h"><span>${label}</span><span class="tm">${tm(t)}</span></div>`;
   const clip = html => `<div class="body clip">${html}</div><button class="more">Show more</button>`;
   const pic = (src, alt) => `<img src="${esc(src)}" alt="${esc(alt)}" loading="lazy">`;
