@@ -338,7 +338,7 @@ a.chip{text-decoration:none}
     <a class="brand" href="#top" aria-label="R3M Riff, back to top">
       <svg viewBox="0 0 64 64" aria-hidden="true"><use href="#octo-mini"/></svg>R3M Riff</a>
     <nav aria-label="Sections">
-      <a href="#maerkte">Markets</a><a href="#signale">Signals</a><a href="#termine">Calendar</a><a href="#archiv">Archive</a>
+      <a href="#markets">Markets</a><a href="#signals">Signals</a><a href="#calendar">Calendar</a><a href="#archive">Archive</a>
     </nav>
     <div class="clock">
       <span class="time" id="clock">--:--</span>
@@ -397,18 +397,18 @@ a.chip{text-decoration:none}
   </div>
   <div class="wave" aria-hidden="true"></div>
 
-  <section id="maerkte"><div class="wrap">
+  <section id="markets"><div class="wrap">
     <div class="sh"><h2>Markets</h2><span class="sub" id="m-sub">Custom Pepper · Pepperstone CFDs</span></div>
     <div class="groups" id="groups"></div>
     <div class="mk2" id="futidx"></div>
   </div></section>
 
-  <section id="einschaetzung"><div class="wrap">
+  <section id="outlook"><div class="wrap">
     <div class="sh"><h2>Outlook</h2><span class="sub">Chart (1h) · levels · scenarios – no recommendations</span></div>
-    <div class="outlook" id="outlook"></div>
+    <div class="outlook" id="outlook-box"></div>
   </div></section>
 
-  <section id="signale"><div class="wrap">
+  <section id="signals"><div class="wrap">
     <div class="sh"><h2>Signals</h2><span class="sub" id="s-sub">Every entry alert of the last 7 days · best target per trade · R = full exit at TP1, stop = −1R</span></div>
     <div class="feedbar sigsrc" role="group" aria-label="Live alerts or replay"><button type="button" id="src-live">Live · 7 days</button><button type="button" id="src-rep">Replay</button></div>
     <div class="sig">
@@ -428,17 +428,17 @@ a.chip{text-decoration:none}
     </div>
   </div></section>
 
-  <section id="aktien"><div class="wrap">
+  <section id="stocks"><div class="wrap">
     <div class="sh"><h2>Stocks</h2><span class="sub">Standouts from your three lists</span></div>
-    <div class="stocks" id="stocks"></div>
+    <div class="stocks" id="stocks-box"></div>
   </div></section>
 
-  <section id="termine"><div class="wrap">
+  <section id="calendar"><div class="wrap">
     <div class="sh"><h2>Calendar</h2><span class="sub">Berlin time · the group gets a heads-up ~10–40 min before</span></div>
     <div class="agenda" id="agenda"></div>
   </div></section>
 
-  <section id="archiv"><div class="wrap">
+  <section id="archive"><div class="wrap">
     <div class="sh"><h2>Archive</h2><span class="sub">All digests, reviews and recaps</span></div>
     <div class="arch" id="arch"></div>
   </div></section>
@@ -676,7 +676,7 @@ function render(D){
   const chartBy = Object.fromEntries((D.charts || []).map(c => [c.sym, c]));
 
   const priceOf = sym => (M.pepper || []).find(p => p.sym === sym)?.price ?? (M.indices || []).find(i => i.sym === sym)?.price;
-  $("outlook").innerHTML = (M.outlook || []).map(o => { const px = priceOf(o.sym);
+  $("outlook-box").innerHTML = (M.outlook || []).map(o => { const px = priceOf(o.sym);
     const lv = (o.levels || []).slice().sort((a,b) => b.value - a.value).map(l => { const d = px ? (l.value - px) / px * 100 : null;
       const c = d == null ? "" : d > 0.02 ? "res" : d < -0.02 ? "sup" : "now";
       return `<span class="${c}" title="${c === "res" ? "above price" : c === "sup" ? "below price" : "at price"}">${esc(l.name)} ${fmt(l.value)}${d == null ? "" : ` · ${d > 0 ? "+" : d < 0 ? "−" : ""}${fmt(Math.abs(d),1)}%`}</span>`; }).join("");
@@ -767,7 +767,7 @@ function render(D){
     show("trades"); if (k0 !== "trades") requestAnimationFrame(() => show(k0)); }
 
   /* Stocks, calendar */
-  $("stocks").innerHTML = (M.stocks || []).map(s => `<div class="card"><h3>${esc(s.flag)} ${esc(s.list)}</h3>
+  $("stocks-box").innerHTML = (M.stocks || []).map(s => `<div class="card"><h3>${esc(s.flag)} ${esc(s.list)}</h3>
     <div class="chips">${[["strong","s",""],["weak","w",""],["hot","h","🔥 "],["cold","c","🧊 "]].map(([k,c,e]) => (s[k]||[]).map(x => { const t = x.split(" ")[0];
       return `<a class="chip ${c}" href="${tvUrl(tvOf(t, LISTX[s.list]))}" target="_blank" rel="noopener" title="${esc(t)} on TradingView">${e}${esc(x)}</a>`; }).join("")).join("")}</div></div>`).join("");
   const CAL = "https://www.tradingview.com/economic-calendar/";
@@ -783,11 +783,11 @@ function render(D){
   $("arch").innerHTML = (D.digests || []).map((d,i) => `<button data-i="${i}"><div class="d">${dshort(d.date)} · ${kinds[d.kind] || ""}</div><div class="t">${esc(d.title.replace(/^\S+\s*R3M\s*/, ""))}</div></button>`).join("");
   const card = (d,i) => `<button data-i="${i}"><div class="d">${dshort(d.date)} · ${kinds[d.kind] || ""}</div><div class="t">${esc(d.title.replace(/^\S+\s*R3M\s*/, ""))}</div></button>`;
   DIGESTS = D.digests || []; nextReport();
-  $("recent-arch").insertAdjacentHTML("beforeend", (D.digests || []).slice(0,3).map(card).join("") + `<a class="more" href="#archiv">Full archive →</a>`);
+  $("recent-arch").insertAdjacentHTML("beforeend", (D.digests || []).slice(0,3).map(card).join("") + `<a class="more" href="#archive">Full archive →</a>`);
   const open = e => { const b = e.target.closest("button[data-i]"); if (!b) return; const d = D.digests[+b.dataset.i];
     $("dlg-t").textContent = d.title; $("dlg-b").innerHTML = d.html; $("dlg").classList.remove("wide"); $("dlg").showModal(); };
   $("arch").onclick = open; $("recent-arch").onclick = open;
-  $("outlook").onclick = e => { const b = e.target.closest("button.ch"); if (!b) return;
+  $("outlook-box").onclick = e => { const b = e.target.closest("button.ch"); if (!b) return;
     $("dlg-t").textContent = b.dataset.t; $("dlg-b").innerHTML = `<img src="${b.dataset.src}" alt="" style="width:100%;height:auto;border-radius:10px">`; $("dlg").classList.add("wide"); $("dlg").showModal(); };
   $("dlg-x").onclick = () => $("dlg").close();
   $("dlg").onclick = e => { if (e.target === $("dlg")) $("dlg").close(); };
@@ -928,10 +928,12 @@ function bubbles(){
 }
 
 /* Reorder sections */
+const OLD_IDS = {einschaetzung:"outlook", maerkte:"markets", aktien:"stocks", signale:"signals", termine:"calendar", archiv:"archive"};   // the anchors until 2026-10-21
+{ const h = location.hash.slice(1); if (OLD_IDS[h]) { history.replaceState(null, "", "#" + OLD_IDS[h]); setTimeout(() => document.getElementById(OLD_IDS[h])?.scrollIntoView(), 400); } }
 function orderTool(){
-  const main = document.querySelector("main"), names = {einschaetzung:"Outlook",termine:"Calendar",maerkte:"Markets",aktien:"Stocks",signale:"Signals",awards:"Awards",feed:"Feed",archiv:"Archive"}, noNav = ["awards"];
+  const main = document.querySelector("main"), names = {outlook:"Outlook",calendar:"Calendar",markets:"Markets",stocks:"Stocks",signals:"Signals",awards:"Awards",feed:"Feed",archive:"Archive"}, noNav = ["awards"];
   const def = Object.keys(names); let cur = def;
-  try { const v = JSON.parse(localStorage.getItem("r3m-order") || "null"); if (Array.isArray(v)) { const keep = v.filter(k => def.includes(k)); if (keep.length) cur = [...keep, ...def.filter(k => !keep.includes(k))]; } } catch {}
+  try { let v = JSON.parse(localStorage.getItem("r3m-order") || "null"); if (Array.isArray(v)) { v = v.map(k => OLD_IDS[k] || k); const keep = v.filter(k => def.includes(k)); if (keep.length) cur = [...keep, ...def.filter(k => !keep.includes(k))]; } } catch {}
   const apply = () => { cur.forEach(id => main.appendChild($(id)));
     const nav = document.querySelector("nav"); nav.innerHTML = cur.filter(id => names[id] && !noNav.includes(id)).map(id => `<a href="#${id}">${names[id]}</a>`).join("");
     $("order-list").innerHTML = cur.map((id,i) => `<li><span>${i+1}. ${names[id]}</span><button class="m" data-i="${i}" data-d="-1" aria-label="Move ${names[id]} up" ${i ? "" : "disabled"}>↑</button><button class="m" data-i="${i}" data-d="1" aria-label="Move ${names[id]} down" ${i < cur.length-1 ? "" : "disabled"}>↓</button></li>`).join("");
