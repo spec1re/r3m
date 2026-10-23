@@ -1,4 +1,4 @@
-# R3M Reef
+# R3M Arena
 
 https://spec1re.github.io/r3m/
 

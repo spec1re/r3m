@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Live feed for the R3M Reef website: reads the R3M Signals group with a Telegram user session
+"""Live feed for the R3M Arena website: reads the R3M Signals group with a Telegram user session
 and writes the bot messages of the last 7 days to live.json (only bot messages, never what people write).
 
 Runs in the public repo spec1re/r3m (.github/workflows/live.yml, every ~5 min).
