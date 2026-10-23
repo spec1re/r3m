@@ -1,4 +1,4 @@
-# R3M Riff
+# R3M Reef
 
 https://spec1re.github.io/r3m/
 
