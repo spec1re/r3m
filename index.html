@@ -532,7 +532,7 @@ const REPORTS = [
   {k:"gap", name:"🌙 Gap Check", d:[1], hm:"01:25"}, {k:"morning", name:"☕ Morning", d:[1,2,3,4,5], hm:"05:40"},
   {k:"review", name:"🔁 Weekly Review", d:[6], hm:"05:40"}, {k:"outlook", name:"🔭 Weekly Outlook", d:[0], hm:"05:40"},
   {k:"report", name:"📊 Signal Report", d:[6], hm:"06:18", tz:"UTC"}, {k:"midday", name:"🕛 Midday", d:[1,2,3,4,5], hm:"13:20"},
-  {k:"close", name:"🌙 US Close", d:[1,2,3,4,5], hm:"22:20"}];
+  {k:"close", name:"🌙 US Close", d:[1,2,3,4,5], hm:"22:20"}, {k:"lab", name:"🔬 Lab Review", d:[0], hm:"09:50"}];
 const DOW = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 let DIGESTS = [];
 function nextReport(){ const el = $("next-rep"); if (!el) return; const d = new Date(), b = localMin(BER, d), u = localMin("UTC", d);
@@ -797,7 +797,7 @@ function render(D){
   $("agenda").innerHTML = (M.agenda || []).map(a => `<div class="card${a.day === todayL ? " today" : ""}"><div class="day">${esc(a.day)}${a.day === todayL ? '<span class="tday">today</span>' : ""}</div><ul>${a.items.map(i => `<li>${item(i, a.day)}</li>`).join("")}</ul></div>`).join("");
 
   /* Archive */
-  const kinds = {morning:"☕ Morning", close:"🌙 US Close", review:"🔁 Weekly Review", outlook:"🔭 Weekly Outlook", report:"📊 Signal Report", gap:"🌙 Gap Check", midday:"🕛 Midday"};
+  const kinds = {morning:"☕ Morning", close:"🌙 US Close", review:"🔁 Weekly Review", outlook:"🔭 Weekly Outlook", report:"📊 Signal Report", gap:"🌙 Gap Check", midday:"🕛 Midday", lab:"🔬 Lab Review"};
   $("arch").innerHTML = (D.digests || []).map((d,i) => `<button data-i="${i}"><div class="d">${dshort(d.date)} · ${kinds[d.kind] || ""}</div><div class="t">${esc(d.title.replace(/^\S+\s*R3M\s*/, ""))}</div></button>`).join("");
   const card = (d,i) => `<button data-i="${i}"><div class="d">${dshort(d.date)} · ${kinds[d.kind] || ""}</div><div class="t">${esc(d.title.replace(/^\S+\s*R3M\s*/, ""))}</div></button>`;
   DIGESTS = D.digests || []; nextReport();
@@ -850,7 +850,7 @@ function renderFeed(D, kinds){
   const clip = html => `<div class="body clip">${html}</div><button class="more">Show more</button>`;
   const pic = (src, alt) => `<img src="${esc(src)}" alt="${esc(alt)}" loading="lazy">`;
   const KIND = [[/Morning/,"morning"],[/Weekly Review|Wochenrückblick/,"review"],[/Weekly Outlook|Wochenausblick/,"outlook"],[/US.Close/,"close"],
-    [/Midday|Halbzeit/,"midday"],[/Gap.Check/,"gap"],[/Signal Report|Signal-Bilanz/,"report"]];
+    [/Midday|Halbzeit/,"midday"],[/Gap.Check/,"gap"],[/Signal Report|Signal-Bilanz/,"report"],[/Lab Review/,"lab"]];
   /* live.json (the real group, bot messages only) → feed items */
   const fromLive = items => { const out = [];
     for (const m of items){ const plain = m.html.replace(/<[^>]+>/g, "").trim(), first = plain.split("\n")[0];
