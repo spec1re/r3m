@@ -860,7 +860,7 @@ function renderFeed(D, kinds){
       if (/^🧪/.test(plain)) continue;   // test posts
       let type = "alert", kind = "";
       if (/^(⚠️|Forex Factory)/.test(plain)) type = "news";
-      else if (/^(?:\S+ )?(eqx|clx|lava|q210|lavalite|clxlite|eqxlite|dvilite) screener/i.test(first)) type = /\n(🆕|✅|🏆|🛑|🏁) · /u.test(plain) ? "alert" : "screener";   // entries / results are alerts, the Top N a screener post
+      else if (/^(?:\S+ )?(eqx|clx|lava|q210|lavalite|clxlite|eqxlite|dvilite|r3m equinox|r3m climax|r3m lava|r3m dvi) screener/i.test(first)) type = /\n(🆕|✅|🏆|🛑|🏁) · /u.test(plain) ? "alert" : "screener";   // entries / results are alerts, the Top N a screener post
       else if (/Trading Wisdom|Trading Floor|Message of the Day/.test(first)) type = "wisdom";
       else if (/^📝/.test(plain)) type = "changelog";
       else if (/R3M /.test(first)){ const k = KIND.find(([re]) => re.test(first)); if (k){ type = "report"; kind = k[1]; } }
