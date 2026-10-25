@@ -735,10 +735,10 @@ function render(D){
     <td><span class="edge"><i style="width:${Math.round(44 * Math.abs(g.edge) / maxE)}px;background:rgb(var(${g.edge >= 0 ? "--up" : "--down"}))"></i><span class="num ${g.edge >= 0 ? "up" : "down"}">${aR(g.edge)}</span></span></td>
     <td class="num">${q(g.with.tp1, g.with.done)}</td></tr>`).join("")
     || `<tr><td colspan="6" class="sub">Not enough closed trades per confluence yet.</td></tr>`;
-  const resI = {"TP2 Hit":"🏆 TP2","TP1 Hit":"✅ TP1","Stopped":"🛑 SL","open":"⏳ open","offen":"⏳ open"};
+  const resI = {"TP2 Hit":"🏆 TP2","TP1 Hit":"✅ TP1","Stopped":"🛑 SL","Closed":"🏁 session end","open":"⏳ open","offen":"⏳ open"};
   $("recent").innerHTML = (S.recent || []).map(r => `<tr><td class="num">${new Intl.DateTimeFormat(de,{timeZone:TZD,...(rep ? {day:"numeric",month:"short"} : {weekday:"short"}),hour:"2-digit",minute:"2-digit"}).format(new Date(r.t))}</td>
     <td><b>${tv(r.tv || r.sym, esc(r.sym))}</b> <span class="${r.side === "LONG" ? "up" : "down"}">${r.side === "LONG" ? "▲" : "▼"}</span></td><td>${esc(r.script)}</td><td class="sub">${esc(r.setup)}</td>
-    <td class="num">${fmt(r.r1,1)} R</td><td class="res ${r.res === "Stopped" ? "down" : (r.res === "open" || r.res === "offen") ? "flat" : "up"}">${resI[r.res] || esc(r.res)}</td></tr>`).join("")
+    <td class="num">${fmt(r.r1,1)} R</td><td class="res ${r.res === "Stopped" ? "down" : (r.res === "open" || r.res === "offen" || r.res === "Closed") ? "flat" : "up"}">${resI[r.res] || esc(r.res)}</td></tr>`).join("")
     || `<tr><td colspan="6" class="sub">No signals collected yet.</td></tr>`;
   };
   { const R = D.replay, bl = $("src-live"), br = $("src-rep"), sub0 = $("s-sub").textContent;
@@ -860,7 +860,7 @@ function renderFeed(D, kinds){
       if (/^🧪/.test(plain)) continue;   // test posts
       let type = "alert", kind = "";
       if (/^(⚠️|Forex Factory)/.test(plain)) type = "news";
-      else if (/^(?:\S+ )?(eqx|clx|lava|q210) screener/i.test(first)) type = /\n(🆕|✅|🏆|🛑|🏁) · /u.test(plain) ? "alert" : "screener";   // entries / results are alerts, the Top N a screener post
+      else if (/^(?:\S+ )?(eqx|clx|lava|q210|lavalite|clxlite|eqxlite|dvilite) screener/i.test(first)) type = /\n(🆕|✅|🏆|🛑|🏁) · /u.test(plain) ? "alert" : "screener";   // entries / results are alerts, the Top N a screener post
       else if (/Trading Wisdom|Trading Floor|Message of the Day/.test(first)) type = "wisdom";
       else if (/^📝/.test(plain)) type = "changelog";
       else if (/R3M /.test(first)){ const k = KIND.find(([re]) => re.test(first)); if (k){ type = "report"; kind = k[1]; } }
