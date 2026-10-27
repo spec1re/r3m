@@ -738,7 +738,7 @@ function render(D){
   const resI = {"TP2 Hit":"🏆 TP2","TP1 Hit":"✅ TP1","Stopped":"🛑 SL","Closed":"🏁 session end","open":"⏳ open","offen":"⏳ open"};
   $("recent").innerHTML = (S.recent || []).map(r => `<tr><td class="num">${new Intl.DateTimeFormat(de,{timeZone:TZD,...(rep ? {day:"numeric",month:"short"} : {weekday:"short"}),hour:"2-digit",minute:"2-digit"}).format(new Date(r.t))}</td>
     <td><b>${tv(r.tv || r.sym, esc(r.sym))}</b> <span class="${r.side === "LONG" ? "up" : "down"}">${r.side === "LONG" ? "▲" : "▼"}</span></td><td>${esc(r.script)}</td><td class="sub">${esc(r.setup)}</td>
-    <td class="num">${fmt(r.r1,1)} R</td><td class="res ${r.res === "Stopped" ? "down" : (r.res === "open" || r.res === "offen" || r.res === "Closed") ? "flat" : "up"}">${resI[r.res] || esc(r.res)}</td></tr>`).join("")
+    <td class="num">${fmt(r.r1,1)} R</td><td class="res ${r.res === "Stopped" ? "down" : (r.res === "open" || r.res === "offen" || r.res === "Closed") ? "flat" : "up"}">${r.res === "Closed" ? "🏁 " + esc(r.why || "session end") : (resI[r.res] || esc(r.res))}</td></tr>`).join("")
     || `<tr><td colspan="6" class="sub">No signals collected yet.</td></tr>`;
   };
   { const R = D.replay, bl = $("src-live"), br = $("src-rep"), sub0 = $("s-sub").textContent;
