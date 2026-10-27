@@ -187,7 +187,10 @@ h2{font:600 28px var(--f-display);margin:0;letter-spacing:-.2px}
 .btrack{height:10px;border-radius:5px;background:var(--line);overflow:hidden;display:flex}
 .btrack i{display:block;height:100%}
 .feed{background:var(--deep);border:1px solid var(--line);border-radius:var(--r);overflow-x:auto}
-#pane-models,#pane-conf{overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--line) transparent}#pane-models th,#pane-conf th{position:sticky;top:0;background:var(--deep)}
+#pane-trades,#pane-models,#pane-conf{overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--line) transparent}#pane-trades th,#pane-models th,#pane-conf th{position:sticky;top:0;background:var(--deep)}
+/* the trade list fills the panel down to the bottom of the left column and scrolls inside (2026-10-27) · one column: the newest 16 */
+@media (min-width:1281px){.sigpanel{display:flex;flex-direction:column}#pane-trades{flex:1 1 0;min-height:0;contain:size}}
+@media (max-width:1280px){#recent tr:nth-child(n+17){display:none}}
 #conf b{font:600 14px var(--f-body)}#conf .ms{font-size:12px;color:var(--mist)}.edge{display:flex;align-items:center;gap:8px}.edge i{display:block;height:8px;border-radius:4px}
 #models .ms{font-size:12px;color:var(--mist)}#models b{font:600 14.5px var(--f-display)}.tier.hi{color:var(--sun)}.tier.lo{color:var(--mist)}
 table{width:100%;border-collapse:collapse;font-size:13.5px}
@@ -699,6 +702,7 @@ function render(D){
   /* Signals */
   const S = D.signals || {}, T = S.total || {};
   const q = (a,b) => b ? Math.round(100*a/b) + "%" : "–";
+  const scN = s => s === "af" ? "lava af" : s;   /* lava's Auction Failed is script af in the stats, lava af on the page */
   const sR = r => (r > 0 ? "+" : r < 0 ? "−" : "±") + fmt(Math.abs(r ?? 0), 1) + "R";
   /* the signals view, filled from the live alerts (7 days) or the replay (chart history) */
   const sigView = (S, rep) => { const T = S.total || {};
@@ -709,7 +713,7 @@ function render(D){
   drawCurve(S.curve || []);
   /* splits: by script, by session, by bias grade · bar = TP1 · SL · open, scaled to the biggest group of that column */
   const split = (title, list) => { if (!list.length) return ""; const maxN = Math.max(1, ...list.map(g => g.n));
-    return `<div class="split"><h4>${title}</h4>${list.map(g => `<div class="srow"><div class="t"><b>${esc(g.name)}</b><span class="num ${g.r >= 0 ? "up" : "down"}">${g.done ? sR(g.r) : "open"}</span></div>
+    return `<div class="split"><h4>${title}</h4>${list.map(g => `<div class="srow"><div class="t"><b>${esc(scN(g.name))}</b><span class="num ${g.r >= 0 ? "up" : "down"}">${g.done ? sR(g.r) : "open"}</span></div>
       <div class="btrack" title="TP1 ${g.tp1} · SL ${g.sl} · open ${g.open}"><i style="width:${100*g.tp1/maxN}%;background:rgb(var(--up))"></i><i style="width:${100*g.sl/maxN}%;background:rgb(var(--down))"></i><i style="width:${100*g.open/maxN}%;background:var(--mist);opacity:.5"></i></div>
       <div class="m">${g.n} trades · TP1 ${q(g.tp1, g.done)}</div></div>`).join("")}</div>`; };
   const grades = (S.byGrade || []).filter(g => !/^\d+\/\d+$/.test(g.name) && g.n >= 5).sort((a, b) => b.r - a.r).slice(0, 4);
@@ -720,7 +724,7 @@ function render(D){
     const tier = !ranked ? `Forward test ${g.done} / 10` : rating >= 1250 ? "HTF" : rating >= 1100 ? "ITF" : "LTF";
     return {...g, rating, ranked, tier}; }).sort((a, b) => (b.ranked - a.ranked) || (b.rating - a.rating));
   let rank = 0;
-  $("models").innerHTML = models.map(m => `<tr><td class="num sub">${m.ranked ? ++rank : "–"}</td><td><b>${esc(m.name)}</b><div class="ms">${esc(m.script)}${m.script === "lava" && m.name === "accept·VA" ? " · LVA London Value Acceptance" : ""}</div></td>
+  $("models").innerHTML = models.map(m => `<tr><td class="num sub">${m.ranked ? ++rank : "–"}</td><td><b>${esc(m.name)}</b><div class="ms">${esc(scN(m.script))}${m.script === "lava" && m.name === "accept·VA" ? " · LVA London Value Acceptance" : ""}</div></td>
     <td class="tier ${m.ranked && m.tier !== "LTF" ? "hi" : "lo"}">${m.tier}</td><td class="num">${m.rating}</td><td class="num">${m.tp1} / ${m.sl}</td>
     <td class="num">${q(m.tp2, m.done)}</td><td class="num ${m.r >= 0 ? "up" : "down"}">${sR(m.r)}</td></tr>`).join("")
     || `<tr><td colspan="7" class="sub">No models yet.</td></tr>`;
@@ -730,14 +734,14 @@ function render(D){
   const conf = (S.byTag || []).filter(g => g.with.done >= minN && g.without.done >= minN).map(g => ({...g, edge: avg(g.with) - avg(g.without)}))
     .sort((x, y) => y.edge - x.edge);
   const maxE = Math.max(0.01, ...conf.map(g => Math.abs(g.edge))), aR = v => (v > 0 ? "+" : v < 0 ? "−" : "±") + fmt(Math.abs(v), 2) + "R";
-  $("conf").innerHTML = conf.map(g => `<tr><td><b>${esc(g.name)}</b><div class="ms">${esc(g.script)}</div></td><td class="num">${g.with.done}</td>
+  $("conf").innerHTML = conf.map(g => `<tr><td><b>${esc(g.name)}</b><div class="ms">${esc(scN(g.script))}</div></td><td class="num">${g.with.done}</td>
     <td class="num ${avg(g.with) >= 0 ? "up" : "down"}">${aR(avg(g.with))}</td><td class="num sub">${aR(avg(g.without))}</td>
     <td><span class="edge"><i style="width:${Math.round(44 * Math.abs(g.edge) / maxE)}px;background:rgb(var(${g.edge >= 0 ? "--up" : "--down"}))"></i><span class="num ${g.edge >= 0 ? "up" : "down"}">${aR(g.edge)}</span></span></td>
     <td class="num">${q(g.with.tp1, g.with.done)}</td></tr>`).join("")
     || `<tr><td colspan="6" class="sub">Not enough closed trades per confluence yet.</td></tr>`;
   const resI = {"TP2 Hit":"🏆 TP2","TP1 Hit":"✅ TP1","Stopped":"🛑 SL","Closed":"🏁 session end","open":"⏳ open","offen":"⏳ open"};
   $("recent").innerHTML = (S.recent || []).map(r => `<tr><td class="num">${new Intl.DateTimeFormat(de,{timeZone:TZD,...(rep ? {day:"numeric",month:"short"} : {weekday:"short"}),hour:"2-digit",minute:"2-digit"}).format(new Date(r.t))}</td>
-    <td><b>${tv(r.tv || r.sym, esc(r.sym))}</b> <span class="${r.side === "LONG" ? "up" : "down"}">${r.side === "LONG" ? "▲" : "▼"}</span></td><td>${esc(r.script)}</td><td class="sub">${esc(r.setup)}</td>
+    <td><b>${tv(r.tv || r.sym, esc(r.sym))}</b> <span class="${r.side === "LONG" ? "up" : "down"}">${r.side === "LONG" ? "▲" : "▼"}</span></td><td>${esc(scN(r.script))}</td><td class="sub">${esc(r.setup)}</td>
     <td class="num">${fmt(r.r1,1)} R</td><td class="res ${r.res === "Stopped" ? "down" : (r.res === "open" || r.res === "offen" || r.res === "Closed") ? "flat" : "up"}">${r.res === "Closed" ? "🏁 " + esc(r.why || "session end") : (resI[r.res] || esc(r.res))}</td></tr>`).join("")
     || `<tr><td colspan="6" class="sub">No signals collected yet.</td></tr>`;
   };
