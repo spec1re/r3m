@@ -192,7 +192,7 @@ h2{font:600 28px var(--f-display);margin:0;letter-spacing:-.2px}
 @media (min-width:1281px){.sigpanel{display:flex;flex-direction:column}#pane-trades{flex:1 1 0;min-height:0;contain:size}}
 @media (max-width:1280px){#recent tr:nth-child(n+17){display:none}}
 #conf b{font:600 14px var(--f-body)}#conf .ms{font-size:12px;color:var(--mist)}.edge{display:flex;align-items:center;gap:8px}.edge i{display:block;height:8px;border-radius:4px}
-#models .ms{font-size:12px;color:var(--mist)}#models b{font:600 14.5px var(--f-display)}.tier.hi{color:var(--sun)}.tier.lo{color:var(--mist)}
+#models .ms{font-size:12px;color:var(--mist)}#recent .ms{font-size:11.5px;color:var(--mist);margin-top:1px}#models b{font:600 14.5px var(--f-display)}.tier.hi{color:var(--sun)}.tier.lo{color:var(--mist)}
 table{width:100%;border-collapse:collapse;font-size:13.5px}
 th{text-align:left;font-weight:600;color:var(--mist);font-size:11.5px;letter-spacing:.8px;text-transform:uppercase;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
 td{padding:8px 12px;border-bottom:1px solid rgba(26,69,86,.55);white-space:nowrap}
@@ -742,7 +742,8 @@ function render(D){
     <td class="num">${q(g.with.tp1, g.with.done)}</td></tr>`).join("")
     || `<tr><td colspan="6" class="sub">Not enough closed trades per confluence yet.</td></tr>`;
   const resI = {"TP2 Hit":"🏆 TP2","TP1 Hit":"✅ TP1","Stopped":"🛑 SL","Closed":"🏁 session end","open":"⏳ open","offen":"⏳ open"};
-  $("recent").innerHTML = (S.recent || []).map(r => `<tr><td class="num">${new Intl.DateTimeFormat(de,{timeZone:TZD,...(rep ? {day:"numeric",month:"short"} : {weekday:"short"}),hour:"2-digit",minute:"2-digit"}).format(new Date(r.t))}</td>
+  const hmT = t => new Intl.DateTimeFormat(de,{timeZone:TZD,hour:"2-digit",minute:"2-digit"}).format(new Date(t));
+  $("recent").innerHTML = (S.recent || []).map(r => `<tr><td class="num">${new Intl.DateTimeFormat(de,{timeZone:TZD,...(rep ? {day:"numeric",month:"short"} : {weekday:"short"}),hour:"2-digit",minute:"2-digit"}).format(new Date(r.t))}${r.tx && r.tx.slice(0,16) !== r.t.slice(0,16) ? `<div class="ms">→ ${hmT(r.tx)}</div>` : ""}</td>
     <td><b>${tv(r.tv || r.sym, esc(r.sym))}</b> <span class="${r.side === "LONG" ? "up" : "down"}">${r.side === "LONG" ? "▲" : "▼"}</span></td><td>${esc(scN(r.script))}</td><td class="sub">${esc(r.setup)}</td>
     <td class="num">${fmt(r.r1,1)} R</td><td class="res ${r.res === "Stopped" ? "down" : (r.res === "open" || r.res === "offen" || r.res === "Closed") ? "flat" : "up"}">${r.res === "Closed" ? "🏁 " + esc(r.why || "session end") : (resI[r.res] || esc(r.res))}</td></tr>`).join("")
     || `<tr><td colspan="6" class="sub">No signals collected yet.</td></tr>`;
