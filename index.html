@@ -413,7 +413,7 @@ a.chip{text-decoration:none}
   </div></section>
 
   <section id="signals"><div class="wrap">
-    <div class="sh"><h2>Signals</h2><span class="sub" id="s-sub">Every entry alert of the last 7 days · best target per trade · R = full exit at TP1, stop = −1R</span></div>
+    <div class="sh"><h2>Signals</h2><span class="sub" id="s-sub">Every entry alert of the last 7 days · best target per trade · R = full exit at TP1, stops at the close they fired on · gross</span></div>
     <div class="feedbar sigsrc" role="group" aria-label="Live alerts or replay"><button type="button" id="src-live">Live · 7 days</button><button type="button" id="src-rep">Replay</button></div>
     <div class="sig">
       <div>
@@ -709,7 +709,7 @@ function render(D){
   /* the signals view, filled from the live alerts (7 days) or the replay (chart history) */
   const sigView = (S, rep) => { const T = S.total || {};
   $("stats").innerHTML = [["Trades", T.n ?? 0, "", `${T.done ?? 0} closed · ${T.open ?? 0} open`], ["TP1 rate", q(T.tp1, T.done), "up", `${T.tp1 ?? 0} of ${T.done ?? 0}`],
-    ["TP2 rate", q(T.tp2, T.done), "", `${T.tp2 ?? 0} full runs`], ["Σ R", sR(T.r), T.r >= 0 ? "up" : "down", "stop = −1R"]]
+    ["TP2 rate", q(T.tp2, T.done), "", `${T.tp2 ?? 0} full runs`], ["Σ R", sR(T.r), T.r >= 0 ? "up" : "down", S.src ? "r3m·'s exit · gross" : "stops at their close · gross"]]
     .map(([k,v,c,sub]) => `<div class="stat"><div class="v num ${c}">${v}</div><div class="k">${k}</div><div class="s">${sub}</div></div>`).join("");
   $("curve-end").innerHTML = T.done ? `<span class="${T.r >= 0 ? "up" : "down"}">${sR(T.r)}</span>` : "";
   drawCurve(S.curve || []);
@@ -752,7 +752,8 @@ function render(D){
     const dd = t => new Intl.DateTimeFormat(de,{timeZone:TZD,day:"numeric",month:"short"}).format(new Date(t));
     if (!R) br.hidden = true; else br.textContent = `Replay · ${Math.max(1, Math.round((Date.parse(R.to) - Date.parse(R.from)) / 6048e5))} weeks`;
     const set = rp => { sigView(rp ? R : S, rp); bl.setAttribute("aria-pressed", String(!rp)); br.setAttribute("aria-pressed", String(rp));
-      $("s-sub").textContent = rp ? `Replay of climax and equinox on chart history · ${R.symbols.length} Pepper symbols · ${dd(R.from)} – ${dd(R.to)} · the same logic as the live alerts · R = full exit at TP1, stop = −1R` : sub0;
+      $("s-sub").textContent = rp ? (R.src ? `Replay of r3m·'s four engines and their auction failed trades · ${R.symbols.length} symbols · ${R.src.tf} · ${dd(R.from)} ${R.from.slice(0, 4)} – ${dd(R.to)} ${R.to.slice(0, 4)} · current defaults · R = r3m·'s exit (½ at TP1, the rest to TP2 or break-even), stops at the close they fired on · gross`
+        : `Replay of climax and equinox on chart history · ${R.symbols.length} Pepper symbols · ${dd(R.from)} – ${dd(R.to)} · the same logic as the live alerts · R = full exit at TP1, stop = −1R`) : sub0;
       try { localStorage.setItem("r3m-sigsrc", rp ? "rep" : "live"); } catch {} };
     bl.onclick = () => set(false); br.onclick = () => set(true);
     let r0 = false; try { r0 = !!R && localStorage.getItem("r3m-sigsrc") === "rep"; } catch {}
@@ -918,7 +919,7 @@ const getLive = () => fetch("live.json?t=" + Date.now(), {cache: "no-store"}).th
 setInterval(() => { if (!document.hidden && feedLive) getLive().then(feedLive); }, 60000);
 
 function drawCurve(c){
-  const svg = $("curve"), W = 560, H = 200, P = {l:40, r:12, t:12, b:24};
+  const svg = $("curve"), W = 560, H = 200, P = {l:50, r:12, t:12, b:24};
   if (!c.length){ svg.innerHTML = `<text x="${W/2}" y="${H/2}" text-anchor="middle" fill="#8db0b5" font-size="14">No closed trades yet</text>`; return; }
   const ys = [0, ...c.map(p => p.r)], lo = Math.min(...ys), hi = Math.max(...ys), pad = (hi - lo || 1) * .12;
   const y0 = lo - pad, y1 = hi + pad, X = i => P.l + (W - P.l - P.r) * (i / c.length), Y = v => P.t + (H - P.t - P.b) * (1 - (v - y0) / (y1 - y0));
@@ -932,7 +933,7 @@ function drawCurve(c){
     <path d="${line} L ${X(c.length)} ${Y(y0)} L ${X(0)} ${Y(y0)} Z" fill="url(#ga)"/>
     <path d="${line}" fill="none" stroke="${col}" stroke-width="2.4" stroke-linejoin="round"/>
     <circle cx="${X(c.length)}" cy="${Y(last)}" r="5" fill="${col}" stroke="#061a24" stroke-width="2"/>
-    <text x="${W-P.r}" y="${H-6}" text-anchor="end" fill="#8db0b5" font-size="11" font-family="Figtree,sans-serif,Noto Color Emoji">${c.length} closed trades</text>`;
+    <text x="${W-P.r}" y="${H-6}" text-anchor="end" fill="#8db0b5" font-size="11" font-family="Figtree,sans-serif,Noto Color Emoji">${(c[c.length-1].n || c.length).toLocaleString("en-US")} closed trades</text>`;
 }
 
 /* Hero bubbles (calm, still with reduced motion) */
