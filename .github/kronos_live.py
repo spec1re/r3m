@@ -165,7 +165,7 @@ def walk(paths_ohlc, e, ref):
     med = ends[len(ends) // 2] / k
     edge = (n1 * e["r1"] - ns) / len(paths_ohlc)
     return {"n": len(paths_ohlc), "tp1": n1, "stop": ns, "none": nn, "tp2": n2 if t2 is not None else None,
-            "med": med, "edge": round(edge, 2)}
+            "med": float(med), "edge": round(float(edge), 2)}
 
 
 def dec(px):
@@ -194,8 +194,12 @@ def message(e, k):
              f"🎯 TP1 first {k['tp1']} · 🛑 stop first {k['stop']} · ⏸ neither {k['none']} · of {k['n']} paths, next {hrs}h"]
     mid = f"median in {hrs}h {fmt(k['med'], d)} " + ("▲" if k["med"] > float(e["px"]) else "▼")
     lines.append((f"🏆 TP2 before the stop {k['tp2']} · " if k["tp2"] is not None else "") + mid)
-    v = "✓" if k["edge"] > 0 else "✗"
-    lines.append(f"{v} edge {k['edge']:+.2f}R · " + ("leans with the trade" if k["edge"] > 0 else "leans against the trade"))
+    if k["edge"] > 0:
+        lines.append(f"✓ edge {k['edge']:+.2f}R · leans with the trade")
+    elif k["edge"] < 0:
+        lines.append(f"✗ edge {k['edge']:+.2f}R · leans against the trade")
+    else:
+        lines.append(f"➖ edge 0R · no lean, the paths stay between the stop and TP1")
     lines.append(f"<i>read on {html.escape(k['tk'])} · Kronos-small · a test, not advice</i>")
     return "\n".join(lines)
 
@@ -320,7 +324,7 @@ def main():
             yt = pd.Series([datetime.fromtimestamp(rows[-1][0] + STEP * (i + 1), tz).replace(tzinfo=None) for i in range(HORIZON)])
             out = pred.predict_batch([df] * PATHS, [xt] * PATHS, [yt] * PATHS, pred_len=HORIZON, T=1.0, top_p=0.9,
                                      sample_count=1, verbose=False)
-            paths = [list(zip(o["open"].values, o["high"].values, o["low"].values, o["close"].values)) for o in out]
+            paths = [[tuple(map(float, b)) for b in zip(o["open"].values, o["high"].values, o["low"].values, o["close"].values)] for o in out]
             k = walk(paths, e, rows[-1][4])
             k["tk"] = b["tk"]
             mid = send(message(e, k), e["id"], a.dry)
