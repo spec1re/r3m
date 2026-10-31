@@ -140,6 +140,18 @@ h2{font:600 28px var(--f-display);margin:0;letter-spacing:-.2px}
 .charts img{display:block;width:100%;height:auto}
 .charts figcaption{padding:8px 14px;font-size:13px;color:var(--mist)}
 
+/* Oracle · Kronos (2026-10-31) */
+.oracle{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+@media (max-width:1280px){.oracle{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:800px){.oracle{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.oracle{grid-template-columns:1fr}}
+.orc svg{display:block;width:100%;height:auto;margin:8px 0 6px}
+.orc .sym{color:var(--glass)}
+.orc p{margin:2px 0 0;font-size:13px;color:#d4e6e3}
+.orc .ok{color:rgb(var(--up))}.orc .no{color:rgb(var(--down))}
+.oscore{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.oscore span{font:500 12.5px var(--f-data);padding:3px 10px;border-radius:999px;border:1px solid var(--line);color:var(--mist)}
+
 /* Outlook */
 .outlook{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
 .oc{display:flex;flex-direction:column;padding:10px 12px 14px}
@@ -410,6 +422,12 @@ a.chip{text-decoration:none}
   <section id="outlook"><div class="wrap">
     <div class="sh"><h2>Outlook</h2><span class="sub">Chart (1h) · levels · scenarios – no recommendations</span></div>
     <div class="outlook" id="outlook-box"></div>
+  </div></section>
+
+  <section id="oracle"><div class="wrap">
+    <div class="sh"><h2>🔮 Oracle</h2><span class="sub" id="o-sub">Kronos, an open AI model for candles, guesses each focus symbol's cash session from the bars before it · 24 sampled paths, the band = 80 % of them · a player we measure, not a signal</span></div>
+    <div class="oscore" id="o-score"></div>
+    <div class="oracle" id="oracle-box"><div class="card">The first forecast arrives with the next session.</div></div>
   </div></section>
 
   <section id="signals"><div class="wrap">
@@ -701,6 +719,32 @@ function render(D){
       : `<div class="ch none">Chart arrives Mon–Fri with the morning digest</div>`;
     return `<div class="card oc">${pic}<div class="ob"><span class="sym">${fl(o.sym)}${tv(o.sym)}</span>${px ? ` <span class="sub num">${fmt(px)}</span>` : ""}${lv ? `<div class="lv">${lv}</div>` : ""}${body}</div></div>`; }).join("");
 
+  /* Oracle · Kronos (2026-10-31): the newest forecast per symbol, its cone and, once scored, the real path */
+  { const K = D.kronos;
+    if (K && K.days?.length){
+      const sc = K.score || {}, pc = (a,b) => b ? Math.round(100*a/b) + "%" : "–";
+      $("o-score").innerHTML = sc.n ? [`Direction ${sc.hit}/${sc.n} · ${pc(sc.hit, sc.n)}`, `Inside the band ${sc.inside}/${sc.n} · ${pc(sc.inside, sc.n)} (80 % expected)`,
+        `Brier ${fmt(sc.brier, 3)} (a coin = 0.250)`].map(t => `<span>${t}</span>`).join("") : `<span>No session scored yet</span>`;
+      const last = {}; K.days.forEach(d => Object.entries(d.symbols || {}).forEach(([k, e]) => { last[k] = {day: d.day, e}; }));
+      const order = ["NAS100","GER40","US500","XAUUSD","EURUSD"].filter(k => last[k]).concat(Object.keys(last).filter(k => !["NAS100","GER40","US500","XAUUSD","EURUSD"].includes(k)));
+      const svg = e => { const W = 300, H = 120, n0 = e.ctx.length, n1 = e.q50.length, N = n0 + n1;
+        const ys = [...e.ctx, ...e.q10, ...e.q90, ...(e.actual || [])], lo = Math.min(...ys), hi = Math.max(...ys), pad = (hi - lo) * .06 || 1;
+        const X = i => (i / (N - 1)) * W, Y = v => H - ((v - lo + pad) / (hi - lo + 2*pad)) * H;
+        const line = (arr, off) => arr.map((v, i) => `${X(i + off).toFixed(1)},${Y(v).toFixed(1)}`).join(" ");
+        const band = line(e.q90, n0) + " " + e.q10.map((v, i) => `${X(n1 - 1 - i + n0).toFixed(1)},${Y(e.q10[n1 - 1 - i]).toFixed(1)}`).join(" ");
+        const xo = X(n0 + e.open_i).toFixed(1);
+        return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Kronos forecast cone"><polygon points="${band}" fill="var(--glass)" fill-opacity=".16"/>
+          <line x1="${xo}" x2="${xo}" y1="0" y2="${H}" stroke="var(--line)" stroke-dasharray="3 3"/>
+          <polyline points="${line(e.ctx, 0)}" fill="none" stroke="var(--mist)" stroke-width="1.4"/>
+          <polyline points="${line(e.q50, n0)}" fill="none" stroke="var(--glass)" stroke-width="1.4" stroke-dasharray="4 3"/>
+          ${e.actual ? `<polyline points="${line(e.actual, n0)}" fill="none" stroke="var(--foam)" stroke-width="1.6"/>` : ""}</svg>`; };
+      $("oracle-box").innerHTML = order.map(k => { const {day, e} = last[k], up = Math.round(100 * e.up), s = e.score;
+        const read = up >= 50 ? `<b class="up">▲</b> ${up}% of paths end above` : `<b class="down">▼</b> ${100 - up}% of paths end below`;
+        const res = s ? `<p>${s.hit ? `<span class="ok">✓ direction</span>` : `<span class="no">✗ direction</span>`} · ${s.inside ? `<span class="ok">inside the band</span>` : `<span class="no">outside the band</span>`}</p>` : `<p class="sub">scored after the session</p>`;
+        return `<div class="card orc"><span class="sym">${fl(k)}${tv(k)}</span> <span class="sub">${dshort(day)} · ${esc(e.session)} cash</span>${svg(e)}<p>${read} ${fmt(e.ref)}</p>${res}</div>`; }).join("");
+    }
+  }
+
   /* Signals */
   const S = D.signals || {}, T = S.total || {};
   const q = (a,b) => b ? Math.round(100*a/b) + "%" : "–";
@@ -957,7 +1001,7 @@ function bubbles(){
 const OLD_IDS = {einschaetzung:"outlook", maerkte:"markets", aktien:"stocks", signale:"signals", termine:"calendar", archiv:"archive"};   // the anchors until 2026-10-21
 { const h = location.hash.slice(1); if (OLD_IDS[h]) { history.replaceState(null, "", "#" + OLD_IDS[h]); setTimeout(() => document.getElementById(OLD_IDS[h])?.scrollIntoView(), 400); } }
 function orderTool(){
-  const main = document.querySelector("main"), names = {outlook:"Outlook",calendar:"Calendar",markets:"Markets",stocks:"Stocks",signals:"Signals",awards:"Awards",feed:"Feed",archive:"Archive"}, noNav = ["awards"];
+  const main = document.querySelector("main"), names = {outlook:"Outlook",oracle:"Oracle",calendar:"Calendar",markets:"Markets",stocks:"Stocks",signals:"Signals",awards:"Awards",feed:"Feed",archive:"Archive"}, noNav = ["awards"];
   const def = Object.keys(names); let cur = def;
   try { let v = JSON.parse(localStorage.getItem("r3m-order") || "null"); if (Array.isArray(v)) { v = v.map(k => OLD_IDS[k] || k); const keep = v.filter(k => def.includes(k)); if (keep.length) cur = [...keep, ...def.filter(k => !keep.includes(k))]; } } catch {}
   const apply = () => { cur.forEach(id => main.appendChild($(id)));
