@@ -975,20 +975,21 @@ function renderFeed(D, kinds){
 const getKron = () => fetch("kronos-live.json?t=" + Date.now(), {cache: "no-store"}).then(r => r.ok ? r.json() : null).catch(() => null);
 function drawKron(K){ const box = $("k-box"); if (!box || !K || !(K.checks || []).length) return;
   const IC = {equinox:"🌗", climax:"⚡️", lava:"🌋", dvi:"📈"}, kR = r => (r > 0 ? "+" : r < 0 ? "−" : "±") + fmt(Math.abs(r || 0), 2) + "R";
-  const C = K.checks.slice().reverse(), sent = C.filter(c => c.status === "sent");
+  const C = K.checks.slice().reverse(), sent = C.filter(c => c.status === "sent" && !c.crypto), cx = C.filter(c => c.status === "sent" && c.crypto && c.out);
   const grp = (name, f, tip) => { const g = sent.filter(c => c.out && f(c.k.edge)); if (!g.length) return "";
     const tp = g.filter(c => c.out === "tp1").length, r = g.reduce((a, c) => a + (c.rOut || 0), 0);
     return `<span title="${tip} · R to the trade's first word: TP1 = TP1's R, a stop or an early close its own R">${name} ${g.length} · TP1 ${Math.round(100 * tp / g.length)}% · <b class="${r >= 0 ? "up" : "down"}">${kR(r)}</b></span>`; };
   const open = sent.filter(c => !c.out).length;
   $("k-score").innerHTML = grp("✓ with", e => e > 0, "Kronos leans with the trade") + grp("✗ against", e => e < 0, "Kronos leans against the trade")
-    + grp("➖ no lean", e => e === 0, "the paths stay between the stop and TP1") + (open ? `<span>${open} open</span>` : "");
+    + grp("➖ no lean", e => e === 0, "the paths stay between the stop and TP1") + (open ? `<span>${open} open</span>` : "")
+    + (cx.length ? `<span title="crypto rides along as a test, outside the score">🪙 crypto test ${cx.length} · Kronos right ${cx.filter(c => (c.k.edge > 0) === (c.out === "tp1")).length}</span>` : "");
   const when = t => new Intl.DateTimeFormat(de, {timeZone: TZD, weekday: "short", hour: "2-digit", minute: "2-digit"}).format(new Date(t));
   const row = c => { const ar = c.side === "LONG" ? `<b class="up">▲</b>` : `<b class="down">▼</b>`;
     const tr = `${IC[c.script] || ""} ${esc(c.script)}${c.af ? " AF" : ""} ${ar} <span class="num">${esc(c.px)}</span>`;
     if (c.status !== "sent") return `<tr><td>${when(c.t)}</td><td>${fl(c.sym)}${tv(c.sym)}</td><td>${tr}</td><td colspan="3" class="sub">${c.status === "wait" ? "waiting for the proxy bars" : "skipped · " + esc(c.why || "")}</td></tr>`;
     const k = c.k, e = k.edge, v = e > 0 ? `<span class="ok">✓ ${kR(e)}</span>` : e < 0 ? `<span class="no">✗ ${kR(e)}</span>` : `<span class="sub">➖ 0R</span>`;
     const out = !c.out ? `<span class="sub">open</span>` : c.out === "tp1" ? `<span class="ok">✅ TP1 ${kR(c.rOut)}</span>` : c.out === "stop" ? `<span class="no">🛑 ${kR(c.rOut)}</span>` : `🏁 ${kR(c.rOut)}`;
-    return `<tr><td>${when(c.t)}</td><td>${fl(c.sym)}${tv(c.sym)}</td><td>${tr}</td><td class="num" title="of ${k.n} paths · read on ${esc(k.tk)}">🎯 ${k.tp1} · 🛑 ${k.stop} · ⏸ ${k.none}</td><td class="num">${v}</td><td>${out}</td></tr>`; };
+    return `<tr><td>${when(c.t)}</td><td>${fl(c.sym)}${tv(c.sym)}${c.crypto ? ` <span class="sub" title="crypto: a test, outside the score">🪙</span>` : ""}</td><td>${tr}</td><td class="num" title="of ${k.n} paths · read on ${esc(k.tk)}">🎯 ${k.tp1} · 🛑 ${k.stop} · ⏸ ${k.none}</td><td class="num">${v}</td><td>${out}</td></tr>`; };
   box.innerHTML = `<table><thead><tr><th>Signal</th><th>Symbol</th><th>Trade</th><th>Kronos paths</th><th>Edge</th><th>Result</th></tr></thead><tbody>${C.slice(0, 30).map(row).join("")}</tbody></table>`; }
 const getLive = () => fetch("live.json?t=" + Date.now(), {cache: "no-store"}).then(r => r.ok ? r.json() : null).catch(() => null);
 setInterval(() => { if (!document.hidden && feedLive) getLive().then(feedLive); }, 60000);
