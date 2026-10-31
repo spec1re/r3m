@@ -150,6 +150,14 @@ h2{font:600 28px var(--f-display);margin:0;letter-spacing:-.2px}
 .orc p{margin:2px 0 0;font-size:13px;color:#d4e6e3}
 .orc .ok{color:rgb(var(--up))}.orc .no{color:rgb(var(--down))}
 .oscore{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.osh{margin:22px 0 10px;font-size:16px;font-weight:600}
+.osh .sub{font-weight:400;font-size:13px;margin-left:6px}
+.kchk{padding:0;overflow-x:auto}
+.kchk table{width:100%;border-collapse:collapse;font-size:13px;min-width:640px}
+.kchk th{font-weight:500;text-align:left;color:var(--mist);padding:8px 12px;border-bottom:1px solid var(--line)}
+.kchk td{padding:7px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+.kchk tr:last-child td{border-bottom:0}
+.kchk .ok{color:rgb(var(--up))}.kchk .no{color:rgb(var(--down))}
 .oscore span{font:500 12.5px var(--f-data);padding:3px 10px;border-radius:999px;border:1px solid var(--line);color:var(--mist)}
 
 /* Outlook */
@@ -428,6 +436,9 @@ a.chip{text-decoration:none}
     <div class="sh"><h2>🔮 Oracle</h2><span class="sub" id="o-sub">Kronos, an open AI model for candles, guesses each focus symbol's cash session from the bars before it · 24 sampled paths, the band = 80 % of them · a player we measure, not a signal</span></div>
     <div class="oscore" id="o-score"></div>
     <div class="oracle" id="oracle-box"><div class="card">The first forecast arrives with the next session.</div></div>
+    <h3 class="osh">Signal checks<span class="sub">every r3m· entry read by Kronos on a free proxy feed (index futures, cash indices, FX) · 24 paths of the next 3h, TP1 first or the stop first · edge = TP1 first × TP1's R − stop first, per path</span></h3>
+    <div class="oscore" id="k-score"></div>
+    <div class="card kchk" id="k-box"><p style="padding:14px 16px;margin:0">The first check arrives with the next r3m· entry.</p></div>
   </div></section>
 
   <section id="signals"><div class="wrap">
@@ -911,7 +922,8 @@ function renderFeed(D, kinds){
         out.push({type:"photos", t:m.t, syms:[sym]}); continue; }
       if (/^🧪/.test(plain)) continue;   // test posts
       let type = "alert", kind = "";
-      if (/^(⚠️|Forex Factory)/.test(plain)) type = "news";
+      if (/^🔮/.test(plain)) type = "oracle";
+      else if (/^(⚠️|Forex Factory)/.test(plain)) type = "news";
       else if (/^(?:\S+ )?(eqx|clx|lava|q210|lavalite|clxlite|eqxlite|dvilite|r3m equinox|r3m climax|r3m lava|r3m dvi|r3m autopilot) screener/i.test(first)) type = /\n(🆕|✅|🏆|🛑|🏁) · /u.test(plain) ? "alert" : "screener";   // entries / results are alerts, the Top N a screener post
       else if (/Trading Wisdom|Trading Floor|Message of the Day/.test(first)) type = "wisdom";
       else if (/^📝/.test(plain)) type = "changelog";
@@ -921,7 +933,7 @@ function renderFeed(D, kinds){
   const bubble = x => {
     if (x.html != null){   // live message
       const label = x.type === "report" ? (kinds[x.kind] || "Report") : x.type === "news" ? "📰 News" : x.type === "screener" ? "📊 Screener"
-        : x.type === "wisdom" ? "💭 Wisdom" : x.type === "changelog" ? "📝 Changelog" : "🔔 Alert";
+        : x.type === "wisdom" ? "💭 Wisdom" : x.type === "oracle" ? "🔮 Kronos" : x.type === "changelog" ? "📝 Changelog" : "🔔 Alert";
       return `<div class="bub ${x.type}${x.win ? " win" : x.loss ? " loss" : ""}">${head(label, x.t)}${clip(x.html)}</div>`; }
     if (x.type === "photos") return `<div class="bub report">${head("📈 Charts", x.t)}<div class="body">${esc(x.syms.join(" · "))}</div>`
       + `<div class="pics">${x.syms.filter(s => chartBy[s]).map(s => pic(chartBy[s], s + " chart")).join("")}</div></div>`;
@@ -959,8 +971,28 @@ function renderFeed(D, kinds){
   feedLive = nl => { if (nl && nl.updated !== L?.updated){ L = nl; draw(); } };
   draw();
 }
+/* 🔮 Kronos signal checks (kronos-live.json, written by the site repo's kronos-live.yml) */
+const getKron = () => fetch("kronos-live.json?t=" + Date.now(), {cache: "no-store"}).then(r => r.ok ? r.json() : null).catch(() => null);
+function drawKron(K){ const box = $("k-box"); if (!box || !K || !(K.checks || []).length) return;
+  const IC = {equinox:"🌗", climax:"⚡️", lava:"🌋", dvi:"📈"}, kR = r => (r > 0 ? "+" : r < 0 ? "−" : "±") + fmt(Math.abs(r || 0), 2) + "R";
+  const C = K.checks.slice().reverse(), sent = C.filter(c => c.status === "sent");
+  const grp = (name, f, tip) => { const g = sent.filter(c => c.out && f(c.k.edge)); if (!g.length) return "";
+    const tp = g.filter(c => c.out === "tp1").length, r = g.reduce((a, c) => a + (c.rOut || 0), 0);
+    return `<span title="${tip} · R to the trade's first word: TP1 = TP1's R, a stop or an early close its own R">${name} ${g.length} · TP1 ${Math.round(100 * tp / g.length)}% · <b class="${r >= 0 ? "up" : "down"}">${kR(r)}</b></span>`; };
+  const open = sent.filter(c => !c.out).length;
+  $("k-score").innerHTML = grp("✓ with", e => e > 0, "Kronos leans with the trade") + grp("✗ against", e => e < 0, "Kronos leans against the trade")
+    + grp("➖ no lean", e => e === 0, "the paths stay between the stop and TP1") + (open ? `<span>${open} open</span>` : "");
+  const when = t => new Intl.DateTimeFormat(de, {timeZone: TZD, weekday: "short", hour: "2-digit", minute: "2-digit"}).format(new Date(t));
+  const row = c => { const ar = c.side === "LONG" ? `<b class="up">▲</b>` : `<b class="down">▼</b>`;
+    const tr = `${IC[c.script] || ""} ${esc(c.script)}${c.af ? " AF" : ""} ${ar} <span class="num">${esc(c.px)}</span>`;
+    if (c.status !== "sent") return `<tr><td>${when(c.t)}</td><td>${fl(c.sym)}${tv(c.sym)}</td><td>${tr}</td><td colspan="3" class="sub">${c.status === "wait" ? "waiting for the proxy bars" : "skipped · " + esc(c.why || "")}</td></tr>`;
+    const k = c.k, e = k.edge, v = e > 0 ? `<span class="ok">✓ ${kR(e)}</span>` : e < 0 ? `<span class="no">✗ ${kR(e)}</span>` : `<span class="sub">➖ 0R</span>`;
+    const out = !c.out ? `<span class="sub">open</span>` : c.out === "tp1" ? `<span class="ok">✅ TP1 ${kR(c.rOut)}</span>` : c.out === "stop" ? `<span class="no">🛑 ${kR(c.rOut)}</span>` : `🏁 ${kR(c.rOut)}`;
+    return `<tr><td>${when(c.t)}</td><td>${fl(c.sym)}${tv(c.sym)}</td><td>${tr}</td><td class="num" title="of ${k.n} paths · read on ${esc(k.tk)}">🎯 ${k.tp1} · 🛑 ${k.stop} · ⏸ ${k.none}</td><td class="num">${v}</td><td>${out}</td></tr>`; };
+  box.innerHTML = `<table><thead><tr><th>Signal</th><th>Symbol</th><th>Trade</th><th>Kronos paths</th><th>Edge</th><th>Result</th></tr></thead><tbody>${C.slice(0, 30).map(row).join("")}</tbody></table>`; }
 const getLive = () => fetch("live.json?t=" + Date.now(), {cache: "no-store"}).then(r => r.ok ? r.json() : null).catch(() => null);
 setInterval(() => { if (!document.hidden && feedLive) getLive().then(feedLive); }, 60000);
+setInterval(() => { if (!document.hidden) getKron().then(drawKron); }, 120000);
 
 function drawCurve(c){
   const svg = $("curve"), W = 560, H = 200, P = {l:50, r:12, t:12, b:24};
@@ -1105,7 +1137,7 @@ soundUI();
 orderTool();
 bubbles();
 setInterval(tick, 15000);
-Promise.all([fetch("data.json", {cache: "no-store"}).then(r => r.json()), getLive()]).then(([D, L]) => { D.live = L; render(D); }).catch(() => { $("mood").textContent = "Data not reachable right now"; tick(); });
+Promise.all([fetch("data.json", {cache: "no-store"}).then(r => r.json()), getLive()]).then(([D, L]) => { D.live = L; render(D); getKron().then(drawKron); }).catch(() => { $("mood").textContent = "Data not reachable right now"; tick(); });
 })();
 </script>
 
