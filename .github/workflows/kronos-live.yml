@@ -13,6 +13,10 @@ on:
         description: "dry test: message ids (comma list), nothing is sent or written"
         required: false
         default: ""
+      send:
+        description: "with ids: really send the replies (the state is still not written)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -54,7 +58,7 @@ jobs:
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
         run: |
           set -o pipefail
-          python3 .github/kronos_live.py run live.json kronos-live.json --kronos /tmp/kronos ${{ inputs.ids && format('--dry --ids {0}', inputs.ids) || '' }} 2>&1 | tee "$RUNNER_TEMP/out.txt"
+          python3 .github/kronos_live.py run live.json kronos-live.json --kronos /tmp/kronos ${{ inputs.ids && format('{0}--ids {1}', !inputs.send && '--dry ' || '', inputs.ids) || '' }} 2>&1 | tee "$RUNNER_TEMP/out.txt"
       - name: Report   # the job log as an annotation (readable where the log download is not)
         if: always() && steps.plan.outputs.need_model == '1'
         run: |
