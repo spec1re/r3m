@@ -1,0 +1,73 @@
+name: Kronos signal check
+
+# 🔮 (2026-10-31) After every "Live feed" run: new r3m· entries in live.json → Kronos on proxy bars (Yahoo) → a silent
+# reply in the group · scores the older checks · writes kronos-live.json (the Arena reads it).
+# Source of truth: spec1re/r3m-digest/site-ci/ (kronos_live.py is copied by the site deploy, this file is pushed by hand).
+on:
+  workflow_run:
+    workflows: ["Live feed"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      ids:
+        description: "dry test: message ids (comma list), nothing is sent or written"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: kronos-live
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Plan
+        id: plan
+        run: python3 .github/kronos_live.py plan live.json kronos-live.json ${{ inputs.ids && format('--ids {0}', inputs.ids) || '' }}
+      - name: Cache pip and the models
+        if: steps.plan.outputs.need_model == '1'
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.cache/huggingface
+          key: kronos-${{ runner.os }}-v1
+      - name: Install (CPU torch) and Kronos at a pinned commit
+        if: steps.plan.outputs.need_model == '1'
+        run: |
+          pip install -q torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -q numpy pandas einops==0.8.1 huggingface_hub==0.33.1 safetensors==0.6.2 tqdm
+          git clone -q https://github.com/shiyu-coder/Kronos /tmp/kronos
+          git -C /tmp/kronos checkout -q 67b630e67f6a18c9e9be918d9b4337c960db1e9a
+      - name: Forecast, send and score
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+        run: python3 .github/kronos_live.py run live.json kronos-live.json --kronos /tmp/kronos ${{ inputs.ids && format('--dry --ids {0}', inputs.ids) || '' }}
+      - name: Publish
+        if: ${{ !inputs.ids }}
+        run: |
+          git config user.name "R3M Kronos"
+          git config user.email "noreply@github.com"
+          [ -f kronos-live.json ] || exit 0
+          git add kronos-live.json
+          git diff --cached --quiet && exit 0
+          git commit -qm "kronos check"
+          cp kronos-live.json "$RUNNER_TEMP/k.json"
+          for i in 1 2 3 4 5; do
+            git push -q origin HEAD:main && exit 0
+            sleep $((i * 3))
+            git fetch -q origin main && git reset -q --hard origin/main
+            cp "$RUNNER_TEMP/k.json" kronos-live.json
+            git add kronos-live.json && { git diff --cached --quiet && exit 0; git commit -qm "kronos check"; }
+          done
+          exit 1
