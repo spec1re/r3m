@@ -37,7 +37,18 @@ FLAG = {"NAS100": "🇺🇸", "US500": "🇺🇸", "US30": "🇺🇸", "US2000":
         "FRA40": "🇫🇷", "JPN225": "🇯🇵", "HK50": "🇭🇰", "AUS200": "🇦🇺", "XAUUSD": "🥇", "XAGUSD": "🥈", "SPOTCRUDE": "🛢️",
         "SPOTBRENT": "🛢️", "USOIL": "🛢️", "UKOIL": "🛢️"}
 ICON = {"equinox": "🌗", "climax": "⚡️", "lava": "🌋", "dvi": "📈"}
-CRYPTO = re.compile(r"BTC|ETH|SOL|XRP|DOGE|TOTAL|USDT$|USDC$|\.P$")
+CRYPTO = re.compile(r"USDT$|USDC$|BUSD$|\.P$|^(BTC|ETH|SOL|XRP|DOGE|BNB|ADA|AVAX|LINK|LTC)USD$")
+CX_VENUE = {"BINANCE", "BINANCEUS", "BYBIT", "OKX", "COINBASE", "BITGET", "KRAKEN", "BITSTAMP", "MEXC", "KUCOIN", "CRYPTO", "CRYPTOCAP"}
+CX_ICON = {"BTC": "🟠", "ETH": "🔷", "SOL": "🟣"}
+
+
+def is_crypto(exch, sym):
+    """crypto rides along as a weekend test (2026-10-31, the user: r3m· on the Binance watchlist) · the score keeps it apart"""
+    return exch in CX_VENUE or bool(CRYPTO.search(sym))
+
+
+def cx_base(sym):
+    return re.sub(r"(USDT|USDC|BUSD|FDUSD|USD)$", "", re.sub(r"\.P$", "", sym))
 
 HEAD = re.compile(r"symbol=([A-Z0-9_]+):([A-Z0-9_.!]+)\"[^>]*><b>[^<]+</b></a><b> · (\d+)m · ([^·<]+) · (\w+) (v10\.2[6-9]\w*)")
 ENTRY = re.compile(r"^(🟢|🔴) · (LONG|SHORT) ([\d.]+) · SL ([\d.]+) · TP1 ([\d.]+) \(([\d.]+)R\)(?: · TP2 ([\d.]+) \(([\d.]+)R\))?")
@@ -69,7 +80,8 @@ def parse(items):
                 af = "auction·failed" in ln
                 ent.append({"id": m["id"], "t": m["t"], "exch": exch, "sym": sym, "tf": int(tf), "ses": ses.strip(),
                             "script": script, "ver": ver, "af": af, "side": side, "px": px, "sl": sl, "tp1": t1,
-                            "r1": float(r1), "tp2": t2, "r2": float(r2) if r2 else None, "read": rd[:160]})
+                            "r1": float(r1), "tp2": t2, "r2": float(r2) if r2 else None, "read": rd[:160],
+                            "crypto": is_crypto(exch, sym)})
             r = RESULT.match(ln)
             if r:
                 side, px, kind, rr = r.groups()
@@ -85,8 +97,11 @@ def key(x):
 def proxy_of(exch, sym):
     if sym in PROXY:
         return PROXY[sym]
-    if CRYPTO.search(sym) or sym in ("USDX", "DXY"):
+    if sym in ("USDX", "DXY") or exch == "CRYPTOCAP":
         return None
+    if is_crypto(exch, sym):
+        b = cx_base(sym)
+        return b + "-USD" if b else None
     if re.fullmatch(r"[A-Z]{6}", sym) and sym[:3] in CCY and sym[3:] in CCY:
         return sym + "=X"
     if exch in ("XETR", "XETRA", "FWB"):
@@ -179,6 +194,8 @@ def fmt(x, d):
 def flag(sym):
     if sym in FLAG:
         return FLAG[sym] + " "
+    if CX_ICON.get(cx_base(sym)) and CRYPTO.search(sym):
+        return CX_ICON[cx_base(sym)] + " "
     if re.fullmatch(r"[A-Z]{6}", sym) and sym[:3] in CCY and sym[3:] in CCY:
         return CCY[sym[:3]] + CCY[sym[3:]] + " "
     return ""
@@ -233,7 +250,7 @@ def load(p):
 
 def todo(state, ent, now):
     seen = {c["id"] for c in state["checks"]}
-    new = [e for e in ent if e["id"] not in seen and now - datetime.fromisoformat(e["t"]) <= FRESH and not CRYPTO.search(e["sym"])]
+    new = [e for e in ent if e["id"] not in seen and now - datetime.fromisoformat(e["t"]) <= FRESH]
     wait = [c for c in state["checks"] if c["status"] == "wait"]
     return new, wait
 
