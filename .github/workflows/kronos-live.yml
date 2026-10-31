@@ -52,7 +52,15 @@ jobs:
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
-        run: python3 .github/kronos_live.py run live.json kronos-live.json --kronos /tmp/kronos ${{ inputs.ids && format('--dry --ids {0}', inputs.ids) || '' }}
+        run: |
+          set -o pipefail
+          python3 .github/kronos_live.py run live.json kronos-live.json --kronos /tmp/kronos ${{ inputs.ids && format('--dry --ids {0}', inputs.ids) || '' }} 2>&1 | tee "$RUNNER_TEMP/out.txt"
+      - name: Report   # the job log as an annotation (readable where the log download is not)
+        if: always() && steps.plan.outputs.need_model == '1'
+        run: |
+          [ -f "$RUNNER_TEMP/out.txt" ] || exit 0
+          msg=$(tail -n 60 "$RUNNER_TEMP/out.txt" | cut -c1-300 | sed ':a;N;$!ba;s/%/%25/g;s/\r//g;s/\n/%0A/g')
+          echo "::notice title=kronos::$msg"
       - name: Publish
         if: ${{ !inputs.ids }}
         run: |
