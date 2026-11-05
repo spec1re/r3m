@@ -1,0 +1,1462 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#061a24">
+<meta property="og:title" content="R3M Reef">
+<meta property="og:description" content="Morning digest, markets, calendar and signal report in one place.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M32 6c-12 0-20 9-20 20 0 7 3 11 6 14l-6 14c-1 2 1 4 3 3l8-8 2 10c0 2 3 2 3 0l4-10 4 10c0 2 3 2 3 0l2-10 8 8c2 1 4-1 3-3l-6-14c3-3 6-7 6-14 0-11-8-20-20-20z' fill='%23ff7d93'/%3E%3Ccircle cx='25' cy='25' r='4' fill='%23061a24'/%3E%3Ccircle cx='39' cy='25' r='4' fill='%23061a24'/%3E%3C/svg%3E">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>R3M Reef</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="color-scheme" content="dark">
+<meta name="darkreader-lock">
+<meta name="description" content="R3M Reef – morning digest, markets, calendar and signal report in one place.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Noto+Color+Emoji&display=swap">
+<style>
+/* Layout: a calm night aquarium – header with clock and exchanges, hero with mood and mascot,
+   below it sections like tanks: Markets · Outlook · Signals · Stocks · Calendar · Archive */
+:root{
+  --abyss:#061a24; --deep:#0a2430; --reef:#0e2f3d; --line:#1a4556;
+  --foam:#e6f3f0; --mist:#8db0b5; --glass:#5fd3bf; --coral:#ff8577; --sun:#ffcf73; --octo:#ff7d93;
+  --up:95,211,191; --down:255,133,119;
+  --f-display:"Fredoka","Nunito","Trebuchet MS",system-ui,sans-serif,"Noto Color Emoji";
+  --f-body:"Figtree","Segoe UI",system-ui,sans-serif,"Noto Color Emoji";
+  --f-data:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace,"Noto Color Emoji";
+  --r:14px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{background:var(--abyss);color:var(--foam);font:15px/1.55 var(--f-body);overflow-x:hidden}
+/* 🤿 the dive (2026-11-03, the user's pick from the Deep Dive mockup): the water darkens as the page scrolls (--depth 0 → 1),
+   sun rays fade with it · a parallax reef in the hero · glass tiles · Octi alive · reduced motion = still */
+:root{--depth:0;--surface:#0d3a4a;--floor:#020a0f}
+.water{position:fixed;inset:0;z-index:-2;pointer-events:none;background:
+  radial-gradient(1200px 700px at 70% calc(-20% - var(--depth) * 60%), rgba(95,211,191,calc(.2 - var(--depth) * .18)), transparent 60%),
+  radial-gradient(900px 500px at -10% 30%, rgba(255,125,147,calc(.06 - var(--depth) * .05)), transparent 60%),
+  linear-gradient(180deg, color-mix(in oklab, var(--surface) calc(100% - var(--depth) * 100%), var(--floor)) 0%, color-mix(in oklab, var(--abyss) calc(100% - var(--depth) * 90%), var(--floor)) 100%)}
+.rays{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:calc(.5 - var(--depth) * .5);mix-blend-mode:screen;
+  background:repeating-linear-gradient(104deg, transparent 0 70px, rgba(180,240,230,.05) 70px 110px, transparent 110px 190px);
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,transparent 70%);mask-image:linear-gradient(180deg,#000 0%,transparent 70%);animation:sway 14s ease-in-out infinite alternate}
+@keyframes sway{to{transform:translateX(-60px) skewX(-3deg)}}
+.dbar{height:2px;background:rgba(26,69,86,.5)}.dbar b{display:block;height:100%;width:calc(var(--depth) * 100%);background:linear-gradient(90deg,#5fd3bf,#1a7d8f);box-shadow:0 0 8px rgba(95,211,191,.6)}
+.depthp{font:600 12.5px var(--f-data);color:var(--glass);padding:3px 9px;border-radius:999px;background:rgba(95,211,191,.08);border:1px solid rgba(95,211,191,.25);white-space:nowrap}
+.dm{font:500 12px var(--f-data);color:var(--glass);border:1px solid rgba(95,211,191,.35);border-radius:999px;padding:2px 9px;letter-spacing:.5px;align-self:center}
+.reef{height:46px;margin-top:-1px;pointer-events:none;background:
+  radial-gradient(28px 22px at 4% 100%, rgba(14,47,61,.9) 98%, transparent), radial-gradient(40px 30px at 16% 100%, rgba(14,47,61,.8) 98%, transparent),
+  radial-gradient(22px 16px at 31% 100%, rgba(14,47,61,.9) 98%, transparent), radial-gradient(50px 26px at 52% 100%, rgba(14,47,61,.7) 98%, transparent),
+  radial-gradient(30px 20px at 71% 100%, rgba(14,47,61,.9) 98%, transparent), radial-gradient(46px 30px at 90% 100%, rgba(14,47,61,.8) 98%, transparent)}
+.floor{padding-block:50px 30px;text-align:center;color:var(--mist);font-size:12px}
+.floor svg{width:min(560px,100%);height:auto;display:block;margin:0 auto 14px}
+.empty{display:flex;align-items:center;gap:8px}.empty svg{width:34px;height:34px;flex:0 0 34px;background:none!important}
+#octi .lid{transform-box:fill-box;transform-origin:center;transform:scaleY(0);transition:transform .08s}
+#octi.blink .lid{transform:scaleY(1)}
+#octi .happy,#octi .sad,#octi .tear{opacity:0;transition:opacity .2s}
+#octi.is-happy .eyes{opacity:0}#octi.is-happy .happy{opacity:1}#octi.is-happy .body{animation:hop .6s ease-out 2}
+@keyframes hop{40%{transform:translateY(-26px) rotate(4deg)}}
+#octi .body{transform-origin:110px 120px;transition:transform .6s}
+#octi.is-sad .sad,#octi.is-sad .tear{opacity:1}#octi.is-sad .body{transform:translateY(10px) rotate(2deg)}#octi.is-sad .cheek{fill:#8fb4ff}
+.mascot{position:relative}
+.spark{position:absolute;pointer-events:none;font-size:20px;animation:spark 1.1s ease-out forwards}
+@keyframes spark{from{opacity:1;transform:translate(0,0) scale(.6)}to{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.2)}}
+[data-par]{will-change:transform}
+.odemo{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.odemo button{all:unset;cursor:pointer;font:600 12px var(--f-body);color:var(--foam);border:1px dashed rgba(255,207,115,.5);border-radius:999px;padding:5px 11px;background:rgba(6,26,36,.6)}
+.odemo button:hover,.odemo button:focus-visible{border-style:solid;color:var(--sun)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--abyss)}
+a{color:var(--glass)}
+.wrap{max-width:1680px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.num{font-family:var(--f-data);font-variant-numeric:tabular-nums}
+.up{color:rgb(var(--up))}.down{color:rgb(var(--down))}.flat{color:var(--mist)}
+
+/* Header */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:rgba(6,26,36,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:18px;padding-block:10px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:8px;font:600 20px var(--f-display);color:var(--foam);text-decoration:none;letter-spacing:.2px}
+.brand svg{width:30px;height:30px}
+nav{display:flex;gap:14px;flex-wrap:wrap}
+nav a{color:var(--mist);text-decoration:none;font-weight:500;font-size:14px}
+nav a:hover,nav a:focus-visible{color:var(--foam)}
+.clock{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.time{font:500 15px var(--f-data);color:var(--foam);background:none;border:0;padding:0;cursor:pointer}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;
+  padding:3px 9px;border-radius:999px;border:1px solid var(--line);color:var(--mist)}
+.pill i{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.pill.open{color:var(--foam);border-color:rgba(95,211,191,.55);background:rgba(95,211,191,.12);box-shadow:0 0 12px -3px rgba(95,211,191,.45)}
+.pill.soon{color:var(--foam);border-style:dashed;border-color:rgba(255,207,115,.6)}.pill.soon i{background:var(--sun)}
+.pill.open i{background:var(--glass);box-shadow:0 0 0 0 rgba(95,211,191,.6);animation:pulse 2.4s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 7px rgba(95,211,191,0)}100%{box-shadow:0 0 0 0 rgba(95,211,191,0)}}
+
+/* Hero */
+.hero{position:relative;overflow:hidden}
+#bubbles{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.hero-grid{position:relative;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(200px,.8fr) minmax(260px,1fr);gap:32px;padding-block:44px 30px;align-items:center}
+.recent{display:grid;gap:10px;align-content:center}
+.recent .eyebrow{margin-bottom:2px}
+.rhead{grid-column:1/-1;display:flex;justify-content:space-between;align-items:baseline;gap:4px 12px;flex-wrap:wrap}
+.nextrep{font:500 12.5px var(--f-data);color:var(--mist)}.nextrep b{font:600 13px var(--f-body);color:var(--glass)}.nextrep.due b{color:var(--sun)}
+.recent button{all:unset;cursor:pointer;display:block;background:rgba(10,36,48,.82);border:1px solid var(--line);border-radius:12px;padding:12px 14px;backdrop-filter:blur(4px)}
+.recent button:hover,.recent button:focus-visible{border-color:var(--glass)}
+.recent .d{font:500 12.5px var(--f-data);color:var(--mist)}
+.recent .t{font-weight:600;margin-top:2px}
+.recent .more{font-size:13px;color:var(--glass);text-decoration:none;justify-self:end}
+.eyebrow{font-size:12.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--mist);font-weight:600}
+h1{font:600 clamp(34px,5.4vw,58px)/1.04 var(--f-display);margin:.25em 0 .35em;text-wrap:balance;letter-spacing:-.5px}
+h1 em{font-style:normal;color:var(--octo)}
+.big{list-style:none;margin:0;padding:0;display:grid;gap:8px;max-width:62ch}
+.big li{display:flex;gap:10px;color:#cfe3e0}
+.big li::before{content:"";flex:0 0 8px;height:8px;margin-top:.55em;border-radius:50%;border:1.5px solid var(--glass)}
+.mascot{display:grid;justify-items:center;gap:14px}
+.speech{position:relative;background:var(--reef);border:1px solid var(--line);border-radius:18px;padding:10px 16px;font:500 17px var(--f-display);color:var(--foam);
+  max-width:300px;text-align:center;cursor:pointer;line-height:1.35;transition:opacity .25s}
+.speech.tip{font:500 14.5px var(--f-body)}.speech.fade{opacity:0}
+.speech:hover{border-color:rgba(95,211,191,.55)}
+.speech::after{content:"";position:absolute;left:50%;bottom:-8px;width:14px;height:14px;background:var(--reef);border-right:1px solid var(--line);border-bottom:1px solid var(--line);transform:translateX(-50%) rotate(45deg)}
+.octo{width:min(220px,60vw);height:auto;animation:bob 6s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-8px) rotate(-1.5deg)}}
+.hero-cards{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;padding-bottom:36px}
+.card{background:linear-gradient(160deg,rgba(23,72,88,.55),rgba(10,36,48,.72));border:1px solid rgba(95,211,191,.16);border-radius:16px;padding:16px 18px;
+  backdrop-filter:blur(10px) saturate(1.2);box-shadow:inset 0 1px 0 rgba(230,243,240,.08),0 18px 40px -24px rgba(0,0,0,.8)}
+.card h3{margin:0 0 6px;font:600 13px var(--f-body);letter-spacing:1px;text-transform:uppercase;color:var(--mist)}
+.count{font:600 26px var(--f-display);letter-spacing:.2px}
+.sub{color:var(--mist);font-size:13.5px}
+.sea{display:flex;gap:4px;margin:10px 0 6px}
+.sea span{flex:1;height:8px;border-radius:4px;background:var(--line)}
+.sea span.on{background:var(--glass)}.sea span.on.w{background:var(--sun)}.sea span.on.s{background:var(--coral)}
+.notice{border-color:rgba(255,207,115,.35);grid-column:1/-1;display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;padding-block:12px}
+.notice h3{margin:0}
+.tf{display:grid;gap:6px;margin-top:4px}.tf .tf2 .sym{font-size:15px}.tf .tf2 .num{font-size:14.5px}.tf .rk{display:inline-block;width:26px;font:12px var(--f-data);color:var(--mist)}hr.tfs{border:0;border-top:1px dashed var(--line);margin:3px 0;width:100%}
+.hmore:empty{display:none}.hmore{display:grid;gap:5px;margin-top:10px;padding-top:9px;border-top:1px dashed var(--line);font-size:13px;color:#cfe3e0}.hmore>div{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+#next-more>div{justify-content:flex-start}#next-more .num{flex:none;min-width:64px;color:var(--mist);font-size:12px}.hmore .num{font-size:12.5px}
+.tf div{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.tf .sym{font-size:19px}
+.tf .num{font-size:17px;font-weight:500}
+.notice .count{font-size:17px;line-height:1.35;font-family:var(--f-body);font-weight:500}
+
+/* Abschnitte */
+section{padding-block:34px}
+.sh{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+h2{font:600 28px var(--f-display);margin:0;letter-spacing:-.2px}
+.sh .sub{flex:1;min-width:200px}
+.awards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:12px}
+.award{display:flex;gap:14px;align-items:flex-start}.award svg{flex:0 0 40px}
+.award .at{font:600 18px var(--f-display)}.award .aw{font-weight:600;margin-top:1px}.award .ay{font-size:13px;color:var(--mist);margin-top:2px}
+.wave{height:18px;background:radial-gradient(circle at 10px -4px,transparent 12px,var(--line) 13px,transparent 14px) 0 0/20px 18px repeat-x;opacity:.55}
+
+/* Tiles */
+.groups{display:flex;flex-direction:column;gap:18px}
+.group h4{margin:0 0 8px;font:600 13px var(--f-body);letter-spacing:1px;text-transform:uppercase;color:var(--mist)}
+.tiles{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr))}
+.tile{--h:0;--rgb:var(--up);position:relative;border-radius:12px;padding:12px 14px;border:1px solid var(--line);
+  background:linear-gradient(rgba(var(--rgb),calc(var(--h)*.20)),rgba(var(--rgb),calc(var(--h)*.06))),var(--deep)}
+.tile .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.sym{font:600 16px var(--f-display);letter-spacing:.3px}
+.fl{margin-right:6px;font-size:.92em;letter-spacing:1px}
+.tile .sym{white-space:nowrap}
+.tile .top .sym{min-width:0;overflow:hidden;text-overflow:ellipsis}.tile .top .chg{flex:0 0 auto}
+.chg{font:500 13.5px var(--f-data);padding:1px 8px;border-radius:999px;background:rgba(var(--rgb),.14)}
+.price{font:500 20px var(--f-data);margin:2px 0 8px}
+.range{position:relative;height:6px;border-radius:3px;background:linear-gradient(90deg,rgba(var(--down),.45),rgba(141,176,181,.25),rgba(var(--up),.45))}
+.range::after{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:rgba(230,243,240,.4)}
+.range b{position:absolute;top:50%;width:12px;height:12px;border-radius:50%;background:var(--foam);border:2px solid var(--abyss);transform:translate(-50%,-50%)}
+.rl{display:flex;justify-content:space-between;gap:6px;font:12px var(--f-data);color:var(--mist);margin-top:5px}
+.rl i{font:600 10.5px var(--f-body);font-style:normal;letter-spacing:.6px;margin-right:4px;opacity:.8}
+.zone{font:500 12px var(--f-body);margin-top:4px}.zone.pr{color:var(--sun)}.zone.di{color:var(--glass)}.zone.out{color:var(--coral)}
+.htf{font:12px var(--f-data);color:var(--mist);margin-top:2px}.htf .up,.htf .down{font-weight:600}
+@media (max-width:600px){.rl i{display:none}}
+.note{font-size:12.5px;color:#cfe3e0;margin-top:6px}
+.strip{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+
+/* Charts */
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:16px}
+.charts figure{margin:0;background:var(--deep);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.charts img{display:block;width:100%;height:auto}
+.charts figcaption{padding:8px 14px;font-size:13px;color:var(--mist)}
+
+/* Oracle · Kronos (2026-10-31) */
+.oracle{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+@media (max-width:1280px){.oracle{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:800px){.oracle{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.oracle{grid-template-columns:1fr}}
+.orc svg{display:block;width:100%;height:auto;margin:8px 0 6px}
+.orc .sym{color:var(--glass)}
+.orc p{margin:2px 0 0;font-size:13px;color:#d4e6e3}
+.orc .ok{color:rgb(var(--up))}.orc .no{color:rgb(var(--down))}
+.oscore{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.osh{margin:22px 0 10px;font-size:16px;font-weight:600}
+.osh .sub{font-weight:400;font-size:13px;margin-left:6px}
+.kchk{padding:0;overflow-x:auto}
+.kchk table{width:100%;border-collapse:collapse;font-size:13px;min-width:640px}
+.kchk th{font-weight:500;text-align:left;color:var(--mist);padding:8px 12px;border-bottom:1px solid var(--line)}
+.kchk td{padding:7px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+.kchk tr:last-child td{border-bottom:0}
+.kchk .ok{color:rgb(var(--up))}.kchk .no{color:rgb(var(--down))}
+.oscore span{font:500 12.5px var(--f-data);padding:3px 10px;border-radius:999px;border:1px solid var(--line);color:var(--mist)}
+
+/* Outlook */
+.outlook{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.oc{display:flex;flex-direction:column;padding:10px 12px 14px}
+.ch{all:unset;cursor:zoom-in;display:block;border-radius:10px;overflow:hidden;border:1px solid var(--line);margin-bottom:10px;aspect-ratio:16/9;background:var(--abyss)}
+.ch img{display:block;width:100%;height:100%;object-fit:cover;object-position:left center}
+.ch:hover,.ch:focus-visible{border-color:var(--glass)}
+.ch.none{cursor:default;display:grid;place-items:center;font-size:12.5px;color:var(--mist);text-align:center;padding:8px}
+@media (max-width:1500px){.outlook{grid-template-columns:repeat(6,minmax(0,1fr))}
+  .outlook>.oc{grid-column:span 2}
+  .outlook>.oc:nth-child(-n+2){grid-column:span 3}}
+@media (max-width:1000px){.outlook{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .outlook>.oc,.outlook>.oc:nth-child(-n+2){grid-column:auto}
+  .outlook>.oc:last-child:nth-child(odd){grid-column:1/-1}}
+@media (max-width:640px){.outlook{grid-template-columns:1fr}}
+@media (max-width:640px){.outlook{grid-template-columns:1fr}}
+.outlook .card p{margin:4px 0 0;color:#d4e6e3}
+.outlook .sym{color:var(--glass)}
+.lv{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 6px}
+.lv span{font:500 12px var(--f-data);padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--mist)}
+.lv span.res{color:rgb(var(--down));border-color:rgba(var(--down),.35);background:rgba(var(--down),.08)}
+.lv span.sup{color:rgb(var(--up));border-color:rgba(var(--up),.35);background:rgba(var(--up),.08)}
+.lv span.now{color:var(--foam);border-color:var(--foam)}
+.sc{display:grid;gap:4px;margin-top:4px}
+.sc p{margin:0;display:flex;gap:8px;color:#d4e6e3}
+.sc b{flex:0 0 auto;font-weight:600}
+
+/* Signals */
+.sig{display:grid;grid-template-columns:1.1fr 1fr;gap:16px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.stat{background:var(--deep);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.stat .v{font:600 24px var(--f-display)}
+.stat .k{font-size:12px;color:var(--mist);text-transform:uppercase;letter-spacing:.8px}
+.stat .s{font-size:12px;color:var(--mist);margin-top:2px}
+.ch3{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:6px}.ch3 .num{font-size:14px;font-weight:600}
+.splits{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:14px}
+.split h4{margin:0 0 10px;font:600 12px var(--f-body);letter-spacing:1px;text-transform:uppercase;color:var(--mist)}
+.srow{display:grid;gap:5px;margin-bottom:12px}.srow:last-child{margin-bottom:0}
+.srow .t{display:flex;justify-content:space-between;gap:8px;font-size:13.5px}.srow .t b{font:600 14px var(--f-display)}
+.srow .m{font-size:12px;color:var(--mist)}
+@media (max-width:700px){.splits{grid-template-columns:1fr}}
+.curve{background:var(--deep);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+.curve svg{width:100%;height:auto;display:block}
+.bars{display:grid;gap:8px;margin-top:12px}
+.brow{display:grid;grid-template-columns:110px 1fr 70px;gap:10px;align-items:center;font-size:13.5px}
+.btrack{height:10px;border-radius:5px;background:var(--line);overflow:hidden;display:flex}
+.btrack i{display:block;height:100%}
+.feed{background:var(--deep);border:1px solid var(--line);border-radius:var(--r);overflow-x:auto}
+#pane-trades,#pane-models,#pane-conf{overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--line) transparent}#pane-trades th,#pane-models th,#pane-conf th{position:sticky;top:0;background:var(--deep)}
+/* the trade list fills the panel down to the bottom of the left column and scrolls inside (2026-10-27) · one column: the newest 16 */
+@media (min-width:1281px){.sigpanel{display:flex;flex-direction:column}#pane-trades{flex:1 1 0;min-height:0;contain:size}}
+@media (max-width:1280px){#recent tr:nth-child(n+17){display:none}}
+#conf b{font:600 14px var(--f-body)}#conf .ms{font-size:12px;color:var(--mist)}.edge{display:flex;align-items:center;gap:8px}.edge i{display:block;height:8px;border-radius:4px}
+#models .ms{font-size:12px;color:var(--mist)}#recent .ms{font-size:11.5px;color:var(--mist);margin-top:1px}#models b{font:600 14.5px var(--f-display)}.tier.hi{color:var(--sun)}.tier.lo{color:var(--mist)}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-weight:600;color:var(--mist);font-size:11.5px;letter-spacing:.8px;text-transform:uppercase;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:8px 12px;border-bottom:1px solid rgba(26,69,86,.55);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+.res{font-weight:600}
+
+/* Stocks + calendar */
+.stocks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{font:500 12.5px var(--f-data);padding:3px 9px;border-radius:999px;border:1px solid var(--line)}
+.chip.s{background:rgba(var(--up),.12);color:rgb(var(--up));border-color:rgba(var(--up),.3)}
+.chip.w{background:rgba(var(--down),.12);color:rgb(var(--down));border-color:rgba(var(--down),.3)}
+.chip.h{color:var(--sun);border-color:rgba(255,207,115,.3)}
+.chip.c{color:#9ad7ff;border-color:rgba(154,215,255,.3)}
+.agenda{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x proximity;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:var(--line) transparent;padding-bottom:6px}
+.agenda>.card{flex:1 0 210px;min-width:0;scroll-snap-align:start}
+.agenda>.card.today{border-color:rgba(95,211,191,.6)}
+.agenda .tday{font:600 10.5px var(--f-body);letter-spacing:1px;text-transform:uppercase;color:var(--abyss);background:var(--glass);border-radius:999px;padding:2px 7px;margin-left:8px;vertical-align:3px}
+@media (max-width:600px){.agenda>.card{flex-basis:78%}}
+/* Futures overnight + cash indices: stocks-style cards below the tiles */
+.mk2{display:flex;flex-direction:column;gap:18px;margin-top:18px}
+.crow{display:grid;grid-template-columns:104px minmax(0,1fr);gap:4px 10px;align-items:start;padding:7px 0}
+.crow+.crow{border-top:1px solid rgba(26,69,86,.55)}
+.crow .lab{font:600 11px var(--f-body);letter-spacing:1.2px;text-transform:uppercase;color:var(--mist);padding-top:5px;white-space:nowrap}
+.crow .lab a{color:inherit}.crow .lab .fl{font-size:14px;letter-spacing:0}
+.crow .chips{margin-top:0}
+a.chip{color:var(--foam)}a.chip.s{color:rgb(var(--up))}a.chip.w{color:rgb(var(--down))}a.chip.h{color:var(--sun)}a.chip.c{color:#9ad7ff}
+@media (max-width:600px){.crow{grid-template-columns:1fr;gap:6px}.crow .lab{padding-top:0}}
+svg.fold{display:inline-block!important;width:12px!important;height:10px!important;vertical-align:-1px;margin-right:6px;opacity:.9;flex:none}
+.nchips{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 8px}.nchips button{font:600 11.5px var(--f-body);color:var(--mist);background:rgba(6,26,36,.5);border:1px solid var(--line);border-radius:999px;padding:2px 9px;cursor:pointer;display:inline-flex;align-items:center}
+.nchips button[aria-pressed="true"]{color:var(--foam);border-color:rgba(95,211,191,.55);background:rgba(95,211,191,.12)}.nchips .num{margin-left:4px}
+.nlist{display:grid;gap:7px}.nlist .ni{display:grid;grid-template-columns:auto 1fr;gap:0 2px;align-items:start}.nlist .ni a{text-decoration:none;color:#d4e6e3;font-size:13.5px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.nlist .ni a:hover{color:var(--foam)}.nlist .ni .sub{grid-column:2;font:11px var(--f-data);color:var(--mist);margin-top:1px}.nlist .ni svg.fold{margin-top:4px}.nlist .ni.fresh a{color:var(--sun)}
+.ffsrc{margin-top:10px;font:11px var(--f-data);color:var(--mist)}.ffsrc a{color:var(--mist)}#cal-chips{margin:0 0 0 auto}
+.agenda ul{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:6px}
+.agenda li{font-size:14px;color:#d4e6e3}
+.agenda .day{font:600 18px var(--f-display);color:var(--foam)}
+
+
+/* 🧭 Outlook 🔮 Oracle tiles + the symbol card + the archive popup (2026-11-03) */
+.sun{color:var(--sun)}.mist{color:var(--mist)}
+.sh .fresh{text-transform:none;letter-spacing:0;font-weight:500}.sh .fresh i{background:var(--glass)}
+.olg{margin:-6px 0 14px;font-size:13px;color:var(--mist)}
+.board{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px}
+.board>.bt{grid-column:span 2}.board>.bt:nth-child(-n+2){grid-column:span 3}
+@media (max-width:1000px){.board{grid-template-columns:repeat(2,minmax(0,1fr))}.board>.bt,.board>.bt:nth-child(-n+2){grid-column:auto}.board>.bt:last-child:nth-child(odd){grid-column:1/-1}}
+@media (max-width:640px){.board{grid-template-columns:1fr}}
+.bt,.mt{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;min-width:0;position:relative;overflow:hidden;
+  background:linear-gradient(160deg,rgba(23,72,88,.55),rgba(10,36,48,.72));border:1px solid rgba(95,211,191,.16);backdrop-filter:blur(10px) saturate(1.2);
+  box-shadow:inset 0 1px 0 rgba(230,243,240,.08),0 18px 40px -24px rgba(0,0,0,.8);
+  transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--ty,0));transition:transform .25s ease,border-color .2s}
+.bt::after,.mt::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 30%,rgba(230,243,240,.09) 45%,transparent 60%);transform:translateX(-120%);transition:transform .9s ease}
+.bt:hover,.mt:hover{--ty:-3px}.bt:hover::after,.mt:hover::after{transform:translateX(120%)}
+.bt.live,.mt.live{animation:live 2.6s ease-in-out infinite;border-color:rgba(255,207,115,.55)}
+@keyframes live{50%{box-shadow:0 0 0 1px rgba(255,207,115,.5),0 0 26px -4px rgba(255,207,115,.45),inset 0 1px 0 rgba(230,243,240,.08)}}
+.bt{gap:10px;padding:16px 18px;border-radius:var(--r)}
+.bt:hover,.bt:focus-visible,.mt:hover,.mt:focus-visible{border-color:var(--glass)}
+.bt .sym a,.mt .sym a{color:inherit}.nbar{margin:8px 0 6px}
+.bt .hd{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.bt .hd .sym{font-size:21px}.bt .hd .px{font-size:19px}.bt .hd .num{font-size:13.5px}
+.bt svg{display:block;width:100%;height:auto;background:rgba(6,26,36,.55);border-radius:10px}
+.bt svg text,.card2 svg text{font-family:var(--f-data)}
+.nocone{display:grid;place-items:center;aspect-ratio:400/140;background:var(--deep);border-radius:10px;font-size:13px;color:var(--mist)}
+.bt .kr{font-size:13.5px;color:#d4e6e3}.bt .kr .sub{font-size:12.5px}
+.bt .scn{display:grid;gap:4px;font-size:13px;color:#d4e6e3}
+.bt .ft{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12.5px;color:var(--mist);border-top:1px solid var(--line);padding-top:8px;margin-top:auto}
+.minis{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:12px;margin-top:16px}
+@media (max-width:1280px){.minis{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:700px){.minis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.mt{gap:5px;padding:12px 14px;border-radius:12px;font-size:12.5px;color:var(--mist)}
+.mt.live{border-color:rgba(255,207,115,.55)}
+.mt .sym{font-size:16px;color:var(--foam);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mt>.num{font-size:15px;color:var(--foam)}.mt>.num span{font-size:12px}
+.mt svg{display:block;width:100%;height:auto;background:rgba(6,26,36,.55);border-radius:8px;margin:2px 0}.mt .mk{font-size:12px}
+dialog.symc{max-width:min(1180px,96vw)}dialog.symc .dlg-b,dialog.ar .dlg-b{max-height:82vh;padding:18px 22px 22px}
+dialog.ar{max-width:min(1240px,96vw)}
+#dlg-t{display:flex;align-items:baseline;gap:6px 12px;flex-wrap:wrap;font-weight:500}
+#dlg-t .ct{font:600 24px var(--f-display)}#dlg-t .ct a{color:var(--foam)}#dlg-t>.num{font-size:18px}
+#dlg-t .pill{align-self:center}
+.back{all:unset;cursor:pointer;font:600 13px var(--f-body);color:var(--glass);border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+.card2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.card2>div{display:flex;flex-direction:column;gap:18px;min-width:0}
+@media (max-width:860px){.card2{grid-template-columns:1fr}}
+.cs{background:var(--reef);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.csh{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.csh h3{margin:0;font:600 17px var(--f-display)}.csh span{font:600 11px var(--f-body);letter-spacing:1px;text-transform:uppercase;color:var(--mist)}
+.cs p{margin:0;font-size:14px;color:#d4e6e3}.cs .mood{font:600 16px var(--f-display);color:var(--foam)}
+.cs svg{display:block;width:100%;height:auto;background:var(--deep);border-radius:10px}
+.lvs{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px}
+.lvb{display:grid;gap:1px;padding:8px 10px;border-radius:10px;background:var(--deep);border:1px solid var(--line);font-size:12px;color:var(--mist)}
+.lvb b{font-size:15px;color:var(--foam);font-weight:500}.lvb i{font-style:normal;font-size:11.5px}
+.lvb.res i{color:rgb(var(--down))}.lvb.sup i{color:rgb(var(--up))}
+.cimg{display:block;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:var(--deep)}.cimg img,.cimg svg{display:block;width:100%;height:auto}.cimg svg text{font-family:var(--f-data)}
+.lg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--mist)}
+.cl{display:grid;grid-template-columns:46px minmax(0,1fr);gap:8px;font-size:13.5px;color:#d4e6e3}.cl .num{color:var(--mist);font-size:12px;padding-top:2px}
+.tr{padding:10px 12px;border-radius:10px;background:var(--deep);border:1px solid var(--line);display:grid;gap:3px}
+.tr .t1{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:14px}.tr .t2{font-size:12.5px;color:var(--mist)}
+.kot{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto auto;gap:6px 14px;font-size:13px;align-items:baseline}
+.kot>span:nth-child(-n+5){font:600 11px var(--f-body);letter-spacing:.8px;text-transform:uppercase;color:var(--mist)}
+.crec{grid-column:1/-1}.rbs{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.rb{display:grid;gap:2px;padding:10px 12px;border-radius:10px;background:var(--deep);font-size:12.5px;color:var(--mist)}.rb b{font-size:20px}
+.afil{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.afil button{all:unset;cursor:pointer;font:600 12.5px var(--f-body);color:var(--foam);border:1px solid var(--line);background:var(--reef);border-radius:999px;padding:5px 11px}
+.afil button[aria-pressed="true"]{color:var(--abyss);background:var(--glass);border-color:var(--glass)}
+.ahead,.aw{display:grid;grid-template-columns:96px repeat(7,minmax(0,1fr));gap:8px}
+.ahead{font:600 11px var(--f-body);letter-spacing:1px;color:var(--mist);margin-bottom:6px}
+.arows{display:grid;gap:8px}
+.am{font:600 13px var(--f-display);letter-spacing:1px;color:var(--mist);margin-top:6px}
+.awk{display:grid;align-content:start;gap:1px;padding-top:4px}.awk b{font:600 16px var(--f-display)}.awk span{font-size:11.5px;color:var(--mist)}
+.ad{display:flex;flex-direction:column;gap:5px;padding:7px;min-height:58px;border-radius:10px;background:var(--deep);border:1px solid var(--line);min-width:0}
+.ad.e{background:transparent;border-color:rgba(26,69,86,.5)}.ad.td{border-color:var(--sun)}
+.ad>.num{font-size:11px;color:var(--mist)}.ad.td>.num{color:var(--sun)}.ad .dot{color:#3d6470}
+.ad button{all:unset;cursor:pointer;display:flex;align-items:center;gap:5px;padding:4px 7px;border-radius:8px;background:var(--reef);border:1px solid var(--line);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ad button i{font-style:normal;color:var(--mist);font-size:11px}
+.ad button:hover,.ad button:focus-visible{border-color:var(--glass)}
+@media (max-width:760px){.ahead{display:none}.aw{grid-template-columns:1fr 1fr}.awk{grid-column:1/-1}.ad.e{display:none}}
+/* Archive (old grid, unused) */
+.arch{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:10px}
+.arch button{all:unset;cursor:pointer;display:block;background:var(--deep);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.arch button:hover,.arch button:focus-visible{border-color:var(--glass)}
+.arch .d{font:500 12.5px var(--f-data);color:var(--mist)}
+.arch .t{font-weight:600;margin-top:2px}
+dialog.wide{max-width:min(1260px,96vw)}
+dialog.wide .dlg-b{max-height:none;padding:12px 14px 14px}
+dialog.wide .dlg-b img{display:block;max-height:84vh;object-fit:contain}
+dialog{max-width:min(720px,94vw);width:100%;background:var(--deep);color:var(--foam);border:1px solid var(--line);border-radius:18px;padding:0}
+dialog::backdrop{background:rgba(3,12,18,.7);backdrop-filter:blur(3px)}
+.dlg-h{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line)}
+.dlg-b{padding:16px 20px;max-height:72vh;overflow:auto;line-height:1.6;overflow-wrap:anywhere}
+.x{all:unset;cursor:pointer;font-size:22px;color:var(--mist);padding:2px 8px;border-radius:8px}
+.x:focus-visible{outline:2px solid var(--glass)}
+
+/* Feed (Telegram group, chat style) */
+.sh .fold{all:unset;cursor:pointer;margin-left:auto;font:600 13px var(--f-body);color:var(--glass);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+.sh .fold:hover,.sh .fold:focus-visible{border-color:var(--glass)}#feed .sh h2{cursor:pointer}
+.feedgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+.feedgrid>div{min-width:0}
+.feedbar{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;align-items:center;margin-bottom:12px;min-height:30px;white-space:nowrap}
+.feedbar::-webkit-scrollbar{display:none}
+.feedbar>*{flex:0 0 auto}
+.clbox{height:min(760px,78vh);overflow:auto;overscroll-behavior:contain;background:var(--deep);border:1px solid var(--line);border-radius:18px;padding:14px 18px}
+.clbox{display:flex;flex-direction:column;gap:12px}
+.clbox .cd{align-self:center;font:600 12px var(--f-body);color:var(--mist);background:var(--reef);border-radius:999px;padding:3px 12px}
+.clbox pre{white-space:pre-wrap;font:13px/1.6 var(--f-data);color:#cfe3e0;margin:0}.clbox pre b{color:var(--octo)}
+.feedbar button{all:unset;cursor:pointer;font:600 12.5px var(--f-body);color:var(--mist);border:1px solid var(--line);border-radius:999px;padding:5px 10px}
+.feedbar button[aria-pressed="true"]{color:var(--abyss);background:var(--glass);border-color:var(--glass)}
+.feedbar button:focus-visible{outline:2px solid var(--glass);outline-offset:2px}
+.feedbar .tg{margin-left:auto;font-size:12.5px;color:var(--mist);align-self:center}
+.feedbar .clmark{font-size:12.5px;color:var(--mist);align-self:center;margin-right:6px}
+.chat{height:min(760px,78vh);overflow:auto;overscroll-behavior:contain;background:linear-gradient(180deg,rgba(10,36,48,.6),rgba(6,26,36,.9));
+  border:1px solid var(--line);border-radius:18px;padding:14px 14px 18px;display:flex;flex-direction:column;gap:8px}
+.chat .day{align-self:center;font:600 12px var(--f-body);color:var(--mist);background:var(--reef);border-radius:999px;padding:3px 12px;margin:8px 0 2px;position:sticky;top:0;z-index:1;box-shadow:0 2px 8px rgba(3,12,18,.6)}
+.bub{align-self:flex-start;max-width:min(640px,100%);background:var(--deep);border:1px solid var(--line);border-radius:4px 16px 16px 16px;padding:9px 13px 7px;
+  font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+.bub .h{display:flex;gap:8px;align-items:baseline;font:600 12px var(--f-body);color:var(--glass);margin-bottom:3px}
+.bub .h .tm{margin-left:auto;font:500 11.5px var(--f-data);color:var(--mist)}
+.bub.alert{border-left:3px solid var(--sun)} .bub.alert .h{color:var(--sun)}
+.bub.alert.win{border-left-color:rgb(var(--up))} .bub.alert.loss{border-left-color:rgb(var(--down))}
+.bub.news .h{color:var(--coral)} .bub.changelog .h{color:var(--octo)} .bub.screener .h{color:var(--glass)} .bub.wisdom .h{color:var(--mist)}
+.bub.news{border-left:3px solid var(--coral)} .bub.screener{border-left:3px solid var(--glass)} .bub.wisdom{font-style:italic}
+.bub .body.clip{max-height:15.5em;overflow:hidden;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}
+.bub .more{all:unset;cursor:pointer;font:600 12.5px var(--f-body);color:var(--glass);margin-top:4px;display:inline-block}
+.bub .pics{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-top:8px}
+.bub .pics img{width:100%;border-radius:8px;display:block;cursor:zoom-in}
+.bub pre{white-space:pre-wrap;font:12.5px/1.5 var(--f-data);margin:0}
+.chat .empty{color:var(--mist);text-align:center;padding:30px 0}
+
+footer{border-top:1px solid var(--line);margin-top:20px;padding-block:26px 56px;color:var(--mist);font-size:13.5px;background:#04151d;line-height:1.7}
+.foot{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
+.motto{font-style:italic;color:var(--mist);font-size:13.5px}
+pre.cl{white-space:pre-wrap;font:13px/1.55 var(--f-data);color:#cfe3e0;margin:6px 0 0;background:var(--deep);border:1px solid var(--line);border-radius:12px;padding:12px 14px;max-height:260px;overflow:auto}
+:focus-visible{outline:2px solid var(--glass);outline-offset:2px}
+
+@media (max-width:1280px){
+  .hero-grid{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}
+  .recent{grid-column:1/-1;grid-template-columns:repeat(3,minmax(0,1fr))}
+  .recent .eyebrow,.recent .more{grid-column:1/-1}
+  .hero-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (min-width:1600px){.stocks{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:900px){
+  .hero-grid{grid-template-columns:1fr;padding-block:28px 18px}
+  .recent{grid-template-columns:1fr}
+  .mascot{order:-1;grid-auto-flow:column;justify-content:start;align-items:center}
+  .octo{width:110px}
+  .groups,.sig,.foot,.feedgrid{grid-template-columns:1fr}
+  .clbox{height:auto;max-height:420px}
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tile{padding:10px 11px}.price{font-size:17px}.rl{font-size:11px}
+  nav{flex-wrap:nowrap;overflow-x:auto;max-width:100%}
+  .bar{gap:10px 16px}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:600px){
+  .depthp{display:none}
+  .hero-cards{grid-template-columns:1fr}
+  .clock{margin-left:0}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important}}
+
+/* Section order panel */
+.order-btn{position:fixed;right:max(16px,calc(env(safe-area-inset-right,0px) + 16px));bottom:calc(env(safe-area-inset-bottom,0px) + 16px);z-index:8;
+  font:600 12px var(--f-body);color:var(--glass);background:rgba(10,36,48,.55);border:1px solid rgba(95,211,191,.35);border-radius:999px;padding:5px 11px;cursor:pointer;
+  backdrop-filter:blur(4px);opacity:.6;transition:opacity .15s,background .15s}
+.order-btn:hover,.order-btn:focus-visible,.order-btn[aria-expanded="true"]{opacity:1;color:var(--abyss);background:var(--glass)}
+.order{position:fixed;right:max(16px,calc(env(safe-area-inset-right,0px) + 16px));bottom:calc(env(safe-area-inset-bottom,0px) + 52px);z-index:8;width:min(300px,calc(100vw - 32px));
+  background:var(--deep);border:1px solid var(--line);border-radius:16px;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+.order ol{list-style:none;margin:6px 0 10px;padding:0;display:grid;gap:6px}
+.order li{display:flex;align-items:center;gap:8px;background:var(--reef);border-radius:10px;padding:6px 8px;font-weight:600}
+.order li span{flex:1}
+.order button.m{all:unset;cursor:pointer;width:28px;height:28px;display:grid;place-items:center;border-radius:8px;color:var(--foam);background:var(--line)}
+.order button.m:focus-visible{outline:2px solid var(--glass)}
+.order .r{all:unset;cursor:pointer;color:var(--mist);font-size:13px;text-decoration:underline}
+
+/* Sound */
+.snd{background:none;cursor:pointer;font-family:var(--f-body)}
+.snd[aria-pressed="true"]{color:var(--foam);border-color:rgba(95,211,191,.55);background:rgba(95,211,191,.10)}
+.snd[aria-pressed="true"] .eq{display:inline-flex}
+.eq{display:none;gap:2px;align-items:flex-end;height:10px}
+.eq b{width:2px;background:var(--glass);animation:eq 1s ease-in-out infinite}
+.eq b:nth-child(2){animation-delay:-.4s}.eq b:nth-child(3){animation-delay:-.7s}
+@keyframes eq{0%,100%{height:3px}50%{height:10px}}
+
+/* TradingView-Links */
+a.tv{color:inherit;text-decoration:none;border-bottom:1px dotted transparent;position:relative}
+a.tv:hover,a.tv:focus-visible{border-bottom-color:currentColor}
+a.tv::after{content:"↗";font-size:.7em;position:absolute;left:100%;top:-.2em;margin-left:1px;opacity:0;pointer-events:none;transition:opacity .15s}
+a.tv:hover::after,a.tv:focus-visible::after{opacity:.7}
+a.chip{text-decoration:none}
+</style>
+
+<div class="water" aria-hidden="true"></div><div class="rays" aria-hidden="true"></div>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="#top" aria-label="R3M Reef, back to top">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><use href="#octo-mini"/></svg>R3M Reef</a>
+    <nav aria-label="Sections">
+      <a href="#outlook">🧭 Outlook 🔮 Oracle</a><a href="#calendar">📅 Calendar</a><a href="#feed">🔔 Feed</a><a href="#archive" data-arch>🗄️ Archive</a>
+    </nav>
+    <div class="clock">
+      <button class="time" id="clock" title="Times in your local zone · click for Berlin time">--:--</button>
+      <span class="depthp" title="How deep the dive is">🤿 <span class="num" id="dread">−0 m</span></span>
+      <span class="pill" id="s-tokyo"><i></i>🇯🇵 Tokyo</span>
+      <span class="pill" id="s-london"><i></i>🇬🇧 London</span>
+      <span class="pill" id="s-nyam"><i></i>🇺🇸 NY AM</span>
+      <span class="pill" id="s-nypm"><i></i>🇺🇸 NY PM</span>
+      <button class="pill snd" id="snd-music" aria-pressed="false" title="Lo-fi music: click for track 1">♪ Lo-fi<span id="snd-n" class="num"></span> <span class="eq" aria-hidden="true"><b></b><b></b><b></b></span></button>
+      <button class="pill snd" id="snd-sfx" aria-pressed="false" title="Sound effects on or off">🫧 SFX</button>
+    </div>
+  </div>
+  <div class="dbar" aria-hidden="true"><b></b></div>
+</header>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <g id="octo-mini">
+      <path d="M32 6c-12 0-20 9-20 20 0 7 3 11 6 14l-6 14c-1 2 1 4 3 3l8-8 2 10c0 2 3 2 3 0l4-10 4 10c0 2 3 2 3 0l2-10 8 8c2 1 4-1 3-3l-6-14c3-3 6-7 6-14 0-11-8-20-20-20z" fill="#ff7d93"/>
+      <circle cx="25" cy="25" r="4" fill="#061a24"/><circle cx="39" cy="25" r="4" fill="#061a24"/>
+    </g>
+  </defs>
+</svg>
+
+<main id="top">
+  <div class="hero">
+    <canvas id="bubbles" aria-hidden="true"></canvas>
+    <div class="wrap hero-grid">
+      <div data-par="0.12">
+        <div class="eyebrow" id="eyebrow">R3M Reef</div>
+        <h1 id="mood">Loading the reef …</h1>
+        <ul class="big" id="big"></ul>
+      </div>
+      <div class="mascot" data-par="-0.18">
+        <button type="button" class="speech" id="greet" title="Octi's tips · click for the next one">gm ☕</button>
+        <svg class="octo" id="octi" viewBox="0 0 220 230" role="img" aria-label="Octi, the R3M octopus mascot">
+          <ellipse cx="110" cy="218" rx="64" ry="8" fill="rgba(2,10,15,.45)"/>
+          <g class="body">
+            <path fill="#ff7d93" d="M110 22c-42 0-66 30-66 66 0 22 9 36 20 46-6 18-22 34-34 40-6 3-3 11 4 10 18-3 32-14 42-28 2 22-4 38-12 48-4 5 2 11 7 7 16-12 24-30 26-50 4 20 14 38 30 50 5 4 11-2 7-7-8-10-14-26-12-48 10 14 24 25 42 28 7 1 10-7 4-10-12-6-28-22-34-40 11-10 20-24 20-46 0-36-24-66-66-66z"/>
+            <path d="M66 54c8-14 22-20 34-21" stroke="#ffb3c1" stroke-width="6" stroke-linecap="round" fill="none" opacity=".7"/>
+            <g class="eyes">
+              <ellipse cx="88" cy="84" rx="13" ry="15" fill="#061a24"/><ellipse cx="132" cy="84" rx="13" ry="15" fill="#061a24"/>
+              <circle id="pl" cx="92" cy="79" r="4.5" fill="#e6f3f0"/><circle id="pr" cx="136" cy="79" r="4.5" fill="#e6f3f0"/>
+              <rect class="lid" x="73" y="68" width="30" height="32" rx="14" fill="#ff7d93"/><rect class="lid" x="117" y="68" width="30" height="32" rx="14" fill="#ff7d93"/>
+            </g>
+            <g class="happy" stroke="#061a24" stroke-width="5" stroke-linecap="round" fill="none"><path d="M77 86q11-14 22 0"/><path d="M121 86q11-14 22 0"/></g>
+            <g class="sad" stroke="#061a24" stroke-width="4" stroke-linecap="round" fill="none"><path d="M78 66l18 6"/><path d="M142 66l-18 6"/></g>
+            <path class="tear" d="M140 100q4 8 0 12q-4-4 0-12z" fill="#8fd3ff"/>
+            <path d="M98 110c7 7 17 7 24 0" stroke="#061a24" stroke-width="5" stroke-linecap="round" fill="none"/>
+            <circle class="cheek" cx="72" cy="104" r="7" fill="#ff9fb0"/><circle class="cheek" cx="148" cy="104" r="7" fill="#ff9fb0"/>
+          </g>
+        </svg>
+        <div class="odemo" role="group" aria-label="Play with Octi"><button type="button" id="o-tp" title="Octi cheers for today's best trade">🏆 TP hit</button><button type="button" id="o-sl" title="Octi remembers today's last stop">🛑 Stopped</button><button type="button" id="o-fish" title="A school swims by">🐟 Fish</button></div>
+      </div>
+      <div class="recent" id="recent-arch" aria-label="Latest reports" data-par="0.06"><div class="rhead"><span class="eyebrow">📰 Latest</span><span class="nextrep" id="next-rep"></span></div></div>
+    </div>
+    <div class="wrap hero-cards">
+      <div class="card newsc"><h3>🗞️ News · <a class="tv" href="https://www.forexfactory.com/news" target="_blank" rel="noopener" title="News on Forex Factory">Forex Factory</a></h3><div class="nchips" id="n-chips" role="group" aria-label="Filter by impact"></div><div class="nlist" id="news"><p class="sub">The wire is quiet</p></div></div>
+      <div class="card"><h3>⏰ Next event</h3><div class="count" id="next">–</div><div class="sea nbar" id="nbar" title="Time to the next event"><span></span><span></span><span></span><span></span><span></span></div><div class="sub" id="next-sub"></div><div class="hmore" id="next-more"></div></div>
+      <div class="card"><h3>🌊 Sea state · <a class="tv" href="https://www.tradingview.com/symbols/TVC-VIX/" target="_blank" rel="noopener" title="VIX on TradingView">VIX</a></h3><div class="count num" id="vix">–</div>
+        <div class="sea" id="sea"><span></span><span></span><span></span><span></span><span></span></div><div class="sub" id="vix-sub"></div><div class="hmore" id="vix-more"></div></div>
+      <div class="card"><h3 id="tf-h">🏁 Top &amp; Flop</h3><div class="tf" id="topflop">–</div></div>
+      <div class="card notice" id="notice-card" hidden><h3>Notice</h3><div class="count" id="notice"></div></div>
+    </div>
+  </div>
+  <div class="reef" aria-hidden="true"></div>
+
+  <section id="outlook"><div class="wrap">
+    <div class="sh"><span class="dm"></span><h2>🧭 Outlook 🔮 Oracle</h2><span class="sub">The morning's levels and scenarios, Kronos's cone for the session and what the market made of both · tap a tile for its card</span><span class="pill fresh" id="o-fresh"><i></i>–</span></div>
+    <p class="olg"><b class="mist">━</b> the bars Kronos read · <b class="up">▬ ▬</b> median of its 24 paths · <b class="up">■</b> q10–q90 band · <b class="sun">━</b> what the market did · ┄ the morning's levels · ✓ / ✗ once scored</p>
+    <div class="board" id="board"><div class="card">Loading the tiles …</div></div>
+    <div class="minis" id="minis"></div>
+  </div></section>
+
+  <section id="calendar"><div class="wrap">
+    <div class="sh"><span class="dm"></span><h2>📅 Calendar</h2><span class="sub" id="cal-sub">Berlin time · the group gets a heads-up ~10–40 min before</span><div class="nchips" id="cal-chips" role="group" aria-label="Filter by impact"></div></div>
+    <div class="agenda" id="agenda"></div>
+  </div></section>
+
+
+  <section id="feed"><div class="wrap">
+    <div class="sh"><span class="dm"></span><h2>🔔 Feed</h2><span class="sub" id="feed-sub">Everything the R3M Signals group got · last 7 days</span><button type="button" class="fold" id="feed-fold" aria-expanded="false" aria-controls="feedgrid">Show ▾</button></div>
+    <div class="feedgrid" id="feedgrid" hidden>
+      <div><div class="feedbar" id="feedbar" role="group" aria-label="Filter feed"></div>
+        <div class="chat" id="chat" aria-live="off"></div></div>
+      <div><div class="feedbar" id="clbar" role="group" aria-label="Filter changelog"></div>
+        <div class="clbox" id="cl">–</div></div>
+    </div>
+  </div></section>
+
+  <section id="awards" hidden><div class="wrap">
+    <div class="sh"><span class="dm"></span><h2>🏆 Awards</h2><span class="sub">Discipline earns points, volume doesn't · from the signals of the last 7 days, groups with 5+ closed trades</span></div>
+    <div class="awards" id="award-list"></div>
+  </div></section>
+</main>
+
+<div class="floor" aria-hidden="true">
+  <svg viewBox="0 0 560 150" role="img" aria-label="Octi asleep on the sea floor next to a treasure chest">
+    <path d="M0 130 Q80 110 160 126 T320 122 T480 128 T560 120 V150 H0z" fill="#0a2430"/>
+    <g transform="translate(330 78)"><rect x="0" y="18" width="64" height="40" rx="6" fill="#5a3a22"/><path d="M0 24 Q32 -6 64 24z" fill="#6b4529"/><rect x="28" y="26" width="8" height="12" rx="2" fill="#ffcf73"/><path d="M6 18 L58 18" stroke="#ffcf73" stroke-width="3"/><circle cx="18" cy="12" r="3" fill="#ffcf73" opacity=".9"/><circle cx="44" cy="8" r="2" fill="#ffcf73" opacity=".7"/></g>
+    <g transform="translate(200 60) scale(.42)"><path fill="#ff7d93" d="M110 22c-42 0-66 30-66 66 0 22 9 36 20 46-6 18-22 34-34 40-6 3-3 11 4 10 18-3 32-14 42-28 2 22-4 38-12 48-4 5 2 11 7 7 16-12 24-30 26-50 4 20 14 38 30 50 5 4 11-2 7-7-8-10-14-26-12-48 10 14 24 25 42 28 7 1 10-7 4-10-12-6-28-22-34-40 11-10 20-24 20-46 0-36-24-66-66-66z"/><path d="M77 86q11 10 22 0M121 86q11 10 22 0" stroke="#061a24" stroke-width="6" stroke-linecap="round" fill="none"/></g>
+    <text x="252" y="56" font-family="IBM Plex Mono,monospace" font-size="14" fill="#8db0b5">z z z</text>
+    <path d="M70 130 q-6-30 4-60 q-10 30 2 60" fill="#1f6b5c"/><path d="M90 130 q8-40-4-74 q14 36 10 74" fill="#174f45"/><path d="M500 128 q-8-34 6-62 q-14 30-2 62" fill="#1f6b5c"/>
+  </svg>
+  <div class="num" id="floor-m">−180 m · the floor · the night shift sleeps here</div>
+</div>
+
+<footer><div class="wrap foot">
+  <div><strong style="color:var(--foam)">R3M Reef</strong><br>Facts and levels to watch. Not financial advice.<br>
+    Data: TradingView · live layer every 5 min · updated <span class="num" id="gen">–</span><br>
+    Indicators: <a class="tv" href="https://www.tradingview.com/script/Foc4uZgi-r3m-Four-Engines-One-Session-Window-R3M/" target="_blank" rel="noopener">r3m</a> · <a class="tv" href="https://www.tradingview.com/script/NzikTOp2-r3m-screener-r3m-screener-Four-Engines-on-10-Symbols-One-Ale/" target="_blank" rel="noopener">r3m screener</a> · Guides: r3m <a class="tv" href="docs/r3m-guide.pdf" target="_blank" rel="noopener">EN</a> · <a class="tv" href="docs/r3m-anleitung.pdf" target="_blank" rel="noopener">DE</a></div>
+  <div class="motto">scroll down · study the guides · get used to the indicators · be a part of the dream</div>
+</div></footer>
+
+
+<button class="order-btn" id="order-btn" aria-expanded="false" aria-controls="order">↕ Order</button>
+<div class="order" id="order" hidden><strong>Sort sections</strong><div class="sub">Your order is remembered in this browser.</div><ol id="order-list"></ol><button class="r" id="order-reset">Restore default</button></div>
+<dialog id="dlg" aria-labelledby="dlg-t"><div class="dlg-h"><strong id="dlg-t"></strong><button class="x" id="dlg-x" aria-label="Close">×</button></div><div class="dlg-b" id="dlg-b"></div></dialog>
+
+<script>
+(() => {
+const BER = "Europe/Berlin", de = "en-GB";
+/* Display zone · the visitor's own by default (the browser knows it), Berlin on a click of the clock · the logic stays on Berlin */
+const LOCTZ = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || BER; } catch { return BER; } })();
+let TZD = LOCTZ; try { if (localStorage.getItem("r3m-tz") === "berlin") TZD = BER; } catch {}
+const tzLabel = () => TZD === BER ? "Berlin" : (TZD.split("/").pop() || TZD).replace(/_/g, " ");
+const dispOff = d => { const a = localMin(TZD, d).m - localMin(BER, d).m; return ((a + 720) % 1440 + 1440) % 1440 - 720; };   // display − Berlin, minutes
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const dec = v => Math.abs(v) >= 1000 ? 1 : Math.abs(v) >= 10 ? 2 : 4;
+const fmt = (v, d) => v == null ? "–" : new Intl.NumberFormat(de, {minimumFractionDigits: d ?? dec(v), maximumFractionDigits: d ?? dec(v)}).format(v);
+const pct = v => (v > 0 ? "+" : v < 0 ? "−" : "±") + fmt(Math.abs(v), 1) + "%";
+const dshort = (iso, y) => new Intl.DateTimeFormat(de, {weekday: y ? undefined : "short", day: "numeric", month: "short", year: y ? "numeric" : undefined}).format(new Date(iso + "T12:00:00"));
+const cls = v => v > 0.05 ? "up" : v < -0.05 ? "down" : "flat";
+/* TradingView symbol pages: exact exchange per symbol */
+const TVX = {FDAX:"EUREX:FDAX1!",FESX:"EUREX:FESX1!",ES:"CME_MINI:ES1!",NQ:"CME_MINI:NQ1!",YM:"CBOT_MINI:YM1!",RTY:"CME_MINI:RTY1!",
+  "6E":"CME:6E1!","6J":"CME:6J1!",DX:"ICEUS:DX1!",GC:"COMEX:GC1!",SI:"COMEX:SI1!",CL:"NYMEX:CL1!",
+  DAX:"XETR:DAX",SPX:"SP:SPX",NDX:"NASDAQ:NDX",VIX:"TVC:VIX",LLY:"NYSE:LLY","BRK.B":"NYSE:BRK.B"};
+const STOCKX = Object.fromEntries([
+  ..."SAP SIE ALV AIR DTE ENR MUV2 IFX DHL MRK DBK DB1".split(" ").map(t => [t, "XETR:" + t]),
+  ..."NVDA AAPL GOOGL MSFT AMZN META AVGO TSLA MU WMT ASML INTC PLTR COST CSCO LRCX AMAT NFLX PANW ARM TXN AMGN".split(" ").map(t => [t, "NASDAQ:" + t]),
+  ["LLY","NYSE:LLY"], ["BRK.B","NYSE:BRK.B"]]);
+const SYMX = {...STOCKX, NDX:"NASDAQ:NDX", SPX:"SP:SPX", DAX:"XETR:DAX", VIX:"TVC:VIX", DXY:"TVC:DXY", US10Y:"TVC:US10Y", US02Y:"TVC:US02Y", DJI:"DJ:DJI",
+  ...Object.fromEntries("GER40 UK100 EUSTX50 US500 NAS100 US30 US2000 JPN225 FRA40 HK50 EURUSD GBPUSD USDJPY USDCHF AUDUSD USDCAD NZDUSD EURJPY GBPJPY EURGBP EURCHF XAUUSD XAGUSD SPOTCRUDE SPOTBRENT NATGAS USDX".split(" ").map(t => [t, "PEPPERSTONE:" + t])),
+  ...Object.fromEntries(Object.entries(TVX).filter(([k]) => k.length > 2))};   // every symbol a link (2026-11-03) · the 2-letter futures stay out of running text
+const linkTickers = html => html.replace(/\b([A-Z][A-Z0-9]{1,8}(?:\.B)?)\b/g, (m, t) => SYMX[t] ? tv(SYMX[t], t) : m);
+const LISTX = {"DAX Top 12":"XETR","S&P 500 Top 12":"NASDAQ","Nasdaq 100 Next 12":"NASDAQ"};
+const tvUrl = full => full ? "https://www.tradingview.com/symbols/" + encodeURIComponent(full.replace(":", "-")).replace(/%21/g, "!") + "/" : null;
+const tvOf = (sym, ex) => sym.includes(":") ? sym : TVX[sym] || (ex ? ex + ":" + sym : "PEPPERSTONE:" + sym);
+const tv = (sym, text, ex, cls) => `<a class="tv${cls ? " " + cls : ""}" href="${tvUrl(tvOf(sym, ex))}" target="_blank" rel="noopener" title="${esc(sym)} on TradingView">${text ?? esc(sym)}</a>`;
+const FLAGS = {GER40:"🇩🇪",DAX:"🇩🇪",FDAX:"🇩🇪",UK100:"🇬🇧",EUSTX50:"🇪🇺",FESX:"🇪🇺",US500:"🇺🇸",NAS100:"🇺🇸",US30:"🇺🇸",US2000:"🇺🇸",SPX:"🇺🇸",NDX:"🇺🇸",DJI:"🇺🇸",ES:"🇺🇸",NQ:"🇺🇸",YM:"🇺🇸",RTY:"🇺🇸",VIX:"🇺🇸",JPN225:"🇯🇵",
+  EURUSD:"🇪🇺🇺🇸",GBPUSD:"🇬🇧🇺🇸",USDCHF:"🇺🇸🇨🇭",USDJPY:"🇺🇸🇯🇵",EURJPY:"🇪🇺🇯🇵",GBPJPY:"🇬🇧🇯🇵",EURGBP:"🇪🇺🇬🇧",EURCHF:"🇪🇺🇨🇭",AUDUSD:"🇦🇺🇺🇸",USDCAD:"🇺🇸🇨🇦",NZDUSD:"🇳🇿🇺🇸","6E":"🇪🇺","6J":"🇯🇵",DX:"🇺🇸",USDX:"🇺🇸",
+  XAUUSD:"🥇",GC:"🥇",XAGUSD:"🥈",SI:"🥈",SPOTCRUDE:"🛢️",UKOIL:"🛢️",CL:"🛢️",BTCUSD:"🟠",BTC:"🟠",ETHUSD:"🔷",ETH:"🔷",SOLUSD:"🟣",SOL:"🟣",TOTAL3:"🪙"};
+const fl = sym => FLAGS[sym] ? `<span class="fl" aria-hidden="true">${FLAGS[sym]}</span>` : "";
+const heat = (el, v, span) => { el.style.setProperty("--h", Math.min(Math.abs(v) / span, 1).toFixed(2)); el.style.setProperty("--rgb", v >= 0 ? "var(--up)" : "var(--down)"); };
+
+/* Clock + exchanges (local exchange hours, DST handled automatically) */
+/* NY split like the ICT sessions: AM 09:30–12:00, lunch, PM 13:30–16:00 (New York time) */
+const sess = [["s-tokyo","Asia/Tokyo",9*60,15*60,"Tokyo"],["s-london","Europe/London",8*60,16*60+30,"London"],
+  ["s-nyam","America/New_York",9*60+30,12*60,"NY AM"],["s-nypm","America/New_York",13*60+30,16*60,"NY PM"]];
+const hhmm = m => { m = ((m % 1440) + 1440) % 1440; return String(Math.floor(m/60)).padStart(2,"0") + ":" + String(m%60).padStart(2,"0"); };
+let OPEN = new Set(), EYE = "";
+function localMin(tz, d){ const p = new Intl.DateTimeFormat("en-GB",{timeZone:tz,hour:"2-digit",minute:"2-digit",weekday:"short",hourCycle:"h23"}).formatToParts(d);
+  const g = t => p.find(x => x.type === t).value; return {m: +g("hour")*60 + +g("minute"), wd: g("weekday")}; }
+{ const c = document.getElementById("clock");
+  if (c) { if (LOCTZ === BER) c.title = "Berlin time"; else { c.title = TZD === BER ? "Berlin time · click for your local time" : "Your local time · click for Berlin time";
+    c.onclick = () => { try { localStorage.setItem("r3m-tz", TZD === BER ? "local" : "berlin"); } catch {} location.reload(); }; } } }
+function tick(){ const d = new Date();
+  $("clock").textContent = new Intl.DateTimeFormat(de,{timeZone:TZD,hour:"2-digit",minute:"2-digit"}).format(d) + " " + tzLabel();
+  const ber = localMin(TZD, d).m; OPEN = new Set(); let soon = null;
+  for (const [id,tz,a,b,name] of sess){ const {m,wd} = localMin(tz,d), wk = !["Sat","Sun"].includes(wd), open = wk && m >= a && m < b;
+    if (open) OPEN.add(name); const off = ber - m;
+    if (wk && !open && m < a && a - m <= 180 && (!soon || a - m < soon.in)) soon = {id, in: a - m, at: hhmm(a + off), name};
+    const el = $(id); el.classList.toggle("open", open); el.classList.remove("soon"); el.title = `${name} · ${hhmm(a+off)}–${hhmm(b+off)} ${tzLabel()} · ${open ? "open" : "closed"}`; }
+  if (soon && !OPEN.size){ const el = $(soon.id); el.classList.add("soon"); el.title = `${soon.name} opens ${soon.at} ${tzLabel()} · in ${soon.in >= 60 ? Math.floor(soon.in / 60) + " h " : ""}${soon.in % 60} min`; }   // nothing open (e.g. the NY lunch): the next session glows dashed
+  if (EYE){ const h = +new Intl.DateTimeFormat("en-GB", {timeZone: BER, hour: "2-digit", hourCycle: "h23"}).format(d);
+    const ph = h < 5 ? "Night" : h < 12 ? "Morning" : h < 17 ? "Afternoon" : h < 22 ? "Evening" : "Night";
+    $("eyebrow").textContent = [EYE, ph, OPEN.size ? [...OPEN].join(" + ") + " open" : soon ? `${soon.name} at ${soon.at}` : ""].filter(Boolean).join(" · "); }
+  nextReport();
+  countdown(); }
+
+/* Next report: the schedule of the scheduled tasks and Actions (arrival ≈ a few minutes after they start) */
+const REPORTS = [
+  {k:"gap", name:"🌙 Gap Check", d:[1], hm:"01:25"}, {k:"morning", name:"☕ Morning", d:[1,2,3,4,5], hm:"05:40"},
+  {k:"review", name:"🔁 Weekly Review", d:[6], hm:"05:40"}, {k:"outlook", name:"🔭 Weekly Outlook", d:[0], hm:"05:40"},
+  {k:"report", name:"📊 Signal Report", d:[6], hm:"06:18", tz:"UTC"}, {k:"midday", name:"🕛 Midday", d:[1,2,3,4,5], hm:"13:20"},
+  {k:"close", name:"🌙 US Close", d:[1,2,3,4,5], hm:"22:20"}, {k:"lab", name:"🔬 Lab Review", d:[0], hm:"09:50"}];
+const DOW = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+let DIGESTS = [];
+function nextReport(){ const el = $("next-rep"); if (!el) return; const d = new Date(), b = localMin(BER, d), u = localMin("UTC", d);
+  const off = ((b.m - u.m) % 1440 + 1440) % 1440, nowW = DOW.indexOf(b.wd) * 1440 + b.m;
+  const today = new Intl.DateTimeFormat("en-CA",{timeZone:BER}).format(d);
+  let best = null;
+  for (const r of REPORTS) for (const day of r.d){ let [h, m] = r.hm.split(":").map(Number), w = day * 1440 + h * 60 + m;
+    if (r.tz === "UTC") w += off;   // the Action runs on UTC
+    w = ((w % 10080) + 10080) % 10080; let delta = (w - nowW + 10080) % 10080;
+    const wD = w + dispOff(d), bm = ((wD % 1440) + 1440) % 1440, label = `${String(Math.floor(bm/60)).padStart(2,"0")}:${String(bm%60).padStart(2,"0")}`;
+    const late = 10080 - delta;   // minutes since the slot
+    if (late <= 40 && r.k !== "report" && !DIGESTS.some(x => x.kind === r.k && x.date === today)) delta = -1;   // due, not in yet
+    if (!best || delta < best.delta) best = {r, delta, label, day: Math.floor((((wD % 10080) + 10080) % 10080) / 1440)}; }
+  if (!best) return; const {r, delta, label, day} = best, isToday = DOW[day] === localMin(TZD, d).wd;
+  const inT = delta < 0 ? "due now" : delta < 60 ? `in ${delta} min` : delta < 1440 ? `in ${Math.floor(delta/60)}h ${String(delta%60).padStart(2,"0")}m` : `in ${Math.floor(delta/1440)}d ${Math.floor(delta%1440/60)}h`;
+  el.classList.toggle("due", delta < 0);
+  el.innerHTML = `Next · <b>${r.name}</b> ${isToday ? "" : DOW[day] + " "}~${label} · ${inT}`; }
+
+let EVENTS = [], NEXTEV = [];
+const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function berlinUtc(y, mo, d, h, mi){ const t = Date.UTC(y, mo, d, h, mi), x = new Date(t);   // Berlin wall time → UTC ms (DST-safe)
+  return t - (((localMin(BER, x).m - localMin("UTC", x).m) % 1440 + 1440) % 1440) * 60e3; }
+/* impact folders as on the calendars (2026-11-04): red high · orange medium · yellow low · the digest's TradingView importance (1 · 0 · −1), else read from the title */
+const IMP_HI = /\b(nonfarm|payrolls|unemployment rate|rate decision|interest rate|FOMC|fed chair|powell|GDP|ISM|retail sales|PCE)\b|^(?!.*\bcore\b).*\b(CPI|HICP)\b/i, IMP_LO = /\b(mortgage|MBA|redbook|API crude)\b/i;
+function impOf(i, txt){ if (i && typeof i === "object" && [-1, 0, 1].includes(i.imp)) return i.imp; const t = txt ?? (typeof i === "string" ? i : i?.text || i?.title || "");
+  if (!/[\u{1F1E6}-\u{1F1FF}]/u.test(t) && !(i && (i.country || i.tv))) return null;   // earnings and notes carry no folder
+  return IMP_HI.test(t) ? 1 : IMP_LO.test(t) ? -1 : 0; }
+const FOLD = ["#e8c547", "#ff9f43", "#ff5c5c"], FOLDN = ["low impact", "medium impact", "high impact"];
+function fold(m){ if (m == null) return ""; return `<svg class="fold" width="12" height="10" viewBox="0 0 12 10" role="img" aria-label="${FOLDN[m + 1]}"><title>${FOLDN[m + 1]}</title><path d="M0.5 1.6c0-.6.4-1.1 1-1.1h3l1.2 1.3h4.8c.6 0 1 .5 1 1.1v5.5c0 .6-.4 1.1-1 1.1h-9c-.6 0-1-.5-1-1.1z" fill="${FOLD[m + 1]}"/><path d="M0.5 3.4h11" stroke="rgba(0,0,0,.25)" stroke-width=".8"/></svg>`; }
+/* 🗞️ the Forex Factory wire from the group's feed (2026-11-04): the latest headlines, a chip per impact filters (remembered) */
+let NEWSF = (() => { try { return +localStorage.getItem("r3m-news") || 0; } catch(e) { return 0; } })();   // 0 all · 1 medium + high · 2 high
+function newsOf(L){ const out = [];
+  for (const m of L?.items || []){ const h = m.html || ""; if (!/forexfactory\.com\/news\//.test(h)) continue;
+    const a = [...h.matchAll(/<a href="([^"]+)"[^>]*>([^<]*)<\/a>/g)], src = a[1] || [], body = h.split("\n").slice(1).join(" ").replace(/<[^>]+>/g, "");
+    const q = body.match(/^\s*(🟥|🟧|🟨)\s*(High|Medium|Low)\s*·\s*(.+)$/u); if (!q) continue;
+    out.push({id: m.id, t: m.t, imp: {"🟥": 1, "🟧": 0, "🟨": -1}[q[1]], title: q[3].trim(), url: src[1] || "https://www.forexfactory.com/news", src: (src[2] || "").replace(/^@/, "")}); }
+  return out.sort((x, y) => Date.parse(y.t) - Date.parse(x.t)); }
+function drawNews(L){ const all = newsOf(L), day = all.filter(n => Date.now() - Date.parse(n.t) < 864e5), min = [-1, 0, 1][NEWSF];
+  const cnt = m => day.filter(n => n.imp === m).length;
+  $("n-chips").innerHTML = [[0, "All", null], [1, "Medium+", 0], [2, "High", 1]].map(([k, lb, m]) => `<button type="button" data-k="${k}" aria-pressed="${NEWSF === k}" title="${k ? `${lb.replace("+", " and high")} only` : "every headline"} · counts of the last 24 h">${m == null ? "" : fold(m)}${lb}${m == null ? `<span class="num">${day.length}</span>` : `<span class="num">${m ? cnt(1) : cnt(0) + cnt(1)}</span>`}</button>`).join("");
+  $("n-chips").onclick = e => { const b = e.target.closest("button"); if (!b) return; NEWSF = +b.dataset.k; try { localStorage.setItem("r3m-news", NEWSF); } catch(x) {} drawNews(L); };
+  const ls = all.filter(n => n.imp >= min).slice(0, 4);
+  $("news").innerHTML = ls.length ? ls.map(n => `<div class="ni${Date.now() - Date.parse(n.t) < 15 * 6e4 ? " fresh" : ""}">${fold(n.imp)}<a href="${esc(n.url)}" target="_blank" rel="noopener" title="${esc(n.title)}">${esc(n.title)}</a><span class="sub">${hm(n.t)}${n.src ? ` · ${esc(n.src)}` : ""}</span></div>`).join("")
+    : `<p class="sub">No ${["", "medium or high", "high"][NEWSF]} headline in the feed</p>`; }
+/* 🏁 the three best and the three worst (2026-11-04), the first of each big */
+function tfHtml(pp, live){ if (!pp.length) return "–"; const n = Math.min(3, Math.floor(pp.length / 2)), top = pp.slice(0, n), flop = pp.slice(-n).reverse();
+  const row = (x, i, e) => `<div class="${i ? "tf2" : ""}"><span class="sym">${i ? `<span class="rk">${i + 1}</span>` : e + " "}${fl(x.sym)}${tv(x.sym)}</span><span class="num ${cls(x.chg)}">${pct(x.chg)}</span></div>`;
+  return top.map((x, i) => row(x, i, "🚀")).join("") + `<hr class="tfs">` + flop.map((x, i) => row(x, i, "🪨")).join("") + `<div class="sub">out of ${pp.length} Custom Pepper symbols${live ? " · live" : ""}</div>`; }
+/* the calendar on Forex Factory's own impact (2026-11-04, the user's pick): the live layer reads FF's calendar JSON every half
+   hour (symbols.json "ff") · a day FF covers is FF's list for USD · EUR · GBP · JPY · CHF, each line takes the digest's TradingView
+   link when one sits at the same minute and flag · the digest's other lines (earnings, notes, TV-only events) stay · FF Low = yellow */
+const CUR_FL = {USD: "🇺🇸", EUR: "🇪🇺", GBP: "🇬🇧", JPY: "🇯🇵", CHF: "🇨🇭"}, FLAG_RE = /[\u{1F1E6}-\u{1F1FF}]{2}/u;
+const dayKey = u => new Intl.DateTimeFormat("en-US", {timeZone: BER, weekday: "short", month: "short", day: "numeric"}).format(new Date(u)).replace(",", "");
+const hmBer = u => new Intl.DateTimeFormat("en-GB", {timeZone: BER, hour: "2-digit", minute: "2-digit", hourCycle: "h23"}).format(new Date(u));
+let CALF = (() => { try { const v = localStorage.getItem("r3m-cal"); return v == null ? 1 : +v; } catch(e) { return 1; } })();   // 0 all · 1 medium + high (default, 2026-11-04) · 2 high
+function calDays(M){ const yr = +((M.date || "").slice(0, 4)) || new Date().getFullYear();
+  const ff = (SYML?.ff?.ev || []).filter(e => CUR_FL[e.c]).map(e => ({utc: e.t * 1000, flag: CUR_FL[e.c], title: e.title, imp: e.imp, fc: e.fc}));
+  const ffDays = new Set(ff.map(e => dayKey(e.utc))), words = x => new Set(x.toLowerCase().match(/[a-z]{3,}/g) || []);
+  const dated = (M.agenda || []).filter(a => /^\w+\s+\w{3}\s+\d{1,2}$/.test(a.day)).map(a => a.day);
+  return (M.agenda || []).map(a => { const m = a.day.match(/^\w+\s+(\w{3})\s+(\d{1,2})$/);
+    if (a.day === "Next" && ff.length){   // the card after the week: the digest's earnings + FF's red ones of the days after (2026-11-04)
+      const at = x => { const q = (typeof x === "string" ? x : x.text).match(/^\w{3} (\w{3}) (\d{1,2}): ~?(?:(\d{1,2}):(\d{2}))?/);
+        return q && MON.indexOf(q[1]) >= 0 ? berlinUtc(yr, MON.indexOf(q[1]), +q[2], +(q[3] ?? 23), +(q[4] ?? 59)) : Infinity; };
+      const hi = ff.filter(e => e.imp === 1 && !dated.includes(dayKey(e.utc)) && e.utc > Date.now()).slice(0, 8)
+        .map(e => ({o: {text: `${dayKey(e.utc)}: ${hmBer(e.utc)} ${e.flag} ${e.title}${e.fc ? ` (fcst ${e.fc})` : ""}`, imp: 1}, utc: e.utc}));
+      return {day: a.day, items: hi.concat(a.items.map(x => ({o: x, utc: at(x)}))).sort((p, q) => p.utc - q.utc).map(x => x.o)}; }
+    if (!m || MON.indexOf(m[1]) < 0 || !ffDays.has(a.day)) return a;
+    const it = a.items.map(i => { const txt = typeof i === "string" ? i : i.text, t = txt.match(/^~?(\d{1,2}):(\d{2})\s/);
+      const f0 = (txt.match(FLAG_RE) || [])[0];
+      return {i, txt, fl: ["🇩🇪", "🇫🇷", "🇮🇹", "🇪🇸", "🇳🇱"].includes(f0) ? "🇪🇺" : f0, utc: t ? berlinUtc(yr, MON.indexOf(m[1]), +m[2], +t[1], +t[2]) : null}; });
+    const fe = ff.filter(e => dayKey(e.utc) === a.day), used = new Set();
+    const out = fe.map(e => { const w = words(e.title);
+      const best = it.filter(x => !used.has(x) && x.utc != null && x.fl === e.flag && Math.abs(x.utc - e.utc) < 60e3)
+        .map(x => [x, [...words(x.txt)].filter(v => w.has(v)).length]).sort((p, q) => q[1] - p[1])[0]?.[0];
+      if (best) used.add(best);
+      return {o: {text: `${hmBer(e.utc)} ${e.flag} ${e.title}${e.fc ? ` (fcst ${e.fc})` : ""}`, ...(best?.i?.tv ? {tv: best.i.tv} : {}), imp: e.imp}, utc: e.utc}; });
+    const rest = it.filter(x => !used.has(x) && !(x.utc != null && fe.some(e => e.flag === x.fl && Math.abs(e.utc - x.utc) < 60e3)))   // same minute + flag = FF's line already
+      .map(x => ({o: x.i, utc: x.utc ?? -Infinity}));
+    return {day: a.day, items: out.concat(rest).sort((p, q) => p.utc - q.utc).map(x => x.o), ff: 1}; }); }
+/* 💼 earnings lines get their own mark in the folder slot (2026-11-04): teal bars, so they never read as an impact */
+const EARN_RE = /^(?:\w{3} \w{3} \d{1,2}: )?~?(?:\d{1,2}:\d{2} )?[A-Z][A-Z0-9.]{0,6}(?: · [A-Z][A-Z0-9.]{0,6})*$/;
+const isEarn = t => typeof t === "string" && !FLAG_RE.test(t) && EARN_RE.test(t.trim());
+const EARN = `<svg class="fold" width="12" height="10" viewBox="0 0 12 10" role="img" aria-label="earnings"><title>earnings</title><rect x=".5" y="5" width="2.6" height="4.5" rx=".6" fill="#5fd3bf"/><rect x="4.7" y="2.6" width="2.6" height="6.9" rx=".6" fill="#5fd3bf"/><rect x="8.9" y=".5" width="2.6" height="9" rx=".6" fill="#5fd3bf"/></svg>`;
+const mark = (i, txt) => { const t = txt ?? (typeof i === "string" ? i : i?.text || ""); return isEarn(t) ? EARN : fold(impOf(i, t)); };
+function buildNext(M){ const yr = +((M.date || "").slice(0, 4)) || new Date().getFullYear(), out = [];
+  for (const a of calDays(M)){ const m = a.day.match(/^\w+\s+(\w{3})\s+(\d{1,2})$/); if (!m || MON.indexOf(m[1]) < 0) continue;
+    for (const i of a.items){ const txt = typeof i === "string" ? i : i.text, t = txt.match(/^~?(\d{1,2}):(\d{2})\s+(.*)$/); if (!t) continue;
+      const imp = impOf(i, txt); if (imp === -1) continue;   // the countdown waits for medium and high
+      out.push({utc: berlinUtc(yr, MON.indexOf(m[1]), +m[2], +t[1], +t[2]), title: t[3], flag: "", tv: typeof i === "string" ? null : i.tv, approx: txt.startsWith("~"), imp, earn: isEarn(txt)}); } }
+  const hi = EVENTS.map(e => ({utc: Date.parse(e.utc), title: e.title, flag: e.flag, tv: e.tv, imp: [-1, 0, 1].includes(e.imp) ? e.imp : 1}));   // events/*.json = the day's high ones
+  NEXTEV = out.concat(hi.filter(h => !out.some(o => Math.abs(h.utc - o.utc) < 60e3 && o.title.includes(h.flag || "\u0000")))).sort((a, b) => a.utc - b.utc); }
+function countdown(){ const now = Date.now(); const next = NEXTEV.find(e => e.utc > now - 5*60e3);
+  if (!next) return; const ms = next.utc - now;
+  const h = Math.floor(ms/36e5), m = Math.max(0, Math.round((ms % 36e5)/6e4));
+  $("next").textContent = ms <= 0 ? "now" : h >= 24 ? `in ${Math.floor(h/24)} d ${h%24} h` : h ? `in ${h} h ${m} min` : `in ${m} min`;
+  const t = (next.approx ? "~" : "") + new Intl.DateTimeFormat(de,{timeZone:TZD,weekday:"short",hour:"2-digit",minute:"2-digit"}).format(new Date(next.utc));
+  const ttl = next.tv ? `<a class="tv" href="${tvUrl(next.tv)}" target="_blank" rel="noopener">${esc(next.title)}</a>` : linkTickers(esc(next.title));
+  $("next-sub").innerHTML = `${t} · ${next.earn ? EARN : fold(next.imp)}${next.flag ? next.flag + " " : ""}` + (ttl === esc(next.title) && next.flag ? `<a class="tv" href="https://www.tradingview.com/economic-calendar/" target="_blank" rel="noopener" title="Economic calendar on TradingView">${ttl}</a>` : ttl);
+  /* the bar fills from the event before (at most 6 h back) to this one · the last 30 min sun, the last 10 coral (2026-11-03) */
+  const prev = NEXTEV.filter(e => e.utc <= now - 5*60e3).pop(), t0 = Math.max(prev ? prev.utc : 0, next.utc - 6*36e5), sh = Math.min(Math.max((now - t0) / (next.utc - t0), 0), 1);
+  const lit = Math.max(1, Math.ceil(sh * 5)), cl = ms <= 10*6e4 ? " s" : ms <= 30*6e4 ? " w" : "";
+  [...$("nbar").children].forEach((x, i) => { x.className = i < lit ? "on" + cl : ""; });
+  /* then: the next three after it (2026-11-04), the day named when it is not today */
+  const dk = u => new Intl.DateTimeFormat("en-CA", {timeZone: TZD}).format(new Date(u)), today = dk(now);
+  $("next-more").innerHTML = NEXTEV.filter(e => e.utc > next.utc).slice(0, 4).map(e => { const w = new Intl.DateTimeFormat(de, {timeZone: TZD, ...(dk(e.utc) === today ? {} : {weekday: "short"}), hour: "2-digit", minute: "2-digit"}).format(new Date(e.utc));
+    const ttl = e.tv ? `<a class="tv" href="${tvUrl(e.tv)}" target="_blank" rel="noopener">${esc(e.title)}</a>` : linkTickers(esc(e.title));
+    return `<div><span class="num">${e.approx ? "~" : ""}${w}</span><span>${e.earn ? EARN : fold(e.imp)}${e.flag ? e.flag + " " : ""}${ttl}</span></div>`; }).join(""); }
+
+function greet(){ const h = +new Intl.DateTimeFormat("en-GB",{timeZone:TZD,hour:"2-digit",hourCycle:"h23"}).format(new Date());
+  return h < 11 ? "gm! ☕" : h < 17 ? "Good afternoon 🫧" : h < 22 ? "Good evening 🌙" : "Good night 🌊"; }
+
+/* Octi's tips: built fresh each time from the signal stats of the last 7 days, the clock and today's calendar.
+   Facts about his own alerts, never a trade call. Groups under 5 closed trades are left out. */
+let OCTI = {D: null, i: -1, timer: null};
+function octiTips(D){
+  const S = D.signals || {}, M = D.market || {}, out = [], now = Date.now();
+  const R = v => (v > 0 ? "+" : v < 0 ? "−" : "±") + fmt(Math.abs(v), 1) + "R", q = (a, b) => b ? Math.round(100 * a / b) + "%" : "–";
+  const ok = g => g && g.done >= 5, add = (p, t) => out.push({p, t});
+  const ev = EVENTS.find(e => Date.parse(e.utc) > now - 60e3);
+  if (ev){ const m = Math.round((Date.parse(ev.utc) - now) / 6e4);
+    if (m <= 60) add(10, `${ev.flag || "📰"} ${ev.title} ${m <= 0 ? "right now" : "in " + m + " min"}: spreads widen, spikes both ways ⚠️`); }
+  const lr = S.lastResults || []; let k = 0, w = 0;
+  for (let i = lr.length - 1; i >= 0 && lr[i] === "Stopped"; i--) k++;
+  for (let i = lr.length - 1; i >= 0 && lr[i] !== "Stopped"; i--) w++;
+  if (k >= 3) add(9, `${k} stops in a row on the tape. A breather is a position too 🫧`);
+  else if (w >= 4) add(6, `${w} winners in a row. Same size, same rules 🧘`);
+  const ses = OPEN.has("NY AM") || OPEN.has("NY PM") ? "New York" : OPEN.has("London") ? "London" : "";
+  if (ses){ const g = (S.bySession || []).find(x => x.name === ses);
+    if (ok(g)) add(7, `${ses} this week: ${g.done} closed · TP1 ${q(g.tp1, g.done)} · ${R(g.r)}`);
+  }
+  const sy = (S.bySymbol || []).filter(ok);
+  if (sy.length > 1){ const b = sy[0], z = sy[sy.length - 1];
+    if (b.r > 0) add(4, `${FLAGS[b.name] ? FLAGS[b.name] + " " : ""}${b.name} delivers: ${R(b.r)}, ${b.tp1} of ${b.done} hit TP1`);
+    if (z.r < 0) add(5, `${FLAGS[z.name] ? FLAGS[z.name] + " " : ""}${z.name} keeps running stops: ${z.sl} of ${z.done} stopped (${R(z.r)})`); }
+  const vix = (M.indices || []).find(i => i.sym === "VIX");
+  if (vix && vix.price >= 22) add(5, `VIX ${fmt(vix.price, 2)}: rough sea, wide ranges. Stops need room 🌊`);
+  else if (vix && vix.price < 14) add(3, `VIX ${fmt(vix.price, 2)}: glassy water, tight ranges. Targets sit closer 🪞`);
+  const today = new Intl.DateTimeFormat("en-US",{timeZone:BER,weekday:"short",month:"short",day:"numeric"}).format(new Date()).replace(",", "");
+  const day = (M.agenda || []).find(a => a.day === today);
+  (day ? day.items : []).map(i => typeof i === "string" ? i : i.text).filter(t => /^~\d/.test(t))
+    .forEach(t => add(6, `Earnings tonight: ${t} · gap risk for the next open 🌙`));
+  /* ☕ the group's Message of the Day and 🎬 Trading Floor quotes (2026-11-04, the user): the latest of each from the last 24 h */
+  const txt = h => { const e = document.createElement("textarea"); e.innerHTML = h.replace(/<[^>]+>/g, ""); return e.value.trim(); };
+  for (const k of ["Message of the Day", "Trading Floor"]){
+    const m = ((OCTI.L || D.live)?.items || []).filter(x => (x.html || "").includes(`${k}</b>`) && now - Date.parse(x.t) < 864e5).pop();
+    const q = m && txt(m.html.split("\n").slice(1).join(" "));
+    if (q) add(k === "Message of the Day" ? 8 : 7, q); }
+  return out.sort((a, b) => b.p - a.p).map(x => x.t);
+}
+function octiSay(next){ const el = $("greet"); if (!OCTI.D || Date.now() < (OCTI.hold || 0)) return;
+  const tips = octiTips(OCTI.D), all = [greet()].concat(tips);
+  OCTI.i = next ? (OCTI.i + 1) % all.length : 0;
+  el.classList.add("fade");
+  setTimeout(() => { el.textContent = all[OCTI.i]; el.classList.toggle("tip", OCTI.i > 0); el.classList.remove("fade"); }, 250); }
+function octiStart(D){ OCTI.D = D; if (OCTI.timer) return;
+  $("greet").onclick = () => { octiSay(true); clearInterval(OCTI.timer); OCTI.timer = setInterval(() => octiSay(true), 14000); };
+  OCTI.timer = setInterval(() => octiSay(true), 14000); }
+
+function render(D){
+  const M = D.market || {};
+  $("greet").textContent = greet(); octiStart(D);
+  const dt = M.date ? new Intl.DateTimeFormat(de,{weekday:"long",day:"numeric",month:"long"}).format(new Date(M.date+"T12:00:00")) : "";
+  EYE = dt; tick();   // the eyebrow: the date · the time of day · what is open (2026-11-03, the user: "Morning" read wrong in the evening)
+  $("mood").innerHTML = M.mood ? esc(M.mood).replace(/,\s*/, ",<br><em>") + "</em>" : "No digest yet today";
+  $("big").innerHTML = (M.bigPicture || []).map(t => `<li><span>${linkTickers(esc(t))}</span></li>`).join("");
+
+  /* VIX as sea state */
+  const vix = (M.indices || []).find(i => i.sym === "VIX");
+  if (vix){ $("vix").innerHTML = `${fmt(vix.price,2)} <span class="${cls(vix.chg)}" style="font-size:15px">${pct(vix.chg)}</span>`;
+    const lvl = vix.price < 13 ? 1 : vix.price < 17 ? 2 : vix.price < 22 ? 3 : vix.price < 30 ? 4 : 5;
+    [...$("sea").children].forEach((s,i) => { s.className = i < lvl ? "on" + (lvl >= 5 ? " s" : lvl >= 4 ? " w" : "") : ""; });
+    $("vix-sub").textContent = ["","Glassy","Calm sea","Light swell · wider ranges","Rough sea · wider stops","Storm · take care"][lvl];
+    /* what the VIX means for a day (2026-11-04): its implied 1-day move (VIX ÷ √252) on the US500 and NAS100, and where it stands */
+    const dm = vix.price / Math.sqrt(252), px = s => { const l = lvOf(s); return l?.px ?? (M.pepper || []).find(x => x.sym === s)?.price; };
+    const mv = ["US500", "NAS100"].map(s => { const v = px(s); return v ? `<div><span>${fl(s)}${tv(s)}</span><span class="num">±${fmt(v * dm / 100, 0)} pts</span></div>` : ""; }).join("");
+    $("vix-more").innerHTML = `<div><span>📏 implied day move</span><span class="num">±${fmt(dm, 2)}%</span></div>${mv}`
+      + (vix.sma50 ? `<div><span>vs its SMA50 ${fmt(vix.sma50, 1)}</span><span class="num ${vix.price > vix.sma50 ? "down" : "up"}">${vix.price > vix.sma50 ? "above" : "below"} ${pct((vix.price / vix.sma50 - 1) * 100)}</span></div>` : "")
+      + (vix.rsi ? `<div><span>RSI 14</span><span class="num">${fmt(vix.rsi, 0)}</span></div>` : ""); }
+  if (M.notice){ $("notice").textContent = M.notice; $("notice-card").hidden = false; }
+
+  /* Calendar: real events, else agenda */
+  EVENTS = (D.events || []).map(e => ({...e, flag: ({US:"🇺🇸",DE:"🇩🇪",EU:"🇪🇺",GB:"🇬🇧",JP:"🇯🇵",CH:"🇨🇭"})[e.country]}));
+  if (!EVENTS.length && M.agenda?.length){   // no timed event left today: the first agenda line with a clock, else the first line
+    const yr = (M.date || "").slice(0, 4) || new Date().getFullYear(), now = Date.now();
+    const when = (a, txt) => { const m = txt.match(/^~?(\d{1,2}:\d{2})/); if (!m) return NaN; return Date.parse(`${a.day.replace(/^\w+\s+/, "")} ${yr} ${m[1]}`); };
+    const timed = M.agenda.flatMap(a => a.items.map(i => [a, i])).find(([a, i]) => { const t = when(a, typeof i === "string" ? i : i.text); return t > now - 5 * 60e3; });
+    const [a, i0] = timed || [M.agenda[0], M.agenda[0].items[0]]; $("next").textContent = a.day;
+    $("next-sub").innerHTML = typeof i0 === "string" ? esc(i0) : (i0.tv ? `<a class="tv" href="${tvUrl(i0.tv)}" target="_blank" rel="noopener">${esc(i0.text)}</a>` : esc(i0.text)); }
+  buildNext(M); countdown();
+
+  const pp = (M.pepper || []).slice().sort((a,b) => b.chg - a.chg);
+  if (pp.length){ $("tf-h").textContent = `🏁 Top & Flop · ${M.chgLabel || "Day"}`;
+    $("topflop").innerHTML = tfHtml(pp, false); }
+
+  drawBoard(D);
+
+  /* Signals */
+  const S = D.signals || {}, T = S.total || {};
+  const q = (a,b) => b ? Math.round(100*a/b) + "%" : "–";
+  const sR = r => (r > 0 ? "+" : r < 0 ? "−" : "±") + fmt(Math.abs(r ?? 0), 1) + "R";
+
+  /* Awards: discipline over volume, only groups with 5+ closed trades */
+  { const okA = g => g && g.done >= 5 && g.name !== "–", setups = [], syms = (S.bySymbol || []).filter(okA), aw = [];
+    const top = (list, f) => list.length ? list.slice().sort((a, b) => f(b) - f(a))[0] : null, plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+    const fd = top(setups, g => g.tp2);
+    if (fd && fd.tp2) aw.push(["--glass", "Full delivery", fd.name, `${plural(fd.tp2, "run")} to TP2 this week, the most of any model`]);
+    const un = top(syms, g => -g.sl / g.done + g.done / 1e4);
+    if (un) aw.push(["--glass", "Unmitigated", `${FLAGS[un.name] ? FLAGS[un.name] + " " : ""}${un.name}`, `${plural(un.sl, "stop")} in ${un.done} closed trades`]);
+    const pa = top(setups, g => g.r / g.done);
+    if (pa && pa.r > 0) aw.push(["--sun", "Patience", pa.name, `${sR(pa.r / pa.done)} per closed trade in only ${pa.done} trades · quality over quantity`]);
+    const sa = top(syms, g => g.sl / g.done);
+    if (sa && sa.sl / sa.done >= 0.6) aw.push(["--coral", "Stand aside", `${FLAGS[sa.name] ? FLAGS[sa.name] + " " : ""}${sa.name}`, `${sa.sl} stops in ${sa.done} closed trades: no trade is a position too`]);
+    $("award-list").innerHTML = aw.map(([c, t, w, y]) => `<div class="card award"><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="16" r="11" fill="none" stroke="var(${c})" stroke-width="2.5"/><path d="M13 25l-3 12 10-5 10 5-3-12" fill="none" stroke="var(${c})" stroke-width="2.5" stroke-linejoin="round"/></svg>
+      <div><div class="at" style="color:var(${c})">${t}</div><div class="aw">${esc(w)}</div><div class="ay">${esc(y)}</div></div></div>`).join("");
+    $("awards").hidden = true; }   // 2026-11-03: the stats are counted, not shown (the tiles carry each symbol's own)
+
+  /* Calendar */
+  const CAL = "https://www.tradingview.com/economic-calendar/";
+  const yrA = +((M.date || "").slice(0, 4)) || new Date().getFullYear();
+  const shift = (txt, day) => { if (TZD === BER) return txt; const m = day.match(/^\w+\s+(\w{3})\s+(\d{1,2})$/), t = txt.match(/^(~?)(\d{1,2}):(\d{2})(\s.*)$/);
+    if (!m || !t || MON.indexOf(m[1]) < 0) return txt;
+    const u = new Date(berlinUtc(yrA, MON.indexOf(m[1]), +m[2], +t[2], +t[3]));
+    const loc = new Intl.DateTimeFormat("en-US",{timeZone:TZD,weekday:"short",month:"short",day:"numeric"}).format(u).replace(",", "");
+    const hm = new Intl.DateTimeFormat(de,{timeZone:TZD,hour:"2-digit",minute:"2-digit"}).format(u);
+    return t[1] + (loc === day ? "" : loc.split(" ")[0] + " ") + hm + t[4]; };
+  $("cal-sub").textContent = `${tzLabel()} time · the group gets a heads-up ~10–40 min before`;
+  const item = (i, day) => { const t = shift(typeof i === "string" ? i : i.text, day), x = typeof i === "string" ? null : i.tv;
+    if (x) return `<a class="tv" href="${tvUrl(x)}" target="_blank" rel="noopener" title="Indicator on TradingView">${esc(t)}</a>`;
+    const h = linkTickers(esc(t));
+    return h !== esc(t) || !/[\u{1F1E6}-\u{1F1FF}]/u.test(t) ? h : `<a class="tv" href="${CAL}" target="_blank" rel="noopener" title="Economic calendar on TradingView">${h}</a>`; };
+  const todayL = new Intl.DateTimeFormat("en-US",{timeZone:BER,weekday:"short",month:"short",day:"numeric"}).format(new Date()).replace(",", "");
+  const CD = calDays(M), drawCal = () => { const min = [-1, 0, 1][CALF], ok = i => { const m = impOf(i); return m == null || m >= min; };
+    const cnt = k => CD.filter(a => a.day === todayL).flatMap(a => a.items).filter(i => { const m = impOf(i); return m != null && m >= [-1, 0, 1][k]; }).length;
+    $("cal-chips").innerHTML = [[0, "All", null], [1, "Medium+", 0], [2, "High", 1]].map(([k, lb, m]) => `<button type="button" data-k="${k}" aria-pressed="${CALF === k}" title="${k ? `${lb.replace("+", " and high")} only` : "every release"} · counts for today">${m == null ? "" : fold(m)}${lb}<span class="num">${cnt(k)}</span></button>`).join("");
+    $("agenda").innerHTML = CD.map(a => `<div class="card${a.day === todayL ? " today" : ""}"><div class="day">${esc(a.day)}${a.day === todayL ? '<span class="tday">today</span>' : ""}</div><ul>${a.items.filter(ok).map(i => `<li>${mark(i)}${item(i, a.day)}</li>`).join("")}</ul>${a.ff ? '<div class="ffsrc">impact · <a href="https://www.forexfactory.com/calendar" target="_blank" rel="noopener">Forex Factory</a></div>' : ""}</div>`).join(""); };
+  $("cal-chips").onclick = e => { const b = e.target.closest("button"); if (!b) return; CALF = +b.dataset.k; try { localStorage.setItem("r3m-cal", CALF); } catch(x) {} drawCal(); };
+  drawCal();
+
+  /* Archive */
+  const kinds = {morning:"☕ Morning", close:"🌙 US Close", review:"🔁 Weekly Review", outlook:"🔭 Weekly Outlook", report:"📊 Signal Report", gap:"🌙 Gap Check", midday:"🕛 Midday", lab:"🔬 Lab Review", news:"📣 Announcement"};
+  const card = (d,i) => `<button data-i="${i}"><div class="d">${dshort(d.date)} · ${kinds[d.kind] || ""}</div><div class="t">${esc(d.title.replace(/^\S+\s*R3M\s*/, ""))}</div></button>`;
+  DIGESTS = D.digests || []; nextReport();
+  $("recent-arch").insertAdjacentHTML("beforeend", (D.digests || []).slice(0,3).map(card).join("") + `<button type="button" class="more" data-arch>Full archive →</button>`);
+  $("recent-arch").onclick = e => { if (e.target.closest("[data-arch]")) { openArchive(); return; } const b = e.target.closest("button[data-i]"); if (b) openDigest(+b.dataset.i); };
+  if (location.hash === "#archive") history.replaceState(null, "", location.pathname + location.search);   // the popup opens on a click only
+  $("dlg-x").onclick = () => $("dlg").close();
+  $("dlg").addEventListener("close", () => { $("dlg").classList.remove("wide", "symc", "ar"); $("dlg-b").onclick = null; });
+  $("dlg").onclick = e => { if (e.target === $("dlg")) $("dlg").close(); };
+
+  renderFeed(D, kinds);
+  $("gen").textContent = hm(D.generated);   // the time only, as in the mockup · the live layer moves it on
+  if (D.changelog){ renderCl([D.changelog, ...(D.changelog.older || [])]); }
+  tick();
+}
+
+/* Changelog panel: blocks per script ("climax·" line + "• " lines), filter chips like the feed */
+function renderCl(cl){
+  const blocks = [];
+  for (const c of cl){ let cur = null;
+    for (const line of c.text.split("\n")){ const s = line.trim(); if (!s) continue;
+      if (!s.startsWith("•")){ cur = {date: c.date, script: s.replace(/[·:\s]+$/, ""), lines: []}; blocks.push(cur); }
+      else if (cur) cur.lines.push(s); } }
+  const scripts = [...new Set(blocks.map(b => b.script))];
+  const sel = "all";
+  const draw = () => {
+    $("clbar").innerHTML = `<span class="clmark"><span class="pill open" style="padding:2px 9px"><i style="animation:none"></i>latest</span></span>`
+      ;   // 2026-11-03: no filters, everything
+    let last = "", h = "";
+    for (const b of blocks){ if (sel !== "all" && b.script !== sel) continue;
+      if (b.date !== last){ h += `<div class="cd">${dshort(b.date, true)}</div>`; last = b.date; }
+      h += `<pre><b>${esc(b.script)}·</b>\n${b.lines.map(esc).join("\n")}</pre>`; }
+    $("cl").innerHTML = h || "–"; $("cl").scrollTop = 0; };
+  draw();
+}
+let feedLive = null;
+const unclip = () => { const chat = $("chat"); if (!chat.offsetHeight) return;   // folded: measured once it opens
+  chat.querySelectorAll(".bub").forEach(b => { const body = b.querySelector(".body.clip"), m = b.querySelector(".more");
+    if (body && m && body.scrollHeight <= body.clientHeight + 4){ body.classList.remove("clip"); m.remove(); } }); };
+/* the feed folds (2026-11-03): closed on every load, a click on the head opens it */
+{ const fb = $("feed-fold"), fg = $("feedgrid"), set = on => { fg.hidden = !on; fb.setAttribute("aria-expanded", String(on)); fb.textContent = on ? "Hide ▴" : "Show ▾"; if (on) unclip(); };
+  fb.onclick = () => set(fg.hidden);
+  document.querySelector("#feed .sh h2").onclick = () => set(fg.hidden);
+  document.addEventListener("click", e => { const a = e.target.closest('a[href="#feed"]'); if (a) set(true); }); }
+function renderFeed(D, kinds){
+  const byId = Object.fromEntries((D.digests || []).map(d => [d.id, d])), chartBy = Object.fromEntries((D.charts || []).map(c => [c.sym, c.src]));
+  const FL = {US:"🇺🇸",DE:"🇩🇪",EU:"🇪🇺",GB:"🇬🇧",JP:"🇯🇵",CH:"🇨🇭",CN:"🇨🇳",FR:"🇫🇷",IT:"🇮🇹",CA:"🇨🇦",AU:"🇦🇺",NZ:"🇳🇿"};
+  const types = [["all","All"],["alert","Alerts"],["screener","Screener"],["news","News"],["report","Reports"],["wisdom","Wisdom"]];
+  let cur = "all", L = D.live; try { cur = localStorage.getItem("r3m-feed") || "all"; } catch {}
+  if (!types.some(([k]) => k === cur)) cur = "all";
+  const tm = t => new Intl.DateTimeFormat(de,{timeZone:TZD,hour:"2-digit",minute:"2-digit"}).format(new Date(t));
+  const dayOf = t => new Intl.DateTimeFormat(de,{timeZone:TZD,weekday:"short",day:"numeric",month:"short"}).format(new Date(t));
+  const head = (label, t) => `<div class="h"><span>${label}</span><span class="tm">${tm(t)}</span></div>`;
+  const clip = html => `<div class="body clip">${html}</div><button class="more">Show more</button>`;
+  const pic = (src, alt) => `<img src="${esc(src)}" alt="${esc(alt)}" loading="lazy">`;
+  const KIND = [[/Morning/,"morning"],[/Weekly Review|Wochenrückblick/,"review"],[/Weekly Outlook|Wochenausblick/,"outlook"],[/US.Close/,"close"],
+    [/Midday|Halbzeit/,"midday"],[/Gap.Check/,"gap"],[/Signal Report|Signal-Bilanz/,"report"],[/Lab Review/,"lab"],[/Announcement/,"news"]];
+  /* live.json (the real group, bot messages only) → feed items */
+  const fromLive = items => { const out = [];
+    for (const m of items){ const plain = m.html.replace(/<[^>]+>/g, "").trim(), first = plain.split("\n")[0];
+      if (m.photo){ const sym = plain.split(/\s/)[0], prev = out[out.length-1];
+        if (prev && prev.type === "photos" && Date.parse(m.t) - Date.parse(prev.t) < 120e3){ prev.syms.push(sym); continue; }
+        out.push({type:"photos", t:m.t, syms:[sym]}); continue; }
+      if (/^🧪/.test(plain)) continue;   // test posts
+      let type = "alert", kind = "";
+      if (/^🔮/.test(plain)) type = "oracle";
+      else if (/^(⚠️|Forex Factory)/.test(plain)) type = "news";
+      else if (/^(?:\S+ )?(eqx|clx|lava|q210|lavalite|clxlite|eqxlite|dvilite|r3m equinox|r3m climax|r3m lava|r3m dvi|r3m ice|r3m autopilot) screener/i.test(first)) type = /\n(🆕|✅|🏆|🛑|🏁) · /u.test(plain) ? "alert" : "screener";   // entries / results are alerts, the Top N a screener post
+      else if (/Trading Wisdom|Trading Floor|Message of the Day/.test(first)) type = "wisdom";
+      else if (/^📝/.test(plain)) type = "changelog";
+      else if (/R3M /.test(first)){ const k = KIND.find(([re]) => re.test(first)); if (k){ type = "report"; kind = k[1]; } }
+      out.push({type, kind, t:m.t, html:m.html.replace(/\n/g, "<br>"), win:/ Hit|TP1 erreicht|TP2 erreicht/.test(plain), loss:/Stopped|ausgestoppt/.test(plain)}); }
+    return out; };
+  const bubble = x => {
+    if (x.html != null){   // live message
+      const label = x.type === "report" ? (kinds[x.kind] || "Report") : x.type === "news" ? "📰 News" : x.type === "screener" ? "📊 Screener"
+        : x.type === "wisdom" ? "💭 Wisdom" : x.type === "oracle" ? "🔮 Kronos" : x.type === "changelog" ? "📝 Changelog" : "🔔 Alert";
+      return `<div class="bub ${x.type}${x.win ? " win" : x.loss ? " loss" : ""}">${head(label, x.t)}${clip(x.html)}</div>`; }
+    if (x.type === "photos") return `<div class="bub report">${head("📈 Charts", x.t)}<div class="body">${esc(x.syms.join(" · "))}</div>`
+      + `<div class="pics">${x.syms.filter(s => chartBy[s]).map(s => pic(chartBy[s], s + " chart")).join("")}</div></div>`;
+    if (x.type === "report"){ const d = byId[x.id]; if (!d) return "";
+      const pics = (x.charts || []).length ? `<div class="pics">${x.charts.map(src => pic(src, (src.split("chart-")[1] || "").replace(".png","") + " chart")).join("")}</div>` : "";
+      return `<div class="bub report">${head(kinds[x.kind] || "Report", x.t)}${clip(d.html)}${pics}</div>`; }
+    if (x.type === "alert"){ const win = / Hit/.test(x.line), loss = /Stopped/.test(x.line);
+      const meta = [x.tf, x.ses, x.script, x.grade].filter(Boolean).map(esc).join(" · ");
+      return `<div class="bub alert${win ? " win" : loss ? " loss" : ""}">${head(`🔔 ${tv(x.tv, esc(x.sym))} <span class="sub" style="font-weight:500">${meta}</span>`, x.t)}<div class="body">${esc(x.line)}</div></div>`; }
+    if (x.type === "news"){ const ex = [x.forecast && "fcst " + esc(x.forecast), x.previous && "prev " + esc(x.previous)].filter(Boolean).join(" · ");
+      const ttl = x.tv ? `<a class="tv" href="${tvUrl(x.tv)}" target="_blank" rel="noopener">${esc(x.title)}</a>` : esc(x.title);
+      return `<div class="bub news">${head("⚠️ News heads-up", x.t)}<div class="body">${FL[x.country] || "🌐"} ${ttl}${ex ? " · " + ex : ""}</div></div>`; }
+    if (x.type === "changelog") return `<div class="bub changelog">${head("📝 Changelog", x.t)}${clip(`<pre>${esc(x.text)}</pre>`)}</div>`;
+    return ""; };
+  const draw = () => {
+    const live = L && (L.items || []).length, F = live ? fromLive(L.items) : (D.feed || []);
+    const of = k => k === "all" ? F.length : F.filter(x => x.type === k || (k === "report" && x.type === "photos")).length;
+    $("feedbar").innerHTML = (live ? `<span class="clmark"><span class="pill open" style="padding:2px 9px"><i></i>live</span> <span title="last message">${tm(L.items[L.items.length-1].t)}</span></span>` : "")
+      + types.map(([k,l]) => `<button data-k="${k}" aria-pressed="${k === cur}">${l} <span class="num" style="opacity:.7">${of(k)}</span></button>`).join("")
+      + (live ? "" : `<span class="tg">newest first</span>`);
+    let last = "", h = "";
+    for (const x of F.slice().reverse()){ if (cur !== "all" && x.type !== cur && !(cur === "report" && x.type === "photos")) continue;
+      const d = dayOf(x.t); if (d !== last){ h += `<div class="day">${d}</div>`; last = d; } h += bubble(x); }
+    const chat = $("chat"), atTop = !chat.childElementCount || chat.scrollTop < 60, keep = chat.scrollTop;
+    chat.innerHTML = h || `<div class="empty">Nothing here yet.</div>`;
+    unclip();
+    chat.scrollTop = atTop ? 0 : keep;
+    $("feed-sub").textContent = "Everything the R3M Signals group got · last 7 days · " + (live ? "live, refreshes every ~2 min" : "alerts arrive with the next morning digest"); };
+  $("feedbar").onclick = e => { const b = e.target.closest("button[data-k]"); if (!b) return; cur = b.dataset.k;
+    try { localStorage.setItem("r3m-feed", cur); } catch {} $("chat").innerHTML = ""; draw(); };
+  $("chat").onclick = e => { const m = e.target.closest(".more"); if (m){ const body = m.previousElementSibling; const open = body.classList.toggle("clip");
+      m.textContent = open ? "Show more" : "Show less"; return; }
+    const img = e.target.closest(".pics img"); if (img){ $("dlg-t").textContent = img.alt; $("dlg-b").innerHTML = `<img src="${img.src}" alt="" style="width:100%;height:auto;border-radius:10px">`; $("dlg").classList.add("wide"); $("dlg").showModal(); } };
+  feedLive = nl => { if (nl && nl.updated !== L?.updated){ L = nl; draw(); } };
+  draw();
+}
+/* 🧭 Outlook 🔮 Oracle (2026-11-03): one tile per symbol, a card per click · the five focus symbols big (levels, scenarios, Kronos's cone),
+   the other seven small (group, then a running trade, then the latest signal) · the archive in a popup */
+let KRON = null, BOARD = null;
+const ICON = {equinox:"🌗", climax:"⚡️", lava:"🌋", dvi:"📈", af:"🌋", q210:"◇"};
+const scNm = s => s === "af" ? "lava AF" : s.endsWith(" af") ? s.replace(/ af$/, " AF") : s;
+const scIc = s => ICON[s.replace(/ af$/, "")] || "";
+const sR2 = r => (r > 0 ? "+" : r < 0 ? "−" : "±") + fmt(Math.abs(r ?? 0), 2) + "R";
+const hm = t => new Intl.DateTimeFormat(de, {timeZone: TZD, hour: "2-digit", minute: "2-digit"}).format(new Date(t));
+const berDay = t => new Intl.DateTimeFormat("en-CA", {timeZone: BER}).format(new Date(t));
+/* each symbol's cash window as r3m·'s Session Auto reads it */
+const SES = sym => /^(NAS100|US500|US30|US2000)$/.test(sym) ? ["New York", "America/New_York", 570, 960] : ["London", "Europe/London", 480, 990];
+function sesState(sym){ const [nm, tz, a, b] = SES(sym), d = new Date(), l = localMin(tz, d), wk = /Sat|Sun/.test(l.wd);
+  const off = ((localMin(TZD, d).m - l.m + 720) % 1440 + 1440) % 1440 - 720, at = m => hhmm(m + off);
+  if (!wk && l.m >= a && l.m < b) return [`${nm} cash · open until ${at(b)}`, true];
+  return [`${nm} cash · ${!wk && l.m < a ? "opens " + at(a) : "closed"}`, false]; }
+/* the live layer (2026-11-03): symbols.json every ~5 min (prices on the Pepperstone frame, today's path, hour bars, today's
+   trades) and oracle.json (Kronos for the seven tiles the private oracle skips), both written by the site repo's reef-live.yml */
+let SYML = null, ORC = null;
+const BINOC = `<svg viewBox="0 0 64 64" aria-hidden="true"><path fill="#ff7d93" d="M32 8c-12 0-19 8-19 18 0 6 2 10 5 12l-5 13c-1 2 1 3 3 2l7-7 2 9c0 2 3 2 3 0l4-9 4 9c0 2 3 2 3 0l2-9 7 7c2 1 4 0 3-2l-5-13c3-2 5-6 5-12 0-10-7-18-19-18z"/><rect x="19" y="20" width="11" height="12" rx="4" fill="#0e2f3d" stroke="#8db0b5" stroke-width="2"/><rect x="34" y="20" width="11" height="12" rx="4" fill="#0e2f3d" stroke="#8db0b5" stroke-width="2"/><rect x="29" y="23" width="6" height="4" fill="#8db0b5"/><circle cx="24" cy="26" r="2" fill="#5fd3bf"/><circle cx="39" cy="26" r="2" fill="#5fd3bf"/></svg>`;   // 🔭 the empty state
+const getJ = f => fetch(f + "?t=" + Date.now(), {cache: "no-store"}).then(r => r.ok ? r.json() : null).catch(() => null);
+const lvOf = s => SYML?.symbols?.[s];
+function tradesOf(D, sym, today){ const S = D.signals || {}, day = berDay(Date.now());
+  const a = (S.recent || []).filter(r => r.sym === sym && (!today || berDay(r.t) === day)).map(r => ({...r}));
+  for (const x of (lvOf(sym)?.trades || []).filter(r => !today || berDay(r.t) === day)){   // the live layer's word is the newer one
+    const o = a.find(y => y.side === x.side && Math.abs(Date.parse(y.t) - Date.parse(x.t)) < 6e5 && Math.abs(y.entry - x.entry) <= Math.abs(x.entry - x.sl) * .5);
+    if (!o) a.push(x); else if (o.res === "open" && x.res !== "open") Object.assign(o, {res: x.res, rg: x.rg, tx: x.tx}); }   // a booked result of the stats stays
+  return a.sort((x, y) => Date.parse(x.t) - Date.parse(y.t)); }
+const kronOf = (D, sym) => { let o = null; [...(D.kronos?.days || []), ...(ORC?.days || [])].sort((a, b) => a.day < b.day ? -1 : 1)
+  .forEach(d => { const e = d.symbols?.[sym]; if (e) o = {day: d.day, e}; }); return o; };
+/* the real path on the cone's grid: the scored closes, else today's 15m closes of the live layer so far · [[i, close]] */
+function pathOf(e, sym){ if (e.actual) return e.actual.map((v, i) => [i, v]);
+  const m = lvOf(sym)?.m15; if (!m || !m.length) return [];
+  const px = new Map(m.map(([t, c]) => [t, c])), out = [];
+  for (let i = 0; i < e.q50.length; i++){ const g = e.t0 + i * e.step; if (g > m[m.length - 1][0]) break; if (px.has(g)) out.push([i, px.get(g)]); }
+  return out; }
+/* the cone: the bars Kronos read, its band and median, the real path once scored, the morning's levels as dotted lines */
+/* levels closer than gap px share one tag ("PDH 6,204.7 · PWH 6,209.9"), so the tags never print over each other */
+function tagRows(ls, Y, gap){ const a = ls.map(l => ({l, y: Y(l.value)})).sort((p, q) => p.y - q.y), rows = [];
+  for (const x of a){ const r = rows[rows.length - 1]; if (r && x.y - r.y1 < gap){ r.t.push(x.l); r.y1 = x.y; } else rows.push({y: x.y, y1: x.y, t: [x.l]}); }
+  return rows.map(r => ({y: r.y, txt: r.t.map(l => esc(l.name) + " " + fmt(l.value)).join(" · ")})); }
+function cone(e, levels, W, H, act = []){
+  const n0 = e.ctx.length, n1 = e.q50.length, N = n0 + n1;
+  const ys = [...e.ctx, ...e.q10, ...e.q90, ...act.map(a => a[1])], lo0 = Math.min(...ys), hi0 = Math.max(...ys), pad = (hi0 - lo0) * .08 || 1, lo = lo0 - pad, hi = hi0 + pad;
+  const X = i => 6 + (i / (N - 1)) * (W - 12), Y = v => H - 6 - ((v - lo) / (hi - lo)) * (H - 12), f = v => v.toFixed(1);
+  const line = (arr, off) => arr.map((v, i) => `${f(X(i + off))},${f(Y(v))}`).join(" ");
+  const band = line(e.q90, n0) + " " + e.q10.slice().reverse().map((v, i) => `${f(X(n0 + n1 - 1 - i))},${f(Y(v))}`).join(" ");
+  const fs = Math.round(W / 46), up = [], dn = [];
+  const inn = (levels || []).filter(l => { if (l.value == null) return false; if (l.value > hi) { up.push(l); return false; } if (l.value < lo) { dn.push(l); return false; } return true; });
+  const lv = inn.map(l => `<line x1="6" y1="${f(Y(l.value))}" x2="${W - 6}" y2="${f(Y(l.value))}" stroke="#8db0b5" stroke-width=".7" stroke-dasharray="2 4"/>`).join("")
+    + tagRows(inn, Y, fs + 2).map(r => { const ty = r.y < fs + 6 ? r.y + fs + 2 : r.y - 3;   // a line near the top gets its label below it
+      return `<text x="${W - 8}" y="${f(ty)}" text-anchor="end" font-size="${fs}" fill="#8db0b5">${r.txt}</text>`; }).join("");
+  const edge = (arr, top) => arr.length ? `<text x="8" y="${top ? fs + 4 : H - 6}" text-anchor="start" font-size="${fs}" fill="#8db0b5">${top ? "↑" : "↓"} ${arr.map(l => esc(l.name) + " " + fmt(l.value)).join(" · ")}</text>` : "";
+  const xo = f(X(n0 + (e.open_i || 0)));
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Kronos cone with the morning's levels">${lv}${edge(up, true)}${edge(dn, false)}
+    <line x1="${xo}" x2="${xo}" y1="0" y2="${H}" stroke="#1a4556" stroke-dasharray="3 3"/>
+    <polygon points="${band}" fill="#5fd3bf" fill-opacity=".16"/>
+    <polyline points="${line(e.ctx, 0)}" fill="none" stroke="#8db0b5" stroke-width="1.3"/>
+    <polyline points="${line(e.q50, n0)}" fill="none" stroke="#5fd3bf" stroke-width="1.3" stroke-dasharray="5 3"/>
+    ${act.length ? `<polyline points="${act.map(([i, v]) => `${f(X(i + n0))},${f(Y(v))}`).join(" ")}" fill="none" stroke="#ffcf73" stroke-width="1.7"/>` : ""}</svg>`; }
+const kRead = (k, act = []) => { if (!k) return `<span class="sub">🔮 no cone for this symbol yet</span>`; const e = k.e, up = Math.round(100 * e.up), s = e.score;
+  const so = () => { const [i, v] = act[act.length - 1], ok = (e.q50[e.q50.length - 1] - e.ref) * (v - e.ref) > 0, inb = e.q10[i] <= v && v <= e.q90[i];
+    return ` · so far direction <b class="${ok ? "up" : "down"}">${ok ? "✓" : "✗"}</b> · band <b class="${inb ? "up" : "down"}">${inb ? "✓ inside" : v > e.q90[i] ? "✗ broke above" : "✗ broke below"}</b>`; };
+  const dir = up >= 50 ? `<b class="up">🔮 ▲ ${up}%</b> of paths end above ${fmt(e.ref)}` : `<b class="down">🔮 ▼ ${100 - up}%</b> of paths end below ${fmt(e.ref)}`;
+  const day = k.day === berDay(Date.now()) ? "" : ` · ${dshort(k.day)}`;
+  return dir + (s ? ` · direction <b class="${s.hit ? "up" : "down"}">${s.hit ? "✓" : "✗"}</b> · band <b class="${s.inside ? "up" : "down"}">${s.inside ? "✓ inside" : "✗ outside"}</b>` : act.length ? so() : ` · scored after the session`) + `<span class="sub">${day}</span>`; };
+/* the card's hour chart from the live layer: 72 candles, the levels dotted, the last price tagged */
+function candles(b, levels, W, H){ if (!b || b.length < 5) return "";
+  const lo0 = Math.min(...b.map(x => x[3])), hi0 = Math.max(...b.map(x => x[2])), pad = (hi0 - lo0) * .06, lo = lo0 - pad, hi = hi0 + pad;
+  const R = 70, cw = (W - 12 - R) / b.length, X = i => 6 + i * cw + cw / 2, Y = v => 6 + (hi - v) / (hi - lo) * (H - 22), f = v => v.toFixed(1);
+  const inn = levels.filter(l => l.value != null && l.value > lo && l.value < hi);
+  const lv = inn.map(l => `<line x1="6" x2="${W - R}" y1="${f(Y(l.value))}" y2="${f(Y(l.value))}" stroke="${/^PW/.test(l.name) ? "#a78bfa" : "#e0a84a"}" stroke-width=".8" stroke-dasharray="3 3"/>`).join("")
+    + (() => { let py = -99; return inn.map(l => ({l, y: Y(l.value)})).sort((p, q) => p.y - q.y).map(x => { const y = Math.max(x.y, py + 10); py = y;   // the right margin is narrow: close tags step down instead of sharing a row
+      return `<text x="${W - R + 4}" y="${f(y + 3)}" font-size="9" fill="#8db0b5">${esc(x.l.name)} ${fmt(x.l.value)}</text>`; }).join(""); })();
+  const cs = b.map(([t, o, h, l, c], i) => { const up = c >= o, col = up ? "#5fd3bf" : "#ff8577", y1 = Y(Math.max(o, c)), y2 = Y(Math.min(o, c));
+    return `<line x1="${f(X(i))}" x2="${f(X(i))}" y1="${f(Y(h))}" y2="${f(Y(l))}" stroke="${col}" stroke-width="1"/><rect x="${f(X(i) - cw * .35)}" y="${f(y1)}" width="${f(cw * .7)}" height="${f(Math.max(1, y2 - y1))}" fill="${col}"/>`; }).join("");
+  const days = b.map((x, i) => [i, new Intl.DateTimeFormat(de, {timeZone: TZD, weekday: "short"}).format(new Date(x[0] * 1000))]).filter((x, i, a) => i && x[1] !== a[i - 1][1])
+    .map(([i, d]) => `<line x1="${f(X(i) - cw / 2)}" x2="${f(X(i) - cw / 2)}" y1="0" y2="${H - 16}" stroke="#1a4556"/><text x="${f(X(i))}" y="${H - 4}" font-size="9" fill="#8db0b5">${d}</text>`).join("");
+  const last = b[b.length - 1][4];
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Hour candles with the levels">${days}${lv}${cs}<rect x="${W - R + 2}" y="${f(Y(last) - 7)}" width="${R - 6}" height="14" rx="3" fill="#ffcf73"/><text x="${W - R + 6}" y="${f(Y(last) + 3)}" font-size="9" fill="#061a24">${fmt(last)}</text></svg>`; }
+function todayLine(D, sym){ const ts = tradesOf(D, sym, true), live = ts.filter(t => t.res === "open"), done = ts.filter(t => t.res !== "open");
+  const r = done.reduce((a, t) => a + (t.rg || 0), 0);
+  if (!ts.length) return `<span>signals today –</span>`;
+  return `<span>${live.length ? `<b class="sun">● ${live.length} live</b> · ` : ""}signals today ${ts.length}${done.length ? ` · <b class="${r >= 0 ? "up" : "down"}">${sR2(r)}</b>` : ""}</span>`; }
+function drawBoard(D){ const M = D.market || {}, P = M.pepper || [], O = M.outlook || [];
+  const pOf = s => { const p = P.find(x => x.sym === s) || {}, l = lvOf(s); return l ? {...p, price: l.px, chg: l.chg ?? p.chg} : p; }, big = O.map(o => o.sym);
+  const head = s => { const p = pOf(s); return `<span class="sym">${fl(s)}${tv(s)}</span>${p.price != null ? `<span><span class="px num">${fmt(p.price)}</span> <span class="num ${cls(p.chg)}">${p.chg >= 0 ? "▲" : "▼"} ${pct(p.chg)}</span></span>` : ""}`; };
+  $("board").innerHTML = O.map((o, i) => { const k = kronOf(D, o.sym), [st] = sesState(o.sym), pa = k ? pathOf(k.e, o.sym) : [];
+    const scn = [o.up && `<span><b class="up">▲</b> ${esc(o.up)}</span>`, o.down && `<span><b class="down">▼</b> ${esc(o.down)}</span>`, (!o.up && !o.down && o.text) ? `<span>${esc(o.text)}</span>` : ""].filter(Boolean).join("");
+    return `<div class="bt${tradesOf(D, o.sym, true).some(t => t.res === "open") ? " live" : ""}" role="button" tabindex="0" data-sym="${esc(o.sym)}" aria-label="${esc(o.sym)} card"><div class="hd">${head(o.sym)}</div>
+      ${k ? (i < 2 ? cone(k.e, o.levels, 600, 170, pa) : cone(k.e, o.levels, 400, 140, pa)) : `<div class="nocone">Kronos's cone arrives with the session</div>`}
+      <div class="kr">${kRead(k, pa)}</div><div class="scn">${scn}</div>
+      <div class="ft">${todayLine(D, o.sym)}<span>${esc(st)}</span></div></div>`; }).join("");
+  const grp = [...new Set(P.map(p => p.group))], act = s => { const ts = tradesOf(D, s, true); return [ts.some(t => t.res === "open") ? 1 : 0, ts.length ? Date.parse(ts[ts.length - 1].t) : 0]; };
+  const minis = P.filter(p => !big.includes(p.sym)).sort((a, b) => { const g = grp.indexOf(a.group) - grp.indexOf(b.group); if (g) return g;
+    const x = act(a.sym), y = act(b.sym); return (y[0] - x[0]) || (y[1] - x[1]) || (P.indexOf(a) - P.indexOf(b)); });
+  const wk = Object.fromEntries((D.signals?.bySymbol || []).map(g => [g.name, g]));
+  $("minis").innerHTML = minis.map(p0 => { const p = pOf(p0.sym), ts = tradesOf(D, p.sym, true), live = ts.filter(t => t.res === "open"), last = ts[ts.length - 1], w = wk[p.sym];
+    const k = kronOf(D, p.sym), pa = k ? pathOf(k.e, p.sym) : [], m = lvOf(p.sym)?.m15 || [];
+    const pic = k ? cone(k.e, [], 200, 64, pa) : m.length > 4 ? `<svg viewBox="0 0 200 64" role="img" aria-label="Today's path"><polyline points="${m.map(([t, c], i, a) => { const lo = Math.min(...a.map(x => x[1])), hi = Math.max(...a.map(x => x[1])) || 1; return `${(i / (a.length - 1) * 196 + 2).toFixed(1)},${(60 - (c - lo) / ((hi - lo) || 1) * 56).toFixed(1)}`; }).join(" ")}" fill="none" stroke="#8db0b5" stroke-width="1.2"/></svg>` : "";
+    const st = live.length ? `<span class="sun">● ${live.length} live${ts.length > live.length ? ` · ${sR2(ts.filter(t => t.res !== "open").reduce((a, t) => a + (t.rg || 0), 0))}` : ""}</span>`
+      : last ? `<span>${hm(last.t)} · <b class="${last.rg >= 0 ? "up" : "down"}">${sR2(last.rg)}</b></span>`
+      : w && w.done ? `<span>7d <b class="${w.r >= 0 ? "up" : "down"}">${sR2(w.r)}</b></span>` : `<span class="empty">${BINOC}<span>no signal yet · Octi is watching</span></span>`;
+    return `<div class="mt${live.length ? " live" : ""}" role="button" tabindex="0" data-sym="${esc(p.sym)}" aria-label="${esc(p.sym)} card"><span class="sym">${fl(p.sym)}${tv(p.sym)}</span>
+      <span class="num">${fmt(p.price)} <span class="${cls(p.chg)}">${p.chg >= 0 ? "▲" : "▼"} ${pct(p.chg)}</span></span>${pic}${k ? `<span class="mk">${Math.round(100 * k.e.up) >= 50 ? `<b class="up">🔮 ▲ ${Math.round(100 * k.e.up)}%</b>` : `<b class="down">🔮 ▼ ${100 - Math.round(100 * k.e.up)}%</b>`}</span>` : ""}${st}</div>`; }).join("");
+  const kt = (D.kronos?.days || []).flatMap(d => Object.values(d.symbols || {}).map(e => (e.ctx_t0 || 0) + (e.ctx?.length || 0) * (e.step || 900))).sort().pop();
+  $("o-fresh").innerHTML = `<i></i>${SYML ? `prices live ${hm(SYML.updated)}` : `prices ${esc(M.asof || "–")}`} · cones ${kt ? hm(kt * 1000) : "–"}`;
+  if (SYML) $("gen").textContent = hm(SYML.updated);
+  { const pp = P.map(x => pOf(x.sym)).filter(x => x.chg != null).sort((a, b) => b.chg - a.chg);   // Top & Flop on the live changes
+    if (pp.length) $("topflop").innerHTML = tfHtml(pp, !!SYML); }
+  $("board").onclick = $("minis").onclick = e => { if (e.target.closest("a")) return; const b = e.target.closest("[data-sym]"); if (b) openCard(D, b.dataset.sym); };
+  $("board").onkeydown = $("minis").onkeydown = e => { if (e.key !== "Enter" && e.key !== " ") return; const b = e.target.closest("[data-sym]"); if (b && e.target === b){ e.preventDefault(); openCard(D, b.dataset.sym); } };
+  BOARD = D; }
+/* the card: everything about one symbol */
+const CFLAG = {GER40:"🇩🇪🇪🇺🇺🇸", EUSTX50:"🇪🇺🇩🇪🇺🇸", UK100:"🇬🇧🇺🇸", EURUSD:"🇪🇺🇺🇸", GBPUSD:"🇬🇧🇺🇸", USDJPY:"🇺🇸🇯🇵", USDCHF:"🇺🇸🇨🇭"};
+function calOf(M, sym){ const fls = [...(CFLAG[sym] || "🇺🇸")].join("").match(/[\u{1F1E6}-\u{1F1FF}]{2}/gu) || ["🇺🇸"], out = [];
+  for (const a of calDays(M).slice(0, 2)) for (const i of a.items){ const t = typeof i === "string" ? i : i.text;
+    const f = t.match(/[\u{1F1E6}-\u{1F1FF}]{2}/u); if (f ? fls.includes(f[0]) : /^(NAS100|US500)$/.test(sym)) out.push([a.day, t, isEarn(t) ? "e" : impOf(i, t)]); }
+  return out.filter(x => out.length <= 8 || x[2] !== -1).slice(0, 8); }   // more than 8: the yellow ones give way first
+function openCard(D, sym){ const M = D.market || {}, p0 = (M.pepper || []).find(x => x.sym === sym) || {}, l = lvOf(sym), p = l ? {...p0, price: l.px, chg: l.chg ?? p0.chg} : p0, o = (M.outlook || []).find(x => x.sym === sym), k = kronOf(D, sym), pa = k ? pathOf(k.e, sym) : [];
+  const [st, op] = sesState(sym), K = KRON || {checks: []};
+  const sec = (t, sub, body) => `<section class="cs"><div class="csh"><h3>${t}</h3><span>${sub}</span></div>${body}</section>`;
+  /* today: the morning's read */
+  const ch = (D.charts || []).find(c => c.sym === sym);
+  const lvs = [{name: "PDH", value: p0.hi}, {name: "PDL", value: p0.lo}, {name: "PWH", value: l?.pwh}, {name: "PWL", value: l?.pwl}];
+  (o?.levels || []).forEach(x => { const y = lvs.find(y => y.name === x.name); if (!y) lvs.push(x); else y.value = x.value; });   // the morning report's own (Pepperstone) value beats the live layer's proxy-scaled one
+  const lv = lvs.filter(x => x.value != null).slice().sort((a, b) => b.value - a.value).map(l => { const d = p.price ? (l.value - p.price) / p.price * 100 : null;
+    return `<div class="lvb ${d == null ? "" : d > 0.02 ? "res" : d < -0.02 ? "sup" : "now"}"><span>${esc(l.name)}</span><b class="num">${fmt(l.value)}</b>${d == null ? "" : `<i class="num">${d > 0 ? "+" : d < 0 ? "−" : ""}${fmt(Math.abs(d), 2)}%</i>`}</div>`; }).join("");
+  const today = o ? `<p class="mood">${esc(M.mood || "")}</p><div class="lvs">${lv}</div>${o.up ? `<p><b class="up">▲</b> ${esc(o.up)}</p>` : ""}${o.down ? `<p><b class="down">▼</b> ${esc(o.down)}</p>` : ""}${o.text && !o.up && !o.down ? `<p>${esc(o.text)}</p>` : ""}`
+    : `<p class="mood">${esc(M.mood || "")}</p>${lv ? `<div class="lvs">${lv}</div>` : ""}<p class="sub">Not in the morning outlook: the levels without its ▲ ▼ scenarios</p>`;
+  const svgc = l ? candles(l.h1, lvs, 600, 250) : "";
+  const pic = svgc ? `<div class="cimg">${svgc}</div><p class="sub" style="font-size:12px">1h candles · ${esc(l.tk)} on the Pepperstone frame${ch ? ` · <a class="tv" href="${esc(ch.src)}" target="_blank" rel="noopener">the morning's chart</a>` : ""}</p>`
+    : ch ? `<a class="cimg" href="${esc(ch.src)}" target="_blank" rel="noopener" title="Open the 1h chart"><img src="${esc(ch.src)}" alt="${esc(sym)} 1h chart with levels" loading="lazy"></a>` : "";
+  const sc0 = D.kronos?.score?.bySym?.[sym], scd = (ORC?.days || []).map(d => d.symbols?.[sym]?.score).filter(Boolean);
+  const sc = sc0 || (scd.length ? {n: scd.length, hit: scd.filter(x => x.hit).length} : null);
+  const orc = k ? `${cone(k.e, o?.levels || lvs.filter(x => x.value != null), 600, 210, pa)}<div class="lg"><span><b class="mist">━</b> the bars Kronos read</span><span><b class="up">▬ ▬</b> median of ${k.e.paths || 24} paths</span><span><b class="up">■</b> q10–q90 band</span><span><b class="sun">━</b> what the market did</span></div><p>${kRead(k, pa)}${sc ? ` · ${esc(sym)}'s score ${sc.hit} of ${sc.n}` : ""}</p>`
+    : `<p class="sub">No cone for ${esc(sym)} yet · Kronos reads the session from 07:25 London</p>`;
+  const cal = calOf(M, sym).map(([d, t, m]) => `<div class="cl"><span class="num">${esc(d.split(" ")[0])}</span><span>${m === "e" ? EARN : fold(m)}${linkTickers(esc(t))}</span></div>`).join("") || `<p class="sub">Nothing on the calendar for ${esc(sym)}</p>`;
+  /* signals today, each with Kronos's read of it */
+  const ts = tradesOf(D, sym, true).reverse(), kc = t => K.checks.find(c => c.sym === sym && c.side === t.side && c.status === "sent" && Math.abs(Date.parse(c.t) - Date.parse(t.t)) < 6e5);
+  const res = t => t.res === "open" ? `<span class="sun">● live</span>` : t.res === "Stopped" ? `<span class="down">🛑 ${sR2(t.rg)}</span>` : t.res === "TP2 Hit" ? `<span class="up">🏆 TP2 ${sR2(t.rg)}</span>`
+    : t.res === "TP1 Hit" ? `<span class="up">✅ TP1 ${sR2(t.rg)}</span>` : `<span>🏁 closed ${sR2(t.rg)}</span>`;
+  const sig = ts.map(t => { const c = kc(t), kk = c?.k;
+    const kline = kk ? `🔮 Kronos ${kk.edge > 0 ? `<b class="up">✓ with</b>` : kk.edge < 0 ? `<b class="down">✗ against</b>` : "➖ no lean"} · ${kk.tp1} TP1 first, ${kk.stop} stop first of ${kk.n}` : "";
+    return `<div class="tr"><div class="t1"><span><b>${hm(t.t)}</b> · ${scIc(t.script)} ${esc(scNm(t.script))} <b class="${t.side === "LONG" ? "up" : "down"}">${t.side === "LONG" ? "▲" : "▼"} ${esc(t.side)}</b> <span class="num">${fmt(t.entry)}</span></span>${res(t)}</div>
+      <div class="t2 num">SL ${fmt(t.sl)} · TP1 ${fmt(t.tp1)} (${fmt(t.r1, 1)}R)${t.tp2 ? ` · TP2 ${fmt(t.tp2)}` : ""}</div>${kline ? `<div class="t2">${kline}</div>` : ""}</div>`; }).join("");
+  const live = ts.filter(t => t.res === "open").length, done = ts.filter(t => t.res !== "open"), rr = done.reduce((a, t) => a + (t.rg || 0), 0);
+  const sigH = ts.length ? `<p>${live ? `<b class="sun">● ${live} running</b>` : "No trade running"} · ${done.length} closed${done.length ? ` · <b class="${rr >= 0 ? "up" : "down"}">${sR2(rr)}</b>` : ""}</p>${sig}` : `<p class="sub empty">${BINOC}<span>No r3m· signal on ${esc(sym)} today · Octi keeps watching</span></p>`;
+  /* knock-outs of the latest signal (Kronos's reply) */
+  const ko = K.checks.filter(c => c.sym === sym && (c.ko || []).length).pop();
+  const koH = ko ? `<p>For the ${hm(ko.t)} ${c2(ko)} · 0 € at comdirect from 1,000 €</p><div class="kot"><span>WKN</span><span>Issuer</span><span>KO</span><span>Ask</span><span>1R</span>${ko.ko.map(x =>
+      `<a class="tv" href="https://www.comdirect.de/inf/search/all.html?SEARCH_VALUE=${esc(x.wkn)}" target="_blank" rel="noopener">${esc(x.wkn)}</a><span>${esc(x.iss)}</span><span class="num">${fmt(x.ko)}</span><span class="num">${x.ask != null ? fmt(x.ask, 2) + " €" : "–"}</span><span class="num">${x.eurR != null ? Math.round(x.eurR) + " €" : "–"}</span>`).join("")}</div>`
+    : `<p class="sub">No knock-out picked for ${esc(sym)} yet · Kronos's reply names them when a signal comes in during the issuers' hours</p>`;
+  function c2(c){ return `${c.af ? "AF " : ""}${c.side === "LONG" ? "long" : "short"}`; }
+  /* record */
+  const w = (D.signals?.bySymbol || []).find(g => g.name === sym), rp = (D.replay?.bySymbol || []).find(g => g.name === sym);
+  const rec = (lab, g, sub) => g ? `<div class="rb"><span>${lab}</span><b class="num ${g.r >= 0 ? "up" : "down"}">${g.r >= 0 ? "+" : "−"}${fmt(Math.abs(g.r), 1)}R</b><span>${sub(g)}</span></div>` : "";
+  const recH = rec("Live · 7 days", w, g => `${g.n} trades · TP1 ${g.tp1} of ${g.done} closed`) + rec(`Replay${D.replay?.from ? " · " + dshort(D.replay.from.slice(0, 10), true) + " – " + dshort(D.replay.to.slice(0, 10), true) : ""}`, rp, g => `${g.n.toLocaleString("en-US")} trades · TP1 ${g.done ? Math.round(100 * g.tp1 / g.done) : 0}%`) || `<p class="sub">No trades on record yet</p>`;
+  $("dlg-t").innerHTML = `<span class="ct">${fl(sym)}${tv(sym)}</span>${p.price != null ? ` <span class="num">${fmt(p.price)}</span> <span class="num ${cls(p.chg)}">${p.chg >= 0 ? "▲" : "▼"} ${pct(p.chg)}</span> <span class="sub num">PDH ${fmt(p.hi)} · PDL ${fmt(p.lo)}</span>` : ""} <span class="pill${op ? " open" : ""}"><i></i>${esc(st)}</span>`;
+  /* left the morning's read and the calendar, right what the day did: signals, Kronos, knock-outs, record (2026-11-03) */
+  $("dlg-b").innerHTML = `<div class="card2"><div>${sec("📋 Today", `morning report · ${esc(M.asof || "–")}`, today + pic)}${sec("📅 Calendar", "today and tomorrow", cal)}</div>
+    <div>${sec("📡 Signals today", "r3m· · live alerts", sigH)}${sec(`🔮 Oracle${k ? " · " + esc(k.e.session) + " session" : ""}`, k ? `Kronos · ${dshort(k.day)}` : "Kronos", orc)}${sec("🎫 Knock-outs · last signal", ko ? `onvista · ${hm(ko.made || ko.t)}` : "onvista", koH)}</div>
+    <div class="crec">${sec("📊 Record", "live 7 days · replay", `<div class="rbs">${recH}</div>`)}</div></div>`;   // the record one row across the card (2026-11-03)
+  $("dlg-b").onclick = null; $("dlg").classList.add("wide", "symc"); $("dlg").classList.remove("ar"); if (!$("dlg").open) $("dlg").showModal(); $("dlg-b").scrollTop = 0; }
+/* the archive: a week calendar, newest week on top */
+const KINDS = {morning:["☕","Morning"], midday:["🕐","Midday"], close:["🌙","US Close"], gap:["🌓","Gap Check"], review:["🔄","Weekly Review"], outlook:["🔭","Weekly Outlook"], report:["📊","Signal Report"], lab:["🔬","Lab Review"], news:["📣","Announcement"]};
+const AFIL = [["all", "All"], ["morning", "☕ Morning"], ["midday", "🕐 Midday"], ["close", "🌙 US Close"], ["gap", "🌓 Gap Check"], ["weekly", "🔄 🔭 Weekly"], ["report", "📊 Signal Report"], ["lab", "🔬 Lab"], ["news", "📣 Announcements"]];
+let AF = "all";
+function openArchive(){ const DG = DIGESTS, mon = iso => { const d = new Date(iso + "T12:00:00Z"); d.setUTCDate(d.getUTCDate() - (d.getUTCDay() + 6) % 7); return d.toISOString().slice(0, 10); };
+  const ok = d => AF === "all" || d.kind === AF || (AF === "weekly" && (d.kind === "review" || d.kind === "outlook"));
+  const weeks = {}; DG.forEach((d, i) => { if (ok(d)) (weeks[mon(d.date)] ||= []).push([d, i]); });
+  const today = berDay(Date.now()); let lastM = "";
+  const wn = iso => { const d = new Date(iso + "T12:00:00Z"); d.setUTCDate(d.getUTCDate() + 3); const y = new Date(Date.UTC(d.getUTCFullYear(), 0, 4)); return 1 + Math.round(((d - y) / 864e5 - 3 + (y.getUTCDay() + 6) % 7) / 7); };
+  const rows = Object.keys(weeks).sort().reverse().map(w => { const m = new Intl.DateTimeFormat("en-GB", {month: "long", timeZone: "UTC"}).format(new Date(w + "T12:00:00Z")).toUpperCase();
+    const days = [...Array(7)].map((_, j) => { const d = new Date(w + "T12:00:00Z"); d.setUTCDate(d.getUTCDate() + j); return d.toISOString().slice(0, 10); });
+    const end = days[6], rng = `${dshort(w).replace(/^\w+\s/, "")} – ${dshort(end).replace(/^\w+\s/, "")}`;
+    const mh = m !== lastM ? `<div class="am">${m}</div>` : ""; lastM = m;
+    return mh + `<div class="aw"><div class="awk"><b>W${wn(w)}</b><span>${esc(rng)}</span></div>${days.map(d => { const its = weeks[w].filter(([x]) => x.date === d).reverse();
+      return `<div class="ad${its.length ? "" : " e"}${d === today ? " td" : ""}"><span class="num">${+d.slice(8)}${d === today ? " · today" : ""}</span>${its.map(([x, i]) => { const [ic, nm] = KINDS[x.kind] || ["📄", "Report"];
+        const tm = (x.title.match(/(\d{1,2}:\d{2})\s*$/) || [])[1];
+        return `<button type="button" data-i="${i}" title="${esc(x.title)}"><span aria-hidden="true">${ic}</span>${esc(nm)}${tm ? ` <i class="num">${tm}</i>` : ""}</button>`; }).join("") || `<span class="dot">·</span>`}</div>`; }).join("")}</div>`; }).join("");
+  $("dlg-t").innerHTML = `🗄️ Archive <span class="sub">${DG.length} reports · newest week on top</span>`;
+  $("dlg-b").innerHTML = `<div class="afil">${AFIL.map(([k, l]) => `<button type="button" data-f="${k}" aria-pressed="${k === AF}">${l}</button>`).join("")}</div>
+    <div class="ahead"><span></span>${["MON","TUE","WED","THU","FRI","SAT","SUN"].map(d => `<span>${d}</span>`).join("")}</div><div class="arows">${rows || `<p class="sub">Nothing of this kind yet.</p>`}</div>`;
+  $("dlg").classList.add("wide", "ar"); $("dlg").classList.remove("symc"); if (!$("dlg").open) $("dlg").showModal(); $("dlg-b").scrollTop = 0;
+  $("dlg-b").onclick = e => { const f = e.target.closest("button[data-f]"); if (f){ AF = f.dataset.f; openArchive(); return; }
+    const b = e.target.closest("button[data-i]"); if (b) openDigest(+b.dataset.i, true); }; }
+function openDigest(i, back){ const d = DIGESTS[i]; if (!d) return;
+  $("dlg-t").innerHTML = (back ? `<button type="button" class="back" id="dlg-back">← Archive</button> ` : "") + esc(d.title); $("dlg-b").innerHTML = d.html;
+  $("dlg-b").onclick = null; $("dlg").classList.remove("wide", "symc", "ar"); if (!$("dlg").open) $("dlg").showModal(); $("dlg-b").scrollTop = 0;
+  if (back) $("dlg-back").onclick = openArchive; }
+/* 🔮 Kronos signal checks (kronos-live.json, written by the site repo's kronos-live.yml) */
+const getKron = () => fetch("kronos-live.json?t=" + Date.now(), {cache: "no-store"}).then(r => r.ok ? r.json() : null).catch(() => null);
+function drawKron(K){ const box = $("k-box"); if (!box || !K || !(K.checks || []).length) return;
+  const IC = {equinox:"🌗", climax:"⚡️", lava:"🌋", dvi:"📈"}, kR = r => (r > 0 ? "+" : r < 0 ? "−" : "±") + fmt(Math.abs(r || 0), 2) + "R";
+  const C = K.checks.slice().reverse(), sent = C.filter(c => c.status === "sent");
+  const grp = (name, f, tip) => { const g = sent.filter(c => c.out && f(c.k.edge)); if (!g.length) return "";
+    const tp = g.filter(c => c.out === "tp1").length, r = g.reduce((a, c) => a + (c.rOut || 0), 0);
+    return `<span title="${tip} · R to the trade's first word: TP1 = TP1's R, a stop or an early close its own R">${name} ${g.length} · TP1 ${Math.round(100 * tp / g.length)}% · <b class="${r >= 0 ? "up" : "down"}">${kR(r)}</b></span>`; };
+  const open = sent.filter(c => !c.out).length;
+  $("k-score").innerHTML = grp("✓ with", e => e > 0, "Kronos leans with the trade") + grp("✗ against", e => e < 0, "Kronos leans against the trade")
+    + grp("➖ no lean", e => e === 0, "the paths stay between the stop and TP1") + (open ? `<span>${open} open</span>` : "");
+  const when = t => new Intl.DateTimeFormat(de, {timeZone: TZD, weekday: "short", hour: "2-digit", minute: "2-digit"}).format(new Date(t));
+  const row = c => { const ar = c.side === "LONG" ? `<b class="up">▲</b>` : `<b class="down">▼</b>`;
+    const tr = `${IC[c.script] || ""} ${esc(c.script)}${c.af ? " AF" : ""} ${ar} <span class="num">${esc(c.px)}</span>`;
+    if (c.status !== "sent") return `<tr><td>${when(c.t)}</td><td>${fl(c.sym)}${tv(c.sym)}</td><td>${tr}</td><td colspan="3" class="sub">${c.status === "wait" ? "waiting for the proxy bars" : "skipped · " + esc(c.why || "")}</td></tr>`;
+    const k = c.k, e = k.edge, v = e > 0 ? `<span class="ok">✓ ${kR(e)}</span>` : e < 0 ? `<span class="no">✗ ${kR(e)}</span>` : `<span class="sub">➖ 0R</span>`;
+    const out = !c.out ? `<span class="sub">open</span>` : c.out === "tp1" ? `<span class="ok">✅ TP1 ${kR(c.rOut)}</span>` : c.out === "stop" ? `<span class="no">🛑 ${kR(c.rOut)}</span>` : `🏁 ${kR(c.rOut)}`;
+    return `<tr><td>${when(c.t)}</td><td>${fl(c.sym)}${tv(c.sym)}</td><td>${tr}</td><td class="num" title="of ${k.n} paths · read on ${esc(k.tk)}">🎯 ${k.tp1} · 🛑 ${k.stop} · ⏸ ${k.none}</td><td class="num">${v}</td><td>${out}</td></tr>`; };
+  box.innerHTML = `<table><thead><tr><th>Signal</th><th>Symbol</th><th>Trade</th><th>Kronos paths</th><th>Edge</th><th>Result</th></tr></thead><tbody>${C.slice(0, 30).map(row).join("")}</tbody></table>`; }
+const getLive = () => fetch("live.json?t=" + Date.now(), {cache: "no-store"}).then(r => r.ok ? r.json() : null).catch(() => null);
+setInterval(() => { if (!document.hidden && feedLive) getLive().then(L => { octiWatch(L); feedLive(L); drawNews(L); }); }, 60000);
+setInterval(() => { if (!document.hidden) getKron().then(k => { if (k) KRON = k; }); }, 120000);
+setInterval(() => { if (document.hidden || !BOARD) return;   // the tiles follow the live layer (a card stays as it was opened)
+  Promise.all([getJ("symbols.json"), getJ("oracle.json")]).then(([SY, OR]) => { const ch = SY && SY.updated !== SYML?.updated; if (SY) SYML = SY; if (OR) ORC = OR; if (ch || OR) drawBoard(BOARD); }); }, 60000);
+
+function drawCurve(c){
+  const svg = $("curve"), W = 560, H = 200, P = {l:50, r:12, t:12, b:24};
+  if (!c.length){ svg.innerHTML = `<text x="${W/2}" y="${H/2}" text-anchor="middle" fill="#8db0b5" font-size="14">No closed trades yet</text>`; return; }
+  const ys = [0, ...c.map(p => p.r)], lo = Math.min(...ys), hi = Math.max(...ys), pad = (hi - lo || 1) * .12;
+  const y0 = lo - pad, y1 = hi + pad, X = i => P.l + (W - P.l - P.r) * (i / c.length), Y = v => P.t + (H - P.t - P.b) * (1 - (v - y0) / (y1 - y0));
+  const pts = [[X(0), Y(0)], ...c.map((p,i) => [X(i+1), Y(p.r)])];
+  const line = pts.map((p,i) => (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" ");
+  const last = c[c.length-1].r, col = last >= 0 ? "#5fd3bf" : "#ff8577";
+  const step = Math.max(1, Math.ceil((y1 - y0) / 4)), ticks = [];
+  for (let v = Math.ceil(y0); v <= y1; v += step) ticks.push(v);
+  svg.innerHTML = `<defs><linearGradient id="ga" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".35"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>
+    ${ticks.map(v => `<line x1="${P.l}" x2="${W-P.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="#1a4556" stroke-width="1" ${v === 0 ? "" : 'stroke-dasharray="2 4"'}/><text x="${P.l-8}" y="${Y(v)+4}" text-anchor="end" fill="#8db0b5" font-size="11" font-family="IBM Plex Mono,monospace">${v > 0 ? "+" : v < 0 ? "−" : ""}${Math.abs(v)}R</text>`).join("")}
+    <path d="${line} L ${X(c.length)} ${Y(y0)} L ${X(0)} ${Y(y0)} Z" fill="url(#ga)"/>
+    <path d="${line}" fill="none" stroke="${col}" stroke-width="2.4" stroke-linejoin="round"/>
+    <circle cx="${X(c.length)}" cy="${Y(last)}" r="5" fill="${col}" stroke="#061a24" stroke-width="2"/>
+    <text x="${W-P.r}" y="${H-6}" text-anchor="end" fill="#8db0b5" font-size="11" font-family="Figtree,sans-serif,Noto Color Emoji">${(c[c.length-1].n || c.length).toLocaleString("en-US")} closed trades</text>`;
+}
+
+/* 🤿 the sea (2026-11-03): kelp in three depths, rocks, bubbles and the odd fish in the hero, each layer moved by scroll and pointer */
+const STILL = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let SEA_FISH = () => {}, PX = 0, PY = 0;
+function bubbles(){
+  const cv = $("bubbles"), cx = cv.getContext("2d"); if (!cx) return;
+  let W = 0, H = 0, fish = [];
+  const size = () => { const r = cv.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2); W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr; cx.setTransform(dpr, 0, 0, dpr, 0, 0); };
+  size(); addEventListener("resize", size);
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const layers = [{z: .25, col: "rgba(20,80,90,.32)", n: 9, h: [.25, .45], w: 10}, {z: .55, col: "rgba(24,105,95,.45)", n: 7, h: [.3, .6], w: 14}, {z: 1, col: "rgba(31,120,100,.62)", n: 5, h: [.35, .7], w: 18}]
+    .map(L => ({...L, k: [...Array(L.n)].map(() => ({x: Math.random(), h: rnd(...L.h), p: rnd(0, 6.28), s: rnd(.4, .9)}))}));
+  const rocks = [...Array(8)].map(() => ({x: Math.random(), r: rnd(30, 90)}));
+  const bub = [...Array(30)].map(() => ({x: Math.random(), y: Math.random(), r: rnd(1.5, 5.5), v: rnd(.15, .5), w: rnd(0, 6.28)}));
+  SEA_FISH = (n = 1) => { for (let i = 0; i < n; i++){ const d = Math.random() < .5 ? 1 : -1; fish.push({x: d > 0 ? -60 : W + 60, y: rnd(.15, .6) * H, v: rnd(.6, 1.4) * d, s: rnd(.6, 1.2), c: ["#ffcf73", "#5fd3bf", "#ff8577", "#9ad7ff"][i % 4], p: rnd(0, 6)}); } };
+  if (!STILL) SEA_FISH(2);
+  const drawFish = (f, t) => { cx.save(); cx.translate(f.x, f.y + Math.sin(t / 500 + f.p) * 6); cx.scale(f.v > 0 ? f.s : -f.s, f.s); cx.fillStyle = f.c;
+    cx.beginPath(); cx.ellipse(0, 0, 16, 8, 0, 0, 6.283); cx.fill();
+    cx.beginPath(); cx.moveTo(-14, 0); cx.lineTo(-26, -8 + Math.sin(t / 90) * 2); cx.lineTo(-26, 8 + Math.sin(t / 90) * 2); cx.closePath(); cx.fill();
+    cx.fillStyle = "#061a24"; cx.beginPath(); cx.arc(8, -2, 1.8, 0, 6.283); cx.fill(); cx.restore(); };
+  const t0 = performance.now();
+  const frame = now => { const t = now - t0, sy = Math.min(scrollY, H); cx.clearRect(0, 0, W, H);
+    layers.forEach((L, li) => { const ox = -PX * 40 * L.z, oy = sy * .35 * L.z + PY * 14 * L.z;
+      if (li === 1){ cx.fillStyle = "rgba(10,40,50,.6)"; for (const r of rocks){ cx.beginPath(); cx.ellipse(r.x * W + ox, H + 10 + oy, r.r * 1.6, r.r, 0, Math.PI, 0); cx.fill(); } }
+      cx.strokeStyle = L.col; cx.lineCap = "round"; cx.lineWidth = L.w;
+      for (const k of L.k){ const bx = k.x * W + ox, top = H - k.h * H, sw = STILL ? 0 : Math.sin(t / (1400 / k.s) + k.p) * 26 * L.z;
+        cx.beginPath(); cx.moveTo(bx, H + 20 + oy); cx.bezierCurveTo(bx + sw * .3, H - k.h * H * .4 + oy, bx - sw * .6, H - k.h * H * .75 + oy, bx + sw, top + oy); cx.stroke(); }
+      if (li === 1) fish.forEach(f => drawFish(f, t)); });
+    for (const b of bub){ const x = b.x * W + Math.sin(b.w) * 7 - PX * 20, y = b.y * H + sy * .2;
+      cx.beginPath(); cx.arc(x, y, b.r, 0, 6.283); cx.strokeStyle = "rgba(141,176,181,.32)"; cx.lineWidth = 1; cx.stroke();
+      cx.beginPath(); cx.arc(x - b.r * .35, y - b.r * .35, b.r * .28, 0, 6.283); cx.fillStyle = "rgba(230,243,240,.28)"; cx.fill();
+      if (!STILL){ b.y -= b.v / H * 2.4; b.w += .012; if (b.y < -.05){ b.y = 1.05; b.x = Math.random(); } } }
+    if (STILL) return;
+    fish.forEach(f => f.x += f.v); fish = fish.filter(f => f.x > -80 && f.x < W + 80); if (Math.random() < .0015) SEA_FISH(1);
+    if (scrollY < H * 1.5 && !document.hidden) requestAnimationFrame(frame); else setTimeout(() => requestAnimationFrame(frame), 400); };   // off screen: idle
+  requestAnimationFrame(frame);
+}
+/* scroll: the water's depth, the gauge, the hero's parallax · the pointer: the reef and Octi's eyes */
+function dive(){
+  const par = [...document.querySelectorAll("[data-par]")], doc = document.documentElement, oc = $("octi"), pl = $("pl"), pr = $("pr");
+  const upd = () => { const h = doc.scrollHeight - innerHeight, d = h > 0 ? Math.min(1, scrollY / h) : 0;
+    doc.style.setProperty("--depth", d.toFixed(3)); $("dread").textContent = `−${Math.round(d * 180)} m`;
+    if (!STILL && innerWidth > 900 && scrollY < innerHeight * 1.5) par.forEach(el => { el.style.transform = `translate3d(${(-PX * 40 * +el.dataset.par).toFixed(1)}px,${(scrollY * +el.dataset.par).toFixed(1)}px,0)`; }); };
+  addEventListener("scroll", upd, {passive: true}); addEventListener("resize", upd);
+  addEventListener("pointermove", e => { PX = e.clientX / innerWidth - .5; PY = e.clientY / innerHeight - .5; upd();
+    const r = oc.getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height * .37), n = Math.hypot(dx, dy) || 1, m = Math.min(5, n / 40);
+    pl.setAttribute("cx", 88 + dx / n * m); pl.setAttribute("cy", 84 + dy / n * m); pr.setAttribute("cx", 132 + dx / n * m); pr.setAttribute("cy", 84 + dy / n * m); }, {passive: true});
+  upd();
+  const blink = () => { oc.classList.add("blink"); setTimeout(() => oc.classList.remove("blink"), 140); setTimeout(blink, 2500 + Math.random() * 3500); };
+  if (!STILL) setTimeout(blink, 1800);
+  /* the tiles tilt toward the pointer (delegated: the board redraws) */
+  const tilt = e => { if (STILL || e.pointerType !== "mouse") return; const el = e.target.closest(".bt,.mt"); document.querySelectorAll(".bt,.mt").forEach(x => { if (x !== el){ x.style.removeProperty("--rx"); x.style.removeProperty("--ry"); } });
+    if (!el) return; const r = el.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+    el.style.setProperty("--ry", (x * 7).toFixed(2) + "deg"); el.style.setProperty("--rx", (-y * 6).toFixed(2) + "deg"); };
+  ["board", "minis"].forEach(id => { $(id).addEventListener("pointermove", tilt); $(id).addEventListener("pointerleave", e => tilt({...e, target: document.body, pointerType: "mouse"})); });
+}
+/* Octi reacts to the group: a TP / target → joy, a stop → a tear (new live.json messages only, never the backlog) */
+let OSEEN = null, ORT = 0;
+function octiReact(mood, text){ const oc = $("octi"), sp = $("greet"); clearTimeout(ORT); oc.classList.remove("is-happy", "is-sad"); void oc.offsetWidth; oc.classList.add(mood);
+  OCTI.hold = Date.now() + 6000; sp.textContent = text; sp.classList.add("tip");
+  if (mood === "is-happy" && !STILL){ const box = oc.parentElement.getBoundingClientRect(), b = oc.getBoundingClientRect();
+    for (let i = 0; i < 10; i++){ const x = document.createElement("span"); x.className = "spark"; x.textContent = ["✨", "🫧", "⭐"][i % 3];
+      x.style.left = (b.left - box.left + b.width / 2) + "px"; x.style.top = (b.top - box.top + b.height * .35) + "px";
+      x.style.setProperty("--dx", (Math.random() * 220 - 110) + "px"); x.style.setProperty("--dy", (-20 - Math.random() * 100) + "px"); oc.parentElement.appendChild(x); setTimeout(() => x.remove(), 1200); } }
+  ORT = setTimeout(() => oc.classList.remove(mood), 5000); }
+/* the three buttons under Octi (2026-11-03, the user liked them in the mockup): a cheer for today's best TP, a tear for today's
+   last stop (both from the real trades, else a practice round), a school of fish */
+function octiPlay(){ const all = () => (BOARD?.market?.pepper || []).flatMap(p => tradesOf(BOARD, p.sym, true).map(t => ({...t, sym: p.sym})));
+  $("o-tp").onclick = () => { const w = all().filter(t => /TP/.test(t.res)).sort((a, b) => (b.rg || 0) - (a.rg || 0))[0];
+    octiReact("is-happy", w ? `${w.res === "TP2 Hit" ? "🏆" : "✅"} ${w.sym} ${w.res === "TP2 Hit" ? "TP2" : "TP1"} +${fmt(w.rg, 2)}R today · the tide pays` : "🏆 practice cheer · no TP yet today"); };
+  $("o-sl").onclick = () => { const l = all().filter(t => t.res === "Stopped").sort((a, b) => Date.parse(b.tx || b.t) - Date.parse(a.tx || a.t))[0];
+    octiReact("is-sad", l ? `🛑 ${l.sym} stopped ${l.rg != null ? "−" + fmt(Math.abs(l.rg), 2) + "R" : ""} · back to the reef` : "🫧 no stop today · Octi only pretends"); };
+  $("o-fish").onclick = () => { SEA_FISH(STILL ? 0 : 4); octiReact("is-happy", "🐟 fish! the tank is busy"); }; }
+function octiWatch(L){ if (L) OCTI.L = L; const items = L?.items || []; if (!items.length) return; const last = Math.max(...items.map(m => m.id || 0));
+  if (OSEEN == null){ OSEEN = last; return; }
+  for (const m of items.filter(m => (m.id || 0) > OSEEN)){ const t = m.html.replace(/<[^>]+>/g, ""), sym = (m.html.match(/symbol=[A-Z0-9_]+:([A-Z0-9_.!]+)/) || [])[1] || "";
+    const r = (t.match(/\(([+\-−]?[\d.]+)R/) || [])[1] || "";
+    if (/Stopped/.test(t)) octiReact("is-sad", `🛑 ${sym} stopped${r ? " · " + r.replace("-", "−") + "R" : ""} · back to the reef`);
+    else if (/TP2 Hit|AF Target/.test(t)) octiReact("is-happy", `🏆 ${sym} TP2!${r ? " +" + r.replace(/^[+]/, "") + "R" : ""} · the tide pays`);
+    else if (/TP1 Hit/.test(t)) octiReact("is-happy", `✅ ${sym} TP1${r ? " +" + r.replace(/^[+]/, "") + "R" : ""}`); }
+  OSEEN = last; }
+
+/* Reorder sections */
+const OLD_IDS = {einschaetzung:"outlook", maerkte:"outlook", aktien:"outlook", signale:"outlook", termine:"calendar", archiv:"archive",
+  markets:"outlook", oracle:"outlook", signals:"outlook", stocks:"outlook"};   // the old anchors · the sections folded into the tiles on 2026-11-03   // the anchors until 2026-10-21
+{ const h = location.hash.slice(1); if (OLD_IDS[h]) { history.replaceState(null, "", "#" + OLD_IDS[h]); setTimeout(() => document.getElementById(OLD_IDS[h])?.scrollIntoView(), 400); } }
+function orderTool(){
+  const main = document.querySelector("main"), names = {outlook:"🧭 Outlook 🔮 Oracle",calendar:"📅 Calendar",awards:"🏆 Awards",feed:"🔔 Feed"}, noNav = ["awards"];
+  const def = Object.keys(names); let cur = def;
+  try { let v = JSON.parse(localStorage.getItem("r3m-order") || "null"); if (Array.isArray(v)) { v = v.map(k => OLD_IDS[k] || k); const keep = [...new Set(v.filter(k => def.includes(k)))]; /* the old sections all map to outlook now: once */ if (keep.length) cur = [...keep, ...def.filter(k => !keep.includes(k))]; } } catch {}
+  const apply = () => { cur.forEach(id => main.appendChild($(id)));
+    const nav = document.querySelector("nav"); nav.innerHTML = cur.filter(id => names[id] && !noNav.includes(id)).map(id => `<a href="#${id}">${names[id]}</a>`).join("") + `<a href="#archive" data-arch>🗄️ Archive</a>`;
+    $("order-list").innerHTML = cur.map((id,i) => `<li><span>${i+1}. ${names[id]}</span><button class="m" data-i="${i}" data-d="-1" aria-label="Move ${names[id]} up" ${i ? "" : "disabled"}>↑</button><button class="m" data-i="${i}" data-d="1" aria-label="Move ${names[id]} down" ${i < cur.length-1 ? "" : "disabled"}>↓</button></li>`).join("");
+    let m = 0; cur.forEach(id => { const el = $(id), dm = el?.querySelector(".dm"); if (dm && !el.hidden){ m += m < 20 ? 20 : m < 60 ? 40 : 60; dm.textContent = `−${m} m`; } });   // the dive's depth marks
+    try { localStorage.setItem("r3m-order", JSON.stringify(cur)); } catch {} };
+  $("order-list").onclick = e => { const b = e.target.closest("button"); if (!b) return; const i = +b.dataset.i, j = i + +b.dataset.d;
+    cur = cur.slice(); [cur[i], cur[j]] = [cur[j], cur[i]]; apply(); const nb = $("order-list").querySelectorAll("button")[j*2 + (+b.dataset.d > 0 ? 1 : 0)]; nb?.focus(); };
+  $("order-reset").onclick = () => { cur = def; apply(); };
+  document.querySelector("nav").onclick = e => { if (e.target.closest("[data-arch]")) { e.preventDefault(); if (DIGESTS.length) openArchive(); } };
+  $("order-btn").onclick = () => { const o = $("order"); o.hidden = !o.hidden; $("order-btn").setAttribute("aria-expanded", String(!o.hidden)); };
+  apply();
+}
+/* Sound: lo-fi and blub effects, generated in the browser (Web Audio), starts on click only */
+const Sound = (() => {
+  let ctx, master, music, pad, wobble, lp, timer, step = 0, nextT = 0, musicOn = false, sfxOn = false;
+  /* three soft tracks · no plucks, no crackle, no hats · one chord per bar, gentle kick that makes the pad breathe */
+  const TRACKS = [
+    {name: "Riff", bpm: 72, cut: 1800, voice: "rhodes", kick: [0,10], bass: [0,8],
+     chords: [[53,57,60,64],[52,55,59,62],[50,53,57,60],[48,52,55,59]], roots: [41,40,38,36]},          // Fmaj7 Em7 Dm7 Cmaj7
+    {name: "Night swim", bpm: 64, cut: 1300, voice: "rhodes", kick: [0,8], bass: [0],
+     chords: [[57,60,64,67,71],[53,57,60,64],[48,52,55,59],[55,59,62,64]], roots: [45,41,36,43]},       // Am9 Fmaj7 Cmaj7 G6
+    {name: "Dawn", bpm: 78, cut: 2100, voice: "pad", kick: [0,10], bass: [0,7],
+     chords: [[50,54,57,61,64],[47,50,54,57],[43,47,50,54],[45,49,52,54]], roots: [38,35,43,45]}];      // Dmaj9 Bm7 Gmaj7 A6
+  let T = TRACKS[0], S16 = 60 / T.bpm / 4;
+  const midi = n => 440 * Math.pow(2, (n - 69) / 12);
+  function init(){
+    if (ctx) return true;
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return false;
+    ctx = new AC(); master = ctx.createGain(); master.gain.value = .9;
+    const comp = ctx.createDynamicsCompressor(); master.connect(comp); comp.connect(ctx.destination);
+    music = ctx.createGain(); music.gain.value = 0;
+    lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = T.cut; lp.Q.value = .3;
+    music.connect(lp); lp.connect(master);
+    pad = ctx.createGain(); pad.gain.value = 1; pad.connect(music);          // chord bus (breathes with the kick)
+    wobble = ctx.createGain(); wobble.gain.value = 5;                        // tape wobble ±5 cents
+    const lfo = ctx.createOscillator(); lfo.frequency.value = .25; lfo.connect(wobble); lfo.start();
+    return true;
+  }
+  const env = (g, t, peak, a, len) => { g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(peak, t + a); g.gain.exponentialRampToValueAtTime(.0005, t + len); };
+  function rhodes(t, notes, len){ notes.forEach(n => {
+    const o = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain(), g2 = ctx.createGain(), trem = ctx.createGain(), tl = ctx.createOscillator(), td = ctx.createGain();
+    o.type = "sine"; o.frequency.value = midi(n); o2.type = "sine"; o2.frequency.value = midi(n) * 2; g2.gain.value = .12;
+    wobble.connect(o.detune); wobble.connect(o2.detune);
+    tl.frequency.value = 3; td.gain.value = .08; tl.connect(td); td.connect(trem.gain); trem.gain.value = .82;   // soft tremolo
+    o.connect(trem); o2.connect(g2); g2.connect(trem); trem.connect(g); g.connect(pad);
+    env(g, t, .045 * 4 / Math.max(4, notes.length), .45, len);
+    [o, o2, tl].forEach(x => { x.start(t); x.stop(t + len + .1); }); }); }
+  function warm(t, notes, len){ notes.forEach(n => {                         // soft pad: two slightly detuned triangles, slow swell
+    const g = ctx.createGain(), f = ctx.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = 900; f.Q.value = .2;
+    f.frequency.setValueAtTime(700, t); f.frequency.linearRampToValueAtTime(1300, t + len * .5); f.frequency.linearRampToValueAtTime(800, t + len);
+    [-6, 6].forEach(c => { const o = ctx.createOscillator(); o.type = "triangle"; o.frequency.value = midi(n); o.detune.value = c;
+      wobble.connect(o.detune); o.connect(f); o.start(t); o.stop(t + len + .2); });
+    f.connect(g); g.connect(pad); env(g, t, .03 * 4 / Math.max(4, notes.length), 1.1, len); }); }
+  function tone(t, freq, peak, att, len, bus){ const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = "sine"; o.frequency.value = freq; wobble.connect(o.detune); o.connect(g); g.connect(bus || music);
+    env(g, t, peak, att, len); o.start(t); o.stop(t + len + .05); }
+  function kick(t){ const o = ctx.createOscillator(), g = ctx.createGain();
+    o.frequency.setValueAtTime(72, t); o.frequency.exponentialRampToValueAtTime(46, t + .2);
+    o.connect(g); g.connect(music); env(g, t, .18, .015, .38); o.start(t); o.stop(t + .45);
+    pad.gain.cancelScheduledValues(t); pad.gain.setValueAtTime(.72, t); pad.gain.linearRampToValueAtTime(1, t + .35); }
+  function play(s, t){ const bar = Math.floor(s / 16) % T.chords.length, pos = s % 16, barLen = 16 * S16;
+    if (pos === 0) (T.voice === "pad" ? warm : rhodes)(t, T.chords[bar], barLen * .95);
+    if (T.bass.includes(pos)) tone(t, midi(T.roots[bar]), .085, .04, Math.min(1.5, barLen * .45));
+    if (T.kick.includes(pos)) kick(t);
+  }
+  function sched(){ while (nextT < ctx.currentTime + .15){ const sw = (step % 4 === 2) ? .04 : 0; play(step, nextT + sw); nextT += S16; step++; } }
+  /* track: 0, 1, 2 or -1 (off) */
+  function setTrack(i){ if (!init()) return false; ctx.resume(); const t = ctx.currentTime, was = musicOn;
+    music.gain.cancelScheduledValues(t); music.gain.setValueAtTime(music.gain.value, t);
+    if (i < 0){ musicOn = false; music.gain.linearRampToValueAtTime(0, t + .9); setTimeout(() => { if (!musicOn) clearInterval(timer); }, 1000); return true; }
+    musicOn = true; T = TRACKS[i]; S16 = 60 / T.bpm / 4;
+    lp.frequency.cancelScheduledValues(t); lp.frequency.setValueAtTime(lp.frequency.value, t); lp.frequency.linearRampToValueAtTime(T.cut, t + 1.5);
+    if (was){ music.gain.linearRampToValueAtTime(.25, t + .5); music.gain.linearRampToValueAtTime(.6, t + 2.5); }   // soft crossfade
+    else music.gain.linearRampToValueAtTime(.6, t + 2.2);
+    step = 0; nextT = t + (was ? .5 : .08); clearInterval(timer); timer = setInterval(sched, 25);
+    return true; }
+  function blub(kind){ if (!sfxOn || !init()) return; ctx.resume(); const t = ctx.currentTime, o = ctx.createOscillator(), g = ctx.createGain();
+    const f0 = kind === "click" ? 210 + Math.random() * 40 : 380 + Math.random() * 260;
+    o.type = "sine"; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f0 * (kind === "click" ? 3.2 : 2.4), t + (kind === "click" ? .11 : .07));
+    o.connect(g); g.connect(master); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(kind === "click" ? .12 : .06, t + .006); g.gain.exponentialRampToValueAtTime(.0003, t + .14);
+    o.start(t); o.stop(t + .18); }
+  return { setTrack, tracks: TRACKS.map(x => x.name), blub, setSfx: on => { sfxOn = on; if (on) init(); } };
+})();
+function soundUI(){
+  const mb = $("snd-music"), sb = $("snd-sfx");
+  let tr = -1;   // off → track 1 → 2 → 3 → off
+  mb.onclick = () => { const n = tr + 1 >= Sound.tracks.length ? -1 : tr + 1; if (!Sound.setTrack(n)) return; tr = n;
+    mb.setAttribute("aria-pressed", String(tr >= 0)); $("snd-n").textContent = tr >= 0 ? " " + (tr + 1) : "";
+    mb.title = tr >= 0 ? `Lo-fi ${tr + 1} of ${Sound.tracks.length} · ${Sound.tracks[tr]} · click for ${tr + 1 < Sound.tracks.length ? "the next track" : "off"}` : "Lo-fi music: click for track 1"; };
+  const setS = on => { Sound.setSfx(on); sb.setAttribute("aria-pressed", String(on)); try { localStorage.setItem("r3m-sfx", on ? "1" : "0"); } catch {} };
+  sb.onclick = () => { setS(sb.getAttribute("aria-pressed") !== "true"); Sound.blub("click"); };
+  let pref = null; try { pref = localStorage.getItem("r3m-sfx"); } catch {}
+  if (pref !== "0") { Sound.setSfx(true); sb.setAttribute("aria-pressed", "true"); }
+  let last = null, lastT = 0;
+  document.addEventListener("pointerover", e => { if (e.pointerType !== "mouse") return;
+    const el = e.target.closest(".bt,.mt,.ad button,.recent button,nav a,.chip"); if (!el || el === last) return;
+    last = el; const now = performance.now(); if (now - lastT < 70) return; lastT = now; Sound.blub("hover"); });
+  document.addEventListener("click", e => { if (e.target.closest("button:not(#snd-sfx),a,.arch button")) Sound.blub("click"); });
+}
+soundUI();
+orderTool();
+bubbles();
+setInterval(tick, 15000);
+Promise.all([fetch("data.json", {cache: "no-store"}).then(r => r.json()), getLive(), getJ("symbols.json"), getJ("oracle.json")]).then(([D, L, SY, OR]) => { D.live = L; SYML = SY; ORC = OR; octiWatch(L); render(D); drawNews(L); dive(); octiPlay(); getKron().then(k => { if (k) KRON = k; if (BOARD) drawBoard(BOARD); }); }).catch(() => { $("mood").textContent = "Data not reachable right now"; tick(); });
+})();
+</script>
+
+</body>
+</html>

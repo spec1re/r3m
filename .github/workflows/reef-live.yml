@@ -1,0 +1,116 @@
+name: Reef live
+
+# 🧭 (2026-11-03) After every "Live feed" run: symbols.json for the Reef's tiles and cards (live prices on the Pepperstone
+# frame, today's path, the hour bars, PWH / PWL, today's r3m· trades) · once a weekday from 07:25 London the Kronos session
+# oracle for the seven tiles the private oracle skips → oracle.json.
+# Source of truth: spec1re/r3m-digest/site-ci/ (reef_live.py is copied by the site deploy, this file is pushed by hand).
+on:
+  workflow_run:
+    workflows: ["Live feed"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      oracle:
+        description: "run the session oracle now (whatever the clock says)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    concurrency:
+      group: reef-live
+      cancel-in-progress: false
+    outputs:
+      oracle: ${{ steps.live.outputs.oracle }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - id: live
+        run: python3 .github/reef_live.py live
+      - name: Publish
+        run: |
+          git config user.name "R3M Reef"
+          git config user.email "noreply@github.com"
+          [ -f symbols.json ] || exit 0
+          git add symbols.json
+          git diff --cached --quiet && exit 0
+          git commit -qm "reef live"
+          cp symbols.json "$RUNNER_TEMP/s.json"
+          for i in 1 2 3 4 5 6 7 8 9 10; do
+            git push -q origin HEAD:main && exit 0
+            sleep $((i * 2 + RANDOM % 7))     # the busy minutes: live feed, Kronos jobs and the deploy push too
+            git fetch -q origin main && git reset -q --hard origin/main
+            cp "$RUNNER_TEMP/s.json" symbols.json
+            git add symbols.json && { git diff --cached --quiet && exit 0; git commit -qm "reef live"; }
+          done
+          exit 1
+
+  oracle:
+    needs: live
+    if: ${{ needs.live.outputs.oracle == '1' || inputs.oracle }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    concurrency:
+      group: reef-oracle
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - id: due   # a queued run finds the work done by the one before it
+        run: |
+          if [ "${{ inputs.oracle }}" = "true" ]; then echo "oracle=1" >> "$GITHUB_OUTPUT"; else python3 .github/reef_live.py due; fi
+      - uses: actions/setup-python@v5
+        if: steps.due.outputs.oracle == '1'
+        with:
+          python-version: "3.11"
+      - name: Cache pip and the models
+        if: steps.due.outputs.oracle == '1'
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.cache/huggingface
+          key: kronos-${{ runner.os }}-v1
+      - name: Install (CPU torch) and Kronos at a pinned commit
+        if: steps.due.outputs.oracle == '1'
+        run: |
+          pip install -q torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -q numpy pandas einops==0.8.1 huggingface_hub==0.33.1 safetensors==0.6.2 tqdm
+          git clone -q https://github.com/shiyu-coder/Kronos /tmp/kronos
+          git -C /tmp/kronos checkout -q 67b630e67f6a18c9e9be918d9b4337c960db1e9a
+      - name: Forecast and score
+        if: steps.due.outputs.oracle == '1'
+        run: |
+          set -o pipefail
+          python3 .github/reef_live.py oracle --kronos /tmp/kronos 2>&1 | tee "$RUNNER_TEMP/out.txt"
+      - name: Report
+        if: always() && steps.due.outputs.oracle == '1'
+        run: |
+          [ -f "$RUNNER_TEMP/out.txt" ] || exit 0
+          msg=$(tail -n 40 "$RUNNER_TEMP/out.txt" | cut -c1-300 | sed ':a;N;$!ba;s/%/%25/g;s/\r//g;s/\n/%0A/g')
+          echo "::notice title=reef oracle::$msg"
+      - name: Publish
+        if: steps.due.outputs.oracle == '1'
+        run: |
+          git config user.name "R3M Reef"
+          git config user.email "noreply@github.com"
+          [ -f oracle.json ] || exit 0
+          git add oracle.json
+          git diff --cached --quiet && exit 0
+          git commit -qm "reef oracle"
+          cp oracle.json "$RUNNER_TEMP/o.json"
+          for i in 1 2 3 4 5 6 7 8 9 10; do
+            git push -q origin HEAD:main && exit 0
+            sleep $((i * 2 + RANDOM % 7))     # the busy minutes: live feed, Kronos jobs and the deploy push too
+            git fetch -q origin main && git reset -q --hard origin/main
+            cp "$RUNNER_TEMP/o.json" oracle.json
+            git add oracle.json && { git diff --cached --quiet && exit 0; git commit -qm "reef oracle"; }
+          done
+          exit 1
