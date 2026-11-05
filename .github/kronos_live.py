@@ -483,6 +483,9 @@ def ko_find(e, k=None):
         ixq = p["ko"] + p["bid"] * q / p["ratio"] if long else p["ko"] - p["bid"] * q / p["ratio"]
         lev = ixq * p["ratio"] / ((a or p["bid"]) * q)
         spr = f" · spread {f((a - p['bid']) * q / p['ratio'])} ({(a - p['bid']) * q / p['ratio'] / risk:.2f}R)" if a else ""
+        p["lev"] = round(lev, 1)                                                                                                            
+        p["spr"] = round((a - p["bid"]) * q / p["ratio"], 4) if a else None
+        p["sprR"] = round((a - p["bid"]) * q / p["ratio"] / risk, 3) if a else None
         tq = ""
         try:
             age = datetime.now(timezone.utc) - datetime.fromisoformat(p["tq"])
@@ -502,7 +505,7 @@ def ko_line(e, k=None):
 
 def ko_keep(picks):
     pass
-    return [{x: (round(p[x], 4) if isinstance(p[x], float) else p[x]) for x in ("wkn", "iss", "ko", "ratio", "bid", "ask", "n", "eurR")} for p in picks]
+    return [{x: (round(p[x], 4) if isinstance(p[x], float) else p[x]) for x in ("wkn", "iss", "ko", "ratio", "bid", "ask", "n", "eurR", "lev", "spr", "sprR") if x in p} for p in picks]
 
 
 def message(e, k, ko=""):

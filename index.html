@@ -347,8 +347,10 @@ dialog.ar{max-width:min(1240px,96vw)}
 .cl{display:grid;grid-template-columns:46px minmax(0,1fr);gap:8px;font-size:13.5px;color:#d4e6e3}.cl .num{color:var(--mist);font-size:12px;padding-top:2px}
 .tr{padding:10px 12px;border-radius:10px;background:var(--deep);border:1px solid var(--line);display:grid;gap:3px}
 .tr .t1{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:14px}.tr .t2{font-size:12.5px;color:var(--mist)}
-.kot{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto auto;gap:6px 14px;font-size:13px;align-items:baseline}
-.kot>span:nth-child(-n+5){font:600 11px var(--f-body);letter-spacing:.8px;text-transform:uppercase;color:var(--mist)}
+.kot{display:grid;grid-template-columns:auto minmax(0,1fr) repeat(6,auto);gap:6px 12px;font-size:13px;align-items:baseline}
+.kot>span:nth-child(-n+8){font:600 11px var(--f-body);letter-spacing:.8px;text-transform:uppercase;color:var(--mist)}
+.kot .num{white-space:nowrap}.kot>span:nth-child(n+9):nth-child(8n+2){overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:640px){.kot{grid-template-columns:auto repeat(5,auto);gap:6px 10px}.kot>:nth-child(8n+2),.kot>:nth-child(8n+7){display:none}}
 .crec{grid-column:1/-1}.rbs{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
 .rb{display:grid;gap:2px;padding:10px 12px;border-radius:10px;background:var(--deep);font-size:12.5px;color:var(--mist)}.rb b{font-size:20px}
 .afil{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
@@ -1180,8 +1182,11 @@ function openCard(D, sym){ const M = D.market || {}, p0 = (M.pepper || []).find(
   const sigH = ts.length ? `<p>${live ? `<b class="sun">● ${live} running</b>` : "No trade running"} · ${done.length} closed${done.length ? ` · <b class="${rr >= 0 ? "up" : "down"}">${sR2(rr)}</b>` : ""}</p>${sig}` : `<p class="sub empty">${BINOC}<span>No r3m· signal on ${esc(sym)} today · Octi keeps watching</span></p>`;
   /* knock-outs of the latest signal (Kronos's reply) */
   const ko = K.checks.filter(c => c.sym === sym && (c.ko || []).length).pop();
-  const koH = ko ? `<p>For the ${hm(ko.t)} ${c2(ko)} · 0 € at comdirect from 1,000 €</p><div class="kot"><span>WKN</span><span>Issuer</span><span>KO</span><span>Ask</span><span>1R</span>${ko.ko.map(x =>
-      `<a class="tv" href="https://www.comdirect.de/inf/search/all.html?SEARCH_VALUE=${esc(x.wkn)}" target="_blank" rel="noopener">${esc(x.wkn)}</a><span>${esc(x.iss)}</span><span class="num">${fmt(x.ko)}</span><span class="num">${x.ask != null ? fmt(x.ask, 2) + " €" : "–"}</span><span class="num">${x.eurR != null ? Math.round(x.eurR) + " €" : "–"}</span>`).join("")}</div>`
+  /* leverage and spread (2026-11-05): stored since then, older picks derive them from € per 1R a certificate (eurR / n) and the trade's risk */
+  const kx = x => { const r = ko.px != null && ko.sl != null ? Math.abs(ko.px - ko.sl) : null, k1 = x.eurR && x.n ? x.eurR / x.n : null, dB = x.ask != null && x.bid != null ? x.ask - x.bid : null;
+    return {lev: x.lev ?? (k1 && r && x.ask ? k1 * ko.px / (r * x.ask) : null), spr: x.spr ?? (k1 && r && dB != null ? dB * r / k1 : null), sprR: x.sprR ?? (k1 && dB != null ? dB / k1 : null)}; };
+  const koH = ko ? `<p>For the ${hm(ko.t)} ${c2(ko)} · 0 € at comdirect from 1,000 €</p><div class="kot"><span>WKN</span><span>Issuer</span><span>KO</span><span>Ask</span><span title="leverage">Lev.</span><span title="the spread in index points">Spread</span><span title="pieces for 1,000 €">Pcs</span><span title="€ per 1R at 1,000 €">1R</span>${ko.ko.map(x => { const v = kx(x);
+      return `<a class="tv" href="https://www.comdirect.de/inf/search/all.html?SEARCH_VALUE=${esc(x.wkn)}" target="_blank" rel="noopener">${esc(x.wkn)}</a><span>${esc(x.iss)}</span><span class="num">${fmt(x.ko)}</span><span class="num">${x.ask != null ? fmt(x.ask, 2) + " €" : "–"}</span><span class="num">${v.lev != null ? fmt(v.lev, 0) : "–"}</span><span class="num"${v.sprR != null ? ` title="${fmt(v.sprR, 2)}R"` : ""}>${v.spr != null ? fmt(v.spr, v.spr < 10 ? 1 : 0) : "–"}</span><span class="num">${x.n != null ? fmt(x.n, 0) : "–"}</span><span class="num">${x.eurR != null ? Math.round(x.eurR) + " €" : "–"}</span>`; }).join("")}</div>`
     : `<p class="sub">No knock-out picked for ${esc(sym)} yet · Kronos's reply names them when a signal comes in during the issuers' hours</p>`;
   function c2(c){ return `${c.af ? "AF " : ""}${c.side === "LONG" ? "long" : "short"}`; }
   /* record */
