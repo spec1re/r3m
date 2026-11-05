@@ -708,11 +708,13 @@ const FOLD = ["#e8c547", "#ff9f43", "#ff5c5c"], FOLDN = ["low impact", "medium i
 function fold(m){ if (m == null) return ""; return `<svg class="fold" width="12" height="10" viewBox="0 0 12 10" role="img" aria-label="${FOLDN[m + 1]}"><title>${FOLDN[m + 1]}</title><path d="M0.5 1.6c0-.6.4-1.1 1-1.1h3l1.2 1.3h4.8c.6 0 1 .5 1 1.1v5.5c0 .6-.4 1.1-1 1.1h-9c-.6 0-1-.5-1-1.1z" fill="${FOLD[m + 1]}"/><path d="M0.5 3.4h11" stroke="rgba(0,0,0,.25)" stroke-width=".8"/></svg>`; }
 /* 🗞️ the Forex Factory wire from the group's feed (2026-11-04): the latest headlines, a chip per impact filters (remembered) */
 let NEWSF = (() => { try { return +localStorage.getItem("r3m-news") || 0; } catch(e) { return 0; } })();   // 0 all · 1 medium + high · 2 high
+/* the feed keeps HTML entities (&#x27; …): decode once, esc() encodes again on drawing (2026-11-05) */
+const unEnt = s => { const e = document.createElement("textarea"); e.innerHTML = s; return e.value; };
 function newsOf(L){ const out = [];
   for (const m of L?.items || []){ const h = m.html || ""; if (!/forexfactory\.com\/news\//.test(h)) continue;
     const a = [...h.matchAll(/<a href="([^"]+)"[^>]*>([^<]*)<\/a>/g)], src = a[1] || [], body = h.split("\n").slice(1).join(" ").replace(/<[^>]+>/g, "");
     const q = body.match(/^\s*(🟥|🟧|🟨)\s*(High|Medium|Low)\s*·\s*(.+)$/u); if (!q) continue;
-    out.push({id: m.id, t: m.t, imp: {"🟥": 1, "🟧": 0, "🟨": -1}[q[1]], title: q[3].trim(), url: src[1] || "https://www.forexfactory.com/news", src: (src[2] || "").replace(/^@/, "")}); }
+    out.push({id: m.id, t: m.t, imp: {"🟥": 1, "🟧": 0, "🟨": -1}[q[1]], title: unEnt(q[3]).trim(), url: src[1] || "https://www.forexfactory.com/news", src: unEnt(src[2] || "").replace(/^@/, "")}); }
   return out.sort((x, y) => Date.parse(y.t) - Date.parse(x.t)); }
 function drawNews(L){ const all = newsOf(L), day = all.filter(n => Date.now() - Date.parse(n.t) < 864e5), min = [-1, 0, 1][NEWSF];
   const cnt = m => day.filter(n => n.imp === m).length;
