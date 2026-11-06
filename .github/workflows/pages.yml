@@ -2,6 +2,8 @@
 # feed, the live layer and the Kronos checks push every minute or so in market hours: 30+ builds in a row were cancelled,
 # the page served data an hour old. This deploy lets a running one finish (one running, the newest waiting) · needs
 # Settings → Pages → Source: GitHub Actions · reference copy: r3m-digest site-ci/pages.yml
+# Same evening: "Run failed" mails · a deploy hit "in progress deployment" (the one before still being processed by Pages)
+# → it waits and tries twice more, and a run whose main is already live (deployed.txt on the site) skips the deploy
 name: Pages
 on:
   push:
@@ -22,14 +24,36 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.d.outputs.page_url }}
+      url: ${{ steps.d.outputs.page_url || steps.d2.outputs.page_url || steps.d3.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
         with:
           ref: main
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - id: chk
+        run: |
+          head=$(git rev-parse HEAD)
+          live=$(curl -fsS "https://spec1re.github.io/r3m/deployed.txt?t=$(date +%s)" 2>/dev/null | head -c 40 || true)
+          echo "main $head · live $live"
+          if [ "$live" = "$head" ] && [ "$GITHUB_EVENT_NAME" != "workflow_dispatch" ]; then echo "skip=1" >> "$GITHUB_OUTPUT"; fi
+          echo "$head" > deployed.txt
+      - if: steps.chk.outputs.skip != '1'
+        uses: actions/configure-pages@v5
+      - if: steps.chk.outputs.skip != '1'
+        uses: actions/upload-pages-artifact@v3
         with:
           path: .
       - id: d
+        if: steps.chk.outputs.skip != '1'
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+      - if: steps.chk.outputs.skip != '1' && steps.d.outcome == 'failure'
+        run: sleep 60
+      - id: d2
+        if: steps.chk.outputs.skip != '1' && steps.d.outcome == 'failure'
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+      - if: steps.chk.outputs.skip != '1' && steps.d.outcome == 'failure' && steps.d2.outcome == 'failure'
+        run: sleep 120
+      - id: d3
+        if: steps.chk.outputs.skip != '1' && steps.d.outcome == 'failure' && steps.d2.outcome == 'failure'
         uses: actions/deploy-pages@v4
