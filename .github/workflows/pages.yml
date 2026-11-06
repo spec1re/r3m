@@ -4,13 +4,13 @@
 # Settings → Pages → Source: GitHub Actions · reference copy: r3m-digest site-ci/pages.yml
 # Same evening: "Run failed" mails · a deploy hit "in progress deployment" (the one before still being processed by Pages)
 # → it waits and tries twice more, and a run whose main is already live (deployed.txt on the site) skips the deploy
+# Later that evening: deploys still took up to 10 min and timed out · the page now reads live.json, kronos-live.json,
+# symbols.json and oracle.json from raw.githubusercontent, so the live workflows no longer trigger a deploy: only a push
+# (the r3m-digest site build, a PAT push) or a dispatch does
 name: Pages
 on:
   push:
     branches: [main]
-  workflow_run:
-    workflows: ["Live feed", "Reef live", "Kronos signal check"]
-    types: [completed]
   workflow_dispatch:
 permissions:
   contents: read
