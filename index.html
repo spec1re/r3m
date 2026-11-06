@@ -1057,7 +1057,12 @@ function sesState(sym){ const [nm, tz, a, b] = SES(sym), d = new Date(), l = loc
    trades) and oracle.json (Kronos for the seven tiles the private oracle skips), both written by the site repo's reef-live.yml */
 let SYML = null, ORC = null;
 const BINOC = `<svg viewBox="0 0 64 64" aria-hidden="true"><path fill="#ff7d93" d="M32 8c-12 0-19 8-19 18 0 6 2 10 5 12l-5 13c-1 2 1 3 3 2l7-7 2 9c0 2 3 2 3 0l4-9 4 9c0 2 3 2 3 0l2-9 7 7c2 1 4 0 3-2l-5-13c3-2 5-6 5-12 0-10-7-18-19-18z"/><rect x="19" y="20" width="11" height="12" rx="4" fill="#0e2f3d" stroke="#8db0b5" stroke-width="2"/><rect x="34" y="20" width="11" height="12" rx="4" fill="#0e2f3d" stroke="#8db0b5" stroke-width="2"/><rect x="29" y="23" width="6" height="4" fill="#8db0b5"/><circle cx="24" cy="26" r="2" fill="#5fd3bf"/><circle cx="39" cy="26" r="2" fill="#5fd3bf"/></svg>`;   // 🔭 the empty state
-const getJ = f => fetch(f + "?t=" + Date.now(), {cache: "no-store"}).then(r => r.ok ? r.json() : null).catch(() => null);
+/* the live files come straight from the site repo (2026-11-06): a Pages deploy after every live-feed push piled up and timed
+   out, so the page reads them from raw.githubusercontent (CORS open, ~5 min CDN) and falls back to its own copy */
+const RAW = "https://raw.githubusercontent.com/spec1re/r3m/main/";
+const liveJ = f => fetch(RAW + f + "?t=" + Date.now(), {cache: "no-store"}).then(r => r.ok ? r.json() : Promise.reject())
+  .catch(() => fetch(f + "?t=" + Date.now(), {cache: "no-store"}).then(r => r.ok ? r.json() : null)).catch(() => null);
+const getJ = f => liveJ(f);
 const lvOf = s => SYML?.symbols?.[s];
 function tradesOf(D, sym, today){ const S = D.signals || {}, day = berDay(Date.now());
   const a = (S.recent || []).filter(r => r.sym === sym && (!today || berDay(r.t) === day)).map(r => ({...r}));
@@ -1232,7 +1237,7 @@ function openDigest(i, back){ const d = DIGESTS[i]; if (!d) return;
   $("dlg-b").onclick = null; $("dlg").classList.remove("wide", "symc", "ar"); if (!$("dlg").open) $("dlg").showModal(); $("dlg-b").scrollTop = 0;
   if (back) $("dlg-back").onclick = openArchive; }
 /* 🔮 Kronos signal checks (kronos-live.json, written by the site repo's kronos-live.yml) */
-const getKron = () => fetch("kronos-live.json?t=" + Date.now(), {cache: "no-store"}).then(r => r.ok ? r.json() : null).catch(() => null);
+const getKron = () => liveJ("kronos-live.json");
 function drawKron(K){ const box = $("k-box"); if (!box || !K || !(K.checks || []).length) return;
   const IC = {equinox:"🌗", climax:"⚡️", lava:"🌋", dvi:"📈"}, kR = r => (r > 0 ? "+" : r < 0 ? "−" : "±") + fmt(Math.abs(r || 0), 2) + "R";
   const C = K.checks.slice().reverse(), sent = C.filter(c => c.status === "sent");
@@ -1250,7 +1255,7 @@ function drawKron(K){ const box = $("k-box"); if (!box || !K || !(K.checks || []
     const out = !c.out ? `<span class="sub">open</span>` : c.out === "tp1" ? `<span class="ok">✅ TP1 ${kR(c.rOut)}</span>` : c.out === "stop" ? `<span class="no">🛑 ${kR(c.rOut)}</span>` : `🏁 ${kR(c.rOut)}`;
     return `<tr><td>${when(c.t)}</td><td>${fl(c.sym)}${tv(c.sym)}</td><td>${tr}</td><td class="num" title="of ${k.n} paths · read on ${esc(k.tk)}">🎯 ${k.tp1} · 🛑 ${k.stop} · ⏸ ${k.none}</td><td class="num">${v}</td><td>${out}</td></tr>`; };
   box.innerHTML = `<table><thead><tr><th>Signal</th><th>Symbol</th><th>Trade</th><th>Kronos paths</th><th>Edge</th><th>Result</th></tr></thead><tbody>${C.slice(0, 30).map(row).join("")}</tbody></table>`; }
-const getLive = () => fetch("live.json?t=" + Date.now(), {cache: "no-store"}).then(r => r.ok ? r.json() : null).catch(() => null);
+const getLive = () => liveJ("live.json");
 setInterval(() => { if (!document.hidden && feedLive) getLive().then(L => { octiWatch(L); feedLive(L); drawNews(L); }); }, 60000);
 setInterval(() => { if (!document.hidden) getKron().then(k => { if (k) KRON = k; }); }, 120000);
 setInterval(() => { if (document.hidden || !BOARD) return;   // the tiles follow the live layer (a card stays as it was opened)
