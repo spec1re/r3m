@@ -1,0 +1,35 @@
+# The Reef's deploy (2026-11-06): GitHub's own "deploy from a branch" build is cancelled by every newer push, and the live
+# feed, the live layer and the Kronos checks push every minute or so in market hours: 30+ builds in a row were cancelled,
+# the page served data an hour old. This deploy lets a running one finish (one running, the newest waiting) · needs
+# Settings → Pages → Source: GitHub Actions · reference copy: r3m-digest site-ci/pages.yml
+name: Pages
+on:
+  push:
+    branches: [main]
+  workflow_run:
+    workflows: ["Live feed", "Reef live", "Kronos signal check"]
+    types: [completed]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.d.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: d
+        uses: actions/deploy-pages@v4
