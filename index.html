@@ -766,14 +766,19 @@ const isEarn = t => typeof t === "string" && !FLAG_RE.test(t) && EARN_RE.test(t.
 const EARN = `<svg class="fold" width="12" height="10" viewBox="0 0 12 10" role="img" aria-label="earnings"><title>earnings</title><rect x=".5" y="5" width="2.6" height="4.5" rx=".6" fill="#5fd3bf"/><rect x="4.7" y="2.6" width="2.6" height="6.9" rx=".6" fill="#5fd3bf"/><rect x="8.9" y=".5" width="2.6" height="9" rx=".6" fill="#5fd3bf"/></svg>`;
 const mark = (i, txt) => { const t = txt ?? (typeof i === "string" ? i : i?.text || ""); return isEarn(t) ? EARN : fold(impOf(i, t)); };
 function buildNext(M){ const yr = +((M.date || "").slice(0, 4)) || new Date().getFullYear(), out = [];
-  for (const a of calDays(M)){ const m = a.day.match(/^\w+\s+(\w{3})\s+(\d{1,2})$/); if (!m || MON.indexOf(m[1]) < 0) continue;
-    for (const i of a.items){ const txt = typeof i === "string" ? i : i.text, t = txt.match(/^~?(\d{1,2}):(\d{2})\s+(.*)$/); if (!t) continue;
+  for (const a of calDays(M)){ const m = a.day.match(/^\w+\s+(\w{3})\s+(\d{1,2})$/), dated = m && MON.indexOf(m[1]) >= 0;
+    for (const i of a.items){ const txt0 = typeof i === "string" ? i : i.text;
+      /* the "Next" card's lines carry their own day (`Tue Nov 10: 14:30 …`, 2026-11-06): the countdown runs on to them once today is done */
+      const d = dated ? null : txt0.match(/^\w{3},? (\w{3}) (\d{1,2}):?\s+(.*)$/); if (!dated && (!d || MON.indexOf(d[1]) < 0)) continue;
+      const txt = dated ? txt0 : d[3], t = txt.match(/^~?(\d{1,2}):(\d{2})\s+(.*)$/); if (!t) continue;
       const imp = impOf(i, txt); if (imp === -1) continue;   // the countdown waits for medium and high
-      out.push({utc: berlinUtc(yr, MON.indexOf(m[1]), +m[2], +t[1], +t[2]), title: t[3], flag: "", tv: typeof i === "string" ? null : i.tv, approx: txt.startsWith("~"), imp, earn: isEarn(txt)}); } }
+      const mo = MON.indexOf(dated ? m[1] : d[1]), dd = +(dated ? m[2] : d[2]), y = mo < new Date().getMonth() - 6 ? yr + 1 : yr;
+      out.push({utc: berlinUtc(y, mo, dd, +t[1], +t[2]), title: t[3], flag: "", tv: typeof i === "string" ? null : i.tv, approx: txt.startsWith("~"), imp, earn: isEarn(txt)}); } }
   const hi = EVENTS.map(e => ({utc: Date.parse(e.utc), title: e.title, flag: e.flag, tv: e.tv, imp: [-1, 0, 1].includes(e.imp) ? e.imp : 1}));   // events/*.json = the day's high ones
   NEXTEV = out.concat(hi.filter(h => !out.some(o => Math.abs(h.utc - o.utc) < 60e3 && o.title.includes(h.flag || "\u0000")))).sort((a, b) => a.utc - b.utc); }
 function countdown(){ const now = Date.now(); const next = NEXTEV.find(e => e.utc > now - 5*60e3);
-  if (!next) return; const ms = next.utc - now;
+  if (!next){ $("next").textContent = "none this week"; $("next-sub").textContent = "no medium or high event left in the calendar"; $("next-more").innerHTML = ""; return; }
+  const ms = next.utc - now;
   const h = Math.floor(ms/36e5), m = Math.max(0, Math.round((ms % 36e5)/6e4));
   $("next").textContent = ms <= 0 ? "now" : h >= 24 ? `in ${Math.floor(h/24)} d ${h%24} h` : h ? `in ${h} h ${m} min` : `in ${m} min`;
   const t = (next.approx ? "~" : "") + new Intl.DateTimeFormat(de,{timeZone:TZD,weekday:"short",hour:"2-digit",minute:"2-digit"}).format(new Date(next.utc));
