@@ -472,9 +472,10 @@ def ko_find(e, k=None):
         if e["sym"] not in DAX:
             return "", []
         lev = ix / abs(ix - bar) if ix != bar else 0
-        return (head + f" · leverage ≈ {lev:,.0f} · 1R ≈ {risk * 0.01:.2f} € a certificate at ratio 0.01 · "
+        return (head + f"\nleverage ≈ {lev:,.0f} · 1R ≈ {risk * 0.01:.2f} € a certificate at ratio 0.01 · "
                 f"<a href=\"{KO_URL}\">onvista</a>"), []
-    lines = [head + f" · comdirect 0 € from {KO_MIN_EUR:,} €" + ("" if ul[2] == "EUR" else f" · € at EUR{ul[2]} {fx:,.4g}")]
+                                                                                                     
+    lines = [head + f"\ncomdirect 0 € from {KO_MIN_EUR:,} €" + ("" if ul[2] == "EUR" else f" · € at EUR{ul[2]} {fx:,.4g}")]
     for p in picks:
         a = p["ask"]
                                                                                                                               
@@ -493,9 +494,9 @@ def ko_find(e, k=None):
         except ValueError:
             pass
         url = f"https://www.comdirect.de/inf/zertifikate/{p['isin']}" if p["isin"] else KO_URL
-        lines.append(f"• <a href=\"{url}\">{p['wkn']}</a> {html.escape(p['iss'])}{' · XDAX' if p['x'] else ''}{' · quanto' if p['q'] else ''} · KO {f(p['ko'])} · "
-                     + (f"ask {a:,.2f} €" if a else f"bid {p['bid']:,.2f} €") + f" · leverage {lev:,.0f}{spr}{tq} · "
-                     f"{KO_MIN_EUR:,} € = {p['n']:,} pcs · 1R ≈ {p['eurR']:,} €")
+        lines.append(f"\n• <a href=\"{url}\">{p['wkn']}</a> {html.escape(p['iss'])}{' · XDAX' if p['x'] else ''}{' · quanto' if p['q'] else ''} · KO {f(p['ko'])} · "
+                     + (f"ask {a:,.2f} €" if a else f"bid {p['bid']:,.2f} €") + f"\n   leverage {lev:,.0f}{spr}{tq}"
+                     f"\n   {KO_MIN_EUR:,} € = {p['n']:,} pcs · 1R ≈ {p['eurR']:,} €")
     return "\n".join(lines), picks
 
 
@@ -514,10 +515,13 @@ def message(e, k, ko=""):
     eng = ICON.get(e["script"], "") + " " + e["script"] + (" AF" if e["af"] else "")
     tm = datetime.fromisoformat(e["t"]).astimezone(BER).strftime("%H:%M")
     hrs = HORIZON * STEP // 3600
-    lines = [f"🔮 <b>Kronos · {flag(e['sym'])}{html.escape(e['sym'])} · {eng.strip()} {arrow} {tm}</b>",
-             f"🎯 TP1 first {k['tp1']} · 🛑 stop first {k['stop']} · ⏸ neither {k['none']} · of {k['n']} paths, next {hrs}h"]
+    lines = [f"🔮 <b>Kronos · {flag(e['sym'])}{html.escape(e['sym'])} · {eng.strip()} {arrow} {tm}</b>", "",
+             f"🎯 TP1 first {k['tp1']} · 🛑 stop first {k['stop']} · ⏸ neither {k['none']}", f"of {k['n']} paths, next {hrs}h"]
     mid = f"median in {hrs}h {fmt(k['med'], d)} " + ("▲" if k["med"] > float(e["px"]) else "▼")
-    lines.append((f"🏆 TP2 before the stop {k['tp2']} · " if k["tp2"] is not None else "") + mid)
+    if k["tp2"] is not None:
+        lines.append(f"🏆 TP2 before the stop {k['tp2']}")
+    lines.append(f"📍 {mid}")
+    lines.append("")
     if k["edge"] > 0:
         lines.append(f"✓ edge {k['edge']:+.2f}R · leans with the trade")
     elif k["edge"] < 0:
@@ -525,8 +529,8 @@ def message(e, k, ko=""):
     else:
         lines.append(f"➖ edge 0R · no lean, the paths stay between the stop and TP1")
     if ko:
-        lines.append(ko)
-    lines.append(f"<i>read on {html.escape(k['tk'])} · Kronos-small · a test, not advice</i>")
+        lines += ["", ko]
+    lines += ["", f"<i>read on {html.escape(k['tk'])} · Kronos-small · a test, not advice</i>"]
     return "\n".join(lines)
 
 
@@ -665,7 +669,7 @@ def main():
                 mid = None
                 if ko:                                                                                             
                     arrow = "▲" if e["side"] == "LONG" else "▼"
-                    mid = send(f"🎫 <b>KO · {flag(e['sym'])}{html.escape(e['sym'])} · {e['script']}{' AF' if e['af'] else ''} {arrow}</b>\n{ko}\n"
+                    mid = send(f"🎫 <b>KO · {flag(e['sym'])}{html.escape(e['sym'])} · {e['script']}{' AF' if e['af'] else ''} {arrow}</b>\n\n{ko}\n\n"
                                f"<i>no Kronos read: {html.escape(why)}</i>", e["id"], a.dry)
                 state["checks"].append({**e, "status": "skip", "why": why, "msg": mid, **({"ko": ko_keep(picks)} if picks else {})})
                 print(f"{e['sym']} {e['side']} {e['px']}: skipped, {why}")
