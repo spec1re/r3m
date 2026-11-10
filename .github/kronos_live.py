@@ -13,7 +13,7 @@ KEEP = timedelta(days=150)
 RW_PATHS, MOM, BASE_AGE, BASE_TRIES = 200, 12, timedelta(days=50), 3                                                   
 BER = ZoneInfo("Europe/Berlin")
 OV_TS = "https://api.onvista.de/api/v1/instruments/{t}/{e}/times_and_sales"                                                        
-UBS_PAGES = 8                                                         
+UBS_PAGES = 12                                                                                                                                
                                                                                                   
 UBS = {"^GDAXI": ("INDEX", 20735, 60557091, "UBS"),                                                       
        "ES=F": ("INDEX", 4359526, 126161736, "UBS"),                                                                                  
@@ -146,9 +146,15 @@ def ov_ticks(typ, ent, nota, since):
         ts, ps = d.get("datetimePrice") or [], d.get("price") or []
         new = sorted((int(t), float(p)) for t, p in zip(ts, ps) if p is not None and int(t) >= t0)
         out += [x for x in new if not out or x[0] > out[-1][0]]
-        if len(ts) < 10000 or not new:
+        if len(ts) >= 10000 and new:
+            t0 = new[-1][0] + 1
+            continue
+                                                                                                                     
+                                                                                                                           
+        nxt = (t0 // 86400 + 1) * 86400
+        if nxt > time.time():
             break
-        t0 = new[-1][0] + 1
+        t0 = nxt
     return out
 
 
