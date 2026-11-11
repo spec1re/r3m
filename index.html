@@ -1067,8 +1067,9 @@ const lvOf = s => SYML?.symbols?.[s];
 function tradesOf(D, sym, today){ const S = D.signals || {}, day = berDay(Date.now());
   const a = (S.recent || []).filter(r => r.sym === sym && (!today || berDay(r.t) === day)).map(r => ({...r}));
   for (const x of (lvOf(sym)?.trades || []).filter(r => !today || berDay(r.t) === day)){   // the live layer's word is the newer one
-    const o = a.find(y => y.side === x.side && Math.abs(Date.parse(y.t) - Date.parse(x.t)) < 6e5 && Math.abs(y.entry - x.entry) <= Math.abs(x.entry - x.sl) * .5);
-    if (!o) a.push(x); else if (o.res === "open" && x.res !== "open") Object.assign(o, {res: x.res, rg: x.rg, tx: x.tx}); }   // a booked result of the stats stays
+    const o = a.find(y => y.side === x.side && Math.abs(Date.parse(y.t) - Date.parse(x.t)) < 6e5 && (x.sl == null || y.sl == null ? y.entry === x.entry : Math.abs(y.entry - x.entry) <= Math.abs(x.entry - x.sl) * .5));
+    // the newer word wins (2026-11-11: the stats are built at the deploy, a runner's later close came only through the live layer)
+    if (!o) a.push(x); else if (x.res !== "open" && (o.res === "open" || Date.parse(x.tx || 0) > Date.parse(o.tx || 0))) Object.assign(o, {res: x.res, rg: x.rg, tx: x.tx, rn: x.rn}); }
   return a.sort((x, y) => Date.parse(x.t) - Date.parse(y.t)); }
 const kronOf = (D, sym) => { let o = null; [...(D.kronos?.days || []), ...(ORC?.days || [])].sort((a, b) => a.day < b.day ? -1 : 1)
   .forEach(d => { const e = d.symbols?.[sym]; if (e) o = {day: d.day, e}; }); return o; };
@@ -1183,7 +1184,7 @@ function openCard(D, sym){ const M = D.market || {}, p0 = (M.pepper || []).find(
   /* signals today, each with Kronos's read of it */
   const ts = tradesOf(D, sym, true).reverse(), kc = t => K.checks.find(c => c.sym === sym && c.side === t.side && c.status === "sent" && Math.abs(Date.parse(c.t) - Date.parse(t.t)) < 6e5);
   const res = t => t.res === "open" ? `<span class="sun">● live</span>` : t.res === "Stopped" ? `<span class="down">🛑 ${sR2(t.rg)}</span>` : t.res === "TP2 Hit" ? `<span class="up">🏆 TP2 ${sR2(t.rg)}</span>`
-    : t.res === "TP1 Hit" ? `<span class="up">✅ TP1 ${sR2(t.rg)}</span>` : `<span>🏁 closed ${sR2(t.rg)}</span>`;
+    : t.res === "TP1 Hit" ? `<span class="up" title="½ at TP1 + ½ the runner, as r3m·'s exit books it">✅ TP1 ${sR2(t.rg)}${t.rn ? ` <span class="sun">· runner ●</span>` : ""}</span>` : `<span>🏁 closed ${sR2(t.rg)}</span>`;
   const sig = ts.map(t => { const c = kc(t), kk = c?.k;
     const kline = kk ? `🔮 Kronos ${kk.edge > 0 ? `<b class="up">✓ with</b>` : kk.edge < 0 ? `<b class="down">✗ against</b>` : "➖ no lean"} · ${kk.tp1} TP1 first, ${kk.stop} stop first of ${kk.n}` : "";
     return `<div class="tr"><div class="t1"><span><b>${hm(t.t)}</b>${t.gh ? ` <span class="sub" title="TradingView never sent the entry alert · the trade is rebuilt from its result line, timed at that result">· entry not sent</span>` : ""} · ${scIc(t.script)} ${esc(scNm(t.script))} <b class="${t.side === "LONG" ? "up" : "down"}">${t.side === "LONG" ? "▲" : "▼"} ${esc(t.side)}</b> <span class="num">${fmt(t.entry)}</span></span>${res(t)}</div>

@@ -88,7 +88,7 @@ def parse(items):
             r = RESULT.match(ln)
             if r:
                 side, px, kind, rr = r.groups()
-                res.append({"id": m["id"], "t": m["t"], "sym": sym, "tf": int(tf), "side": side, "px": px, "kind": kind,
+                res.append({"id": m["id"], "t": m["t"], "sym": sym, "tf": int(tf), "script": script, "side": side, "px": px, "kind": kind, "half": "½ at TP1" in ln,
                             "r": float(rr.replace("−", "-"))})
     return ent, res
 

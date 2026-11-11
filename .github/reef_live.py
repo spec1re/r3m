@@ -99,26 +99,68 @@ def factor(sym, rows, M, ent):
     return 1.0, None
 
 
+def book(x, rr):
+    pass
+    r1, r2, run, af, half = x["r1"], x.get("r2"), None, x["script"].endswith("af"), False
+    for r in rr:
+        k, v = r["kind"], r["r"]
+        x["tx"] = r["t"]
+        if af:
+            if k == "AF TP1 Hit":
+                half, x["res"], x["rg"] = True, "TP1 Hit", 0.5 * v
+                x["r1"] = x["r1"] or v
+            else:
+                x["rg"] = v
+                x["res"] = "Stopped" if "Stopped" in k else "TP2 Hit" if k == "AF Target" else "TP1 Hit" if half or r.get("half") else "Closed"
+            continue
+        if k == "TP1 Hit":
+            r1 = x["r1"] = v
+            if x["res"] != "TP2 Hit":
+                x["res"] = "TP1 Hit"
+        elif k == "TP2 Hit":
+            r2, x["res"] = v, "TP2 Hit"
+        elif k == "Runner Closed":
+            run = v
+            if x["res"] == "open":
+                x["res"] = "TP1 Hit"
+        elif x["res"] == "open":                                                                           
+            x["res"], x["rg"] = ("Stopped" if "Stopped" in k else "Closed"), v
+        if x["res"] == "TP2 Hit" and r1 is not None and r2 is not None:
+            x["rg"] = round(0.5 * r1 + 0.5 * r2, 2)
+        elif x["res"] == "TP1 Hit" and r1 is not None:
+            x["rg"] = round(0.5 * r1 + 0.5 * (run or 0.0), 2)
+    if x["rg"] is not None:
+        x["rg"] = round(x["rg"], 2)
+    if x["res"] == "TP1 Hit" and not af and run is None:
+        x["rn"] = 1                                                                                             
+    return x
+
+
 def trades_of(sym, ent, res, day):
     pass
-    out = []
+    out, seen = [], set()
+    on = lambda t: datetime.fromisoformat(t).astimezone(ZoneInfo("Europe/Berlin")).date().isoformat() == day
     for e in ent:
-        if e["sym"] != sym or datetime.fromisoformat(e["t"]).astimezone(ZoneInfo("Europe/Berlin")).date().isoformat() != day:
+        if e["sym"] != sym:
             continue
         rr = [r for r in res if r["sym"] == sym and r["tf"] == e["tf"] and r["side"] == e["side"] and r["px"] == e["px"] and r["t"] >= e["t"]]
+        seen.update(id(r) for r in rr)
+        if not on(e["t"]):
+            continue
         x = {"t": e["t"], "script": ("af" if e["script"] == "lava" else e["script"] + " af") if e["af"] else e["script"], "side": e["side"],
              "entry": float(e["px"]), "sl": float(e["sl"]), "tp1": float(e["tp1"]), "tp2": float(e["tp2"]) if e["tp2"] else None,
-             "r1": e["r1"], "res": "open", "rg": None, "tx": None}
-        for r in rr:                                                                                                                 
-            k = r["kind"]                                                                                     
-            x["tx"] = r["t"]
-            if x["res"] in ("TP1 Hit", "TP2 Hit") and k not in ("TP2 Hit", "AF Target"):
-                continue
-            x["rg"] = r["r"]
-            x["res"] = ("Stopped" if "Stopped" in k else "TP2 Hit" if k in ("TP2 Hit", "AF Target") else
-                        "TP1 Hit" if k in ("TP1 Hit", "AF TP1 Hit", "Runner Closed") else "Closed")
-        out.append(x)
-    return out
+             "r1": e["r1"], "r2": e.get("r2"), "res": "open", "rg": None, "tx": None}
+        out.append(book(x, rr))
+    ghosts = {}
+    for r in res:
+        if r["sym"] == sym and id(r) not in seen and on(r["t"]) and r["kind"] != "TP2 Hit":
+            ghosts.setdefault((r["tf"], r["side"], r["px"], r["kind"].startswith("AF")), []).append(r)
+    for (tf, side, px, af), rr in ghosts.items():
+        sc = rr[0].get("script") or "r3m"
+        x = {"t": rr[0]["t"], "script": ("af" if sc == "lava" else sc + " af") if af else sc, "side": side, "entry": float(px),
+             "sl": None, "tp1": None, "tp2": None, "r1": None, "r2": None, "res": "open", "rg": None, "tx": None, "gh": 1}
+        out.append(book(x, rr))
+    return sorted(out, key=lambda x: x["t"])
 
 
 def rnd(x, ref):
