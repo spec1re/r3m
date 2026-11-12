@@ -485,20 +485,22 @@ def ko_find(e, k=None):
     picks = []
     sl1 = None
     if fx:
-        lo, hi = (far, bar) if long else (bar, far)
-        picks = ko_pick(ko_query(ul, long, lo, hi), long, bar, risk, fx, ix, tgt)
-        sls = ko_pick(ko_query(ul, long, lo, hi, feat="STOP_LOSS"), long, bar, risk, fx, ix, tgt)
+                                                                                                                      
+        lo0, hi0 = (far, bar) if long else (bar, far)
+        wins = [(max(lo0, tgt - w * ix), min(hi0, tgt + w * ix)) for w in (0.0025, 0.005)] + [(lo0, hi0)]
+        picks, sls = [], []
+        for lo, hi in wins:
+            picks = picks or ko_pick(ko_query(ul, long, lo, hi), long, bar, risk, fx, ix, tgt)
+            sls = sls or ko_pick(ko_query(ul, long, lo, hi, feat="STOP_LOSS"), long, bar, risk, fx, ix, tgt)
+            if picks and sls:
+                break
         if sls:
             sl1 = sls[0]
-            ref = picks[0] if picks else None
-            a1, a0 = sl1["ask"] or sl1["bid"], (ref["ask"] or ref["bid"]) if ref else None
-            sl1["dear"] = round(a1 / a0 - 1, 3) if a0 else None
-                                                                                                                                   
-                                                   
-            if ref and abs(ref["ko"] - sl1["ko"]) > 0.005 * ix:
-                near = min(picks, key=lambda p: abs(p["ko"] - sl1["ko"]))
-                a0 = near["ask"] or near["bid"]
-                sl1["dear"] = round(a1 / a0 - 1, 3) if a0 else None
+                                                                                                                               
+                                                                                                    
+            u = lambda p: (p["ask"] or p["bid"]) / p["ratio"]
+            near = min(picks, key=lambda p: abs(p["ko"] - sl1["ko"])) if picks else None
+            sl1["dear"] = round(u(sl1) / u(near) - 1, 3) if near else None
             if sl1["dear"] is None or sl1["dear"] <= KO_SL_MAX:
                 picks = [sl1] + picks
             else:
@@ -532,7 +534,7 @@ def ko_find(e, k=None):
         slt = ""
         if p.get("sl"):
             dr = p.get("dear")
-            slt = " · 🛡️ stop-loss (pays back the rest)" + (f" · {dr * 100:+.0f} % a piece" if dr is not None else "")
+            slt = " · 🛡️ stop-loss (pays back the rest)" + (f" · {dr * 100:+.0f} % dearer" if dr is not None else "")
         lines.append(f"\n• <a href=\"{url}\">{p['wkn']}</a> {html.escape(p['iss'])}{' · XDAX' if p['x'] else ''}{' · quanto' if p['q'] else ''}{slt} · KO {f(p['ko'])} "
                      f"({abs(ix - p['ko']) / ix * 100:.1f} %) · "
                      + (f"ask {a:,.2f} €" if a else f"bid {p['bid']:,.2f} €") + f" · leverage {lev:,.0f}{spr}{tq} · "
