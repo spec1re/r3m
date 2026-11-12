@@ -9,7 +9,31 @@ import kronos_live as kl
 
 SYMS = ["GER40", "UK100", "EUSTX50", "US500", "NAS100", "EURUSD", "GBPUSD", "USDJPY", "USDCHF", "XAUUSD", "XAGUSD", "SPOTCRUDE"]
 FOCUS = {"NAS100", "GER40", "US500", "XAUUSD", "EURUSD"}                                                                    
-ORACLE = [s for s in SYMS if s not in FOCUS]
+                                                                                                                            
+                                                                                                                          
+                                                                                                                         
+FOCUS_LIVE = False
+ORACLE = SYMS if FOCUS_LIVE else [s for s in SYMS if s not in FOCUS]
+NYZ = ZoneInfo("America/New_York")
+SESSIONS = {"London": {"tz": "Europe/London", "open": (8, 0), "close": (16, 30), "due": ((7, 25), (12, 0))},
+            "New York": {"tz": "America/New_York", "open": (9, 30), "close": (16, 0), "due": ((8, 10), (12, 0))}}
+NY_SYMS = {"NAS100", "US500"}
+PER_RUN = 5
+
+
+def ses_of(sym):
+    return "New York" if sym in NY_SYMS else "London"
+
+
+def groups():
+    pass
+    return [(ORACLE, "days")] + ([] if FOCUS_LIVE else [(sorted(FOCUS), "focus")])
+
+
+def in_due(sym, now=None):
+    S = SESSIONS[ses_of(sym)]
+    t = (now or datetime.now(timezone.utc)).astimezone(ZoneInfo(S["tz"]))
+    return t.weekday() < 5 and S["due"][0] <= (t.hour, t.minute) < S["due"][1]
 LON = ZoneInfo("Europe/London")
 SES = {"session": "London", "tz": "Europe/London", "open": "08:00", "close": "16:30"}
 DUE_FROM, DUE_TO = (7, 25), (12, 0)                                                       
@@ -246,12 +270,16 @@ def live(out_path, data_path, live_path, oracle_path):
 
 
 def due(oracle_path):
-    t = datetime.now(LON)
-    if t.weekday() >= 5 or not (DUE_FROM <= (t.hour, t.minute) < DUE_TO):
-        return False
     O = load_o(oracle_path)
-    d = next((x for x in O["days"] if x["day"] == t.date().isoformat()), None)
-    return not d or any(s not in d["symbols"] and s not in d.get("skip", {}) for s in ORACLE)
+    for syms, key in groups():
+        for s in syms:
+            if not in_due(s):
+                continue
+            today = datetime.now(ZoneInfo(SESSIONS[ses_of(s)]["tz"])).date().isoformat()
+            d = next((x for x in (O.get(key) or {"days": []} if key == "focus" else O)["days"] if x["day"] == today), None)
+            if not d or (s not in d["symbols"] and s not in d.get("skip", {})):
+                return True
+    return False
 
 
 def load_o(p):
@@ -261,10 +289,11 @@ def load_o(p):
         return {"days": []}
 
 
-def bounds(day):
+def bounds(day, ses="London"):
+    S = SESSIONS[ses]
     d = datetime.strptime(day, "%Y-%m-%d")
-    op = d.replace(hour=8, minute=0, tzinfo=LON)
-    cl = d.replace(hour=16, minute=30, tzinfo=LON)
+    op = d.replace(hour=S["open"][0], minute=S["open"][1], tzinfo=ZoneInfo(S["tz"]))
+    cl = d.replace(hour=S["close"][0], minute=S["close"][1], tzinfo=ZoneInfo(S["tz"]))
     return int(op.timestamp()), int(cl.timestamp())
 
 
@@ -307,25 +336,31 @@ def oracle(oracle_path, data_path, live_path, kronos_dir):
     M = (json.load(open(data_path, encoding="utf-8")).get("market") or {}) if os.path.exists(data_path) else {}
     L = json.load(open(live_path, encoding="utf-8")) if os.path.exists(live_path) else {"items": []}
     ent, _ = kl.parse(L.get("items", []))
-    today = datetime.now(LON).date().isoformat()
-    D = next((x for x in O["days"] if x["day"] == today), None)
-    if D is None:
-        D = {"day": today, "made": datetime.now(timezone.utc).isoformat(timespec="seconds"), "symbols": {}, "skip": {}}
-        O["days"].append(D)
     pred = None
-    for sym in ORACLE:
+    force = os.environ.get("ORACLE_FORCE") == "1"
+    made = 0                                                                                                                       
+    for syms, key in groups():
+      G = O if key == "days" else O.setdefault("focus", {"days": []})
+      for sym in syms:
+        ses = ses_of(sym)
+        S = SESSIONS[ses]
+        today = datetime.now(ZoneInfo(S["tz"])).date().isoformat()
+        D = next((x for x in G["days"] if x["day"] == today), None)
+        if D is None:
+            D = {"day": today, "made": datetime.now(timezone.utc).isoformat(timespec="seconds"), "symbols": {}, "skip": {}}
+            G["days"].append(D)
         rows, lab = bars5(sym, "1mo")
         if not rows:
             continue
         k, _ = factor(sym, rows, M, ent)
         b15 = agg(rows, 900)
-        for od in O["days"]:                                                                     
+        for od in G["days"]:                                                                     
             e = od["symbols"].get(sym)
             if e and "actual" not in e and od["day"] < today and score(e, b15, e.get("k", k)):
                 print(f"scored {od['day']} {sym}: hit {e['score']['hit']} · inside {e['score']['inside']}")
-        if sym in D["symbols"] or sym in D["skip"]:
+        if sym in D["symbols"] or sym in D["skip"] or not (force or in_due(sym)) or made >= PER_RUN:
             continue
-        op, cl = bounds(today)
+        op, cl = bounds(today, ses)
         keep = b15[:-1]                                                                 
         if not keep or time.time() - keep[-1][0] > 90 * 60:
             print(f"{sym}: the last bar is {((time.time() - keep[-1][0]) / 60) if keep else 0:.0f} min old, later")
@@ -342,24 +377,28 @@ def oracle(oracle_path, data_path, live_path, kronos_dir):
         t1 = time.time()
         df = pd.DataFrame({"open": [r[1] for r in ctx], "high": [r[2] for r in ctx], "low": [r[3] for r in ctx],
                            "close": [r[4] for r in ctx], "volume": [r[5] for r in ctx]}, dtype="float64")
-        xt = pd.Series([datetime.fromtimestamp(r[0], LON).replace(tzinfo=None) for r in ctx])
+        z = ZoneInfo(S["tz"])
+        xt = pd.Series([datetime.fromtimestamp(r[0], z).replace(tzinfo=None) for r in ctx])
         grid = list(range(t0, cl, 900))
-        yt = pd.Series([datetime.fromtimestamp(x, LON).replace(tzinfo=None) for x in grid])
+        yt = pd.Series([datetime.fromtimestamp(x, z).replace(tzinfo=None) for x in grid])
         outp = pred.predict_batch([df] * PATHS, [xt] * PATHS, [yt] * PATHS, pred_len=len(grid), T=1.0, top_p=0.9, sample_count=1, verbose=False)
         closes = np.array([o["close"].values for o in outp]) * k
         ref = ctx[-1][4] * k
         d = dec_of([ref, ctx[-2][4] * k]) if len(ctx) > 1 else 2
         d = max(d, 1 if ref >= 1000 else 2 if ref >= 10 else 5)
         q = lambda p: [round(float(v), d) for v in np.percentile(closes, p, axis=0)]
-        D["symbols"][sym] = {"session": "London", "tz": "Europe/London", "step": 900, "t0": t0,
+        D["symbols"][sym] = {"session": ses, "tz": S["tz"], "step": 900, "t0": t0,
                              "open_i": next((i for i, x in enumerate(grid) if x >= op), 0), "close_i": len(grid) - 1,
                              "ref": round(ref, d), "q10": q(10), "q50": q(50), "q90": q(90),
                              "up": round(float((closes[:, -1] > ref).mean()), 3), "paths": PATHS,
                              "ctx_t0": ctx[-48:][0][0], "ctx": [round(r[4] * k, d) for r in ctx[-48:]],
                              "model": kl.MODEL.split("/")[-1], "tk": lab, "k": round(k, 6)}
         print(f"{today} {sym}: {len(grid)} bars · up {D['symbols'][sym]['up']:.0%} · {lab} · {time.time() - t1:.0f}s")
+        made += 1
     cut = (datetime.now(LON) - timedelta(days=KEEP_DAYS)).date().isoformat()
     O["days"] = sorted((x for x in O["days"] if x["day"] >= cut), key=lambda x: x["day"])
+    if "focus" in O:
+        O["focus"]["days"] = sorted((x for x in O["focus"]["days"] if x["day"] >= cut), key=lambda x: x["day"])
     json.dump(O, open(oracle_path, "w", encoding="utf-8"), separators=(",", ":"))
     print(f"→ {oracle_path}")
 
