@@ -375,16 +375,17 @@ KO_ISS = {"54283": "Morgan Stanley", "53159": "Société Générale", "53881": "
 KO_MIN_EUR = 1000                                                                   
 KO_SPR = 0.0002                                                                                                            
 KO_BUF = 0.001                                                                                    
-KO_WIN = (0.0025, 0.01)                                                                                              
-KO_DIST = 0.04                                                                                                                            
-                                                                                                                                  
+KO_DIST = (0.02, 0.04, 0.03)                                                                                                       
+                                                                                                                                   
+KO_SL_MAX = 0.15                                                                                                                    
+                                                                                                                           
 UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36"
 
 
-def ko_query(ul, long, lo, hi, every=False):
+def ko_query(ul, long, lo, hi, every=False, feat="STANDARD"):
     pass
     q = (f"entitySubType=KNOCKOUT_CERTIFICATE&idExerciseRight={2 if long else 1}&knockOutAbsRange={lo:.6g};{hi:.6g}"
-         + ("" if every else "".join(f"&idIssuer={i}" for i in KO_ISS)) + "&feature=STANDARD&")
+         + ("" if every else "".join(f"&idIssuer={i}" for i in KO_ISS)) + f"&feature={feat}&")
     try:
         req = urllib.request.Request(OV_API.format(t=ul[0], v=ul[1]) + urllib.parse.quote(q, safe=""),
                                      headers={"User-Agent": UA, "Accept": "application/json"})
@@ -402,7 +403,7 @@ def fx_eur(cur):
     return rows[-1][4] if rows else None
 
 
-def ko_pick(rows, long, bar, risk, fx, px):
+def ko_pick(rows, long, bar, risk, fx, px, tgt=None):
     pass
     now = datetime.now(timezone.utc)
     best, why = {}, {"bid": 0, "side": 0, "spread": 0, "old": 0}
@@ -431,10 +432,14 @@ def ko_pick(rows, long, bar, risk, fx, px):
         except (KeyError, TypeError, ValueError):
             why["old"] += 1
             continue
-        p = {"wkn": r["instrument"]["wkn"], "isin": r["instrument"].get("isin", ""), "iss": KO_ISS[iss], "ko": ko, "ratio": rt,
+        try:
+            sk = float(r.get("strikeAbs") or ko)
+        except (TypeError, ValueError):
+            sk = ko
+        p = {"wkn": r["instrument"]["wkn"], "isin": r["instrument"].get("isin", ""), "iss": KO_ISS[iss], "ko": ko, "sk": sk, "sl": abs(sk - ko) > 1e-9, "ratio": rt,
              "bid": bid, "ask": ask, "lev": float(r.get("gearingAsk") or 0), "x": bool(re.search(r"\bX-|XDAX", r.get("shortName", ""))),
              "q": bool(r.get("quanto")), "tq": r["quote"].get("datetimeBid", "")}
-        rank = (abs(bar - ko), ask is None, (ask - bid) / ask if ask else 1, p["x"])
+        rank = (abs((bar if tgt is None else tgt) - ko), ask is None, (ask - bid) / ask if ask else 1, p["x"])
         if iss not in best or rank < best[iss][0]:
             best[iss] = (rank, p)
     out = [p for _, p in sorted(best.values(), key=lambda x: x[0])]
@@ -459,31 +464,50 @@ def ko_find(e, k=None):
     buf = max(risk, KO_BUF * ix)
     long = e["side"] == "LONG"
     st = 10 ** math.floor(math.log10(ix * 0.0004))                                                                       
+    d0, d1, dm = KO_DIST
     if long:
-        bar = math.floor(min(sx - buf, ix * (1 - KO_DIST)) / st) * st
+        bar = math.floor(min(sx - buf, ix * (1 - d0)) / st) * st                                                             
+        far = min(bar - 0.01 * ix, ix * (1 - d1))                                            
+        tgt = min(bar, ix * (1 - dm))                                                                   
     else:
-        bar = math.ceil(max(sx + buf, ix * (1 + KO_DIST)) / st) * st
+        bar = math.ceil(max(sx + buf, ix * (1 + d0)) / st) * st
+        far = max(bar + 0.01 * ix, ix * (1 + d1))
+        tgt = max(bar, ix * (1 + dm))
     d = max(0, -int(math.floor(math.log10(st))))
     f = lambda x: fmt(x, d)
-    head = (f"🎫 KO {'long' if long else 'short'} · {ul[3]} · barrier {'≤' if long else '≥'} {f(bar)} "
-            f"({abs(ix - bar) / ix * 100:.1f} % away, leverage ≤ {ix / abs(ix - bar):.0f})" + ("" if cash else " · CFD levels"))
+    head = (f"🎫 KO {'long' if long else 'short'} · {ul[3]} · barrier {f(bar)} … {f(far)} ({abs(ix - bar) / ix * 100:.0f}–"
+            f"{abs(ix - far) / ix * 100:.0f} % away, leverage {ix / abs(ix - far):.0f}–{ix / abs(ix - bar):.0f})" + ("" if cash else " · CFD levels"))
     nb = datetime.now(timezone.utc).astimezone(BER)
     live = nb.weekday() < 5 and 8 <= nb.hour < 22
     fx = fx_eur(ul[2]) if live else None
     if ul[0] == "CURRENCY" and ul[2] == "USD" and e["sym"].startswith("EUR"):
         fx = ix                                                                           
     picks = []
+    sl1 = None
     if fx:
-        for w in KO_WIN:
-            lo, hi = (bar - w * ix, bar) if long else (bar, bar + w * ix)
-            picks = ko_pick(ko_query(ul, long, lo, hi), long, bar, risk, fx, ix)
-            if picks:
-                break
+        lo, hi = (far, bar) if long else (bar, far)
+        picks = ko_pick(ko_query(ul, long, lo, hi), long, bar, risk, fx, ix, tgt)
+        sls = ko_pick(ko_query(ul, long, lo, hi, feat="STOP_LOSS"), long, bar, risk, fx, ix, tgt)
+        if sls:
+            sl1 = sls[0]
+            ref = picks[0] if picks else None
+            a1, a0 = sl1["ask"] or sl1["bid"], (ref["ask"] or ref["bid"]) if ref else None
+            sl1["dear"] = round(a1 / a0 - 1, 3) if a0 else None
+                                                                                                                                   
+                                                   
+            if ref and abs(ref["ko"] - sl1["ko"]) > 0.005 * ix:
+                near = min(picks, key=lambda p: abs(p["ko"] - sl1["ko"]))
+                a0 = near["ask"] or near["bid"]
+                sl1["dear"] = round(a1 / a0 - 1, 3) if a0 else None
+            if sl1["dear"] is None or sl1["dear"] <= KO_SL_MAX:
+                picks = [sl1] + picks
+            else:
+                picks = picks + [sl1]
     if not picks:                                                                                                          
         if e["sym"] not in DAX:
             return "", []
-        lev = ix / abs(ix - bar) if ix != bar else 0
-        return (head + f" · leverage ≈ {lev:,.0f} · 1R ≈ {risk * 0.01:.2f} € a certificate at ratio 0.01 · "
+        lev = ix / abs(ix - tgt) if ix != tgt else 0
+        return (head + f" · at {f(tgt)} leverage ≈ {lev:,.0f} · 1R ≈ {risk * 0.01:.2f} € a certificate at ratio 0.01 · "
                 f"<a href=\"{KO_URL}\">onvista</a>"), []
                                                                                                      
     lines = [head + f" · comdirect 0 € from {KO_MIN_EUR:,} €" + ("" if ul[2] == "EUR" else f" · € at EUR{ul[2]} {fx:,.4g}")]
@@ -492,7 +516,7 @@ def ko_find(e, k=None):
                                                                                                                               
                                                                                                                                          
         q = 1.0 if p["q"] else fx
-        ixq = p["ko"] + p["bid"] * q / p["ratio"] if long else p["ko"] - p["bid"] * q / p["ratio"]
+        ixq = p["sk"] + p["bid"] * q / p["ratio"] if long else p["sk"] - p["bid"] * q / p["ratio"]
         lev = ixq * p["ratio"] / ((a or p["bid"]) * q)
         spr = f" · spread {f((a - p['bid']) * q / p['ratio'])} ({(a - p['bid']) * q / p['ratio'] / risk:.2f}R)" if a else ""
         p["lev"] = round(lev, 1)                                                                                                            
@@ -505,7 +529,12 @@ def ko_find(e, k=None):
         except ValueError:
             pass
         url = f"https://www.comdirect.de/inf/zertifikate/{p['isin']}" if p["isin"] else KO_URL
-        lines.append(f"\n• <a href=\"{url}\">{p['wkn']}</a> {html.escape(p['iss'])}{' · XDAX' if p['x'] else ''}{' · quanto' if p['q'] else ''} · KO {f(p['ko'])} · "
+        slt = ""
+        if p.get("sl"):
+            dr = p.get("dear")
+            slt = " · 🛡️ stop-loss (pays back the rest)" + (f" · {dr * 100:+.0f} % a piece" if dr is not None else "")
+        lines.append(f"\n• <a href=\"{url}\">{p['wkn']}</a> {html.escape(p['iss'])}{' · XDAX' if p['x'] else ''}{' · quanto' if p['q'] else ''}{slt} · KO {f(p['ko'])} "
+                     f"({abs(ix - p['ko']) / ix * 100:.1f} %) · "
                      + (f"ask {a:,.2f} €" if a else f"bid {p['bid']:,.2f} €") + f" · leverage {lev:,.0f}{spr}{tq} · "
                      f"{KO_MIN_EUR:,} € = {p['n']:,} pcs · 1R ≈ {p['eurR']:,} €")
     return "\n".join(lines), picks
@@ -517,7 +546,7 @@ def ko_line(e, k=None):
 
 def ko_keep(picks):
     pass
-    return [{x: (round(p[x], 4) if isinstance(p[x], float) else p[x]) for x in ("wkn", "iss", "ko", "ratio", "bid", "ask", "n", "eurR", "lev", "spr", "sprR") if x in p} for p in picks]
+    return [{x: (round(p[x], 4) if isinstance(p[x], float) else p[x]) for x in ("wkn", "iss", "ko", "sk", "sl", "dear", "ratio", "bid", "ask", "n", "eurR", "lev", "spr", "sprR") if x in p} for p in picks]
 
 
 def message(e, k, ko=""):
