@@ -375,10 +375,10 @@ KO_ISS = {"54283": "Morgan Stanley", "53159": "Société Générale", "53881": "
 KO_MIN_EUR = 1000                                                                   
 KO_SPR = 0.0002                                                                                                            
 KO_BUF = 0.001                                                                                    
-KO_DIST = (0.02, 0.04, 0.03)                                                                                                       
+KO_DIST = (0.02, 0.04, 0.04)                                                                                                       
                                                                                                                                    
-KO_SL_MAX = 0.15                                                                                                                    
-                                                                                                                           
+                                                                                                                                    
+                                                                                              
 UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36"
 
 
@@ -483,28 +483,14 @@ def ko_find(e, k=None):
     if ul[0] == "CURRENCY" and ul[2] == "USD" and e["sym"].startswith("EUR"):
         fx = ix                                                                           
     picks = []
-    sl1 = None
     if fx:
                                                                                                                       
         lo0, hi0 = (far, bar) if long else (bar, far)
-        wins = [(max(lo0, tgt - w * ix), min(hi0, tgt + w * ix)) for w in (0.0025, 0.005)] + [(lo0, hi0)]
-        picks, sls = [], []
-        for lo, hi in wins:
-            picks = picks or ko_pick(ko_query(ul, long, lo, hi), long, bar, risk, fx, ix, tgt)
-            sls = sls or ko_pick(ko_query(ul, long, lo, hi, feat="STOP_LOSS"), long, bar, risk, fx, ix, tgt)
-            if picks and sls:
+        for w in (0.0025, 0.005, None):
+            lo, hi = (lo0, hi0) if w is None else (max(lo0, tgt - w * ix), min(hi0, tgt + w * ix))
+            picks = ko_pick(ko_query(ul, long, lo, hi), long, bar, risk, fx, ix, tgt)
+            if picks:
                 break
-        if sls:
-            sl1 = sls[0]
-                                                                                                                               
-                                                                                                    
-            u = lambda p: (p["ask"] or p["bid"]) / p["ratio"]
-            near = min(picks, key=lambda p: abs(p["ko"] - sl1["ko"])) if picks else None
-            sl1["dear"] = round(u(sl1) / u(near) - 1, 3) if near else None
-            if sl1["dear"] is None or sl1["dear"] <= KO_SL_MAX:
-                picks = [sl1] + picks
-            else:
-                picks = picks + [sl1]
     if not picks:                                                                                                          
         if e["sym"] not in DAX:
             return "", []
@@ -531,11 +517,7 @@ def ko_find(e, k=None):
         except ValueError:
             pass
         url = f"https://www.comdirect.de/inf/zertifikate/{p['isin']}" if p["isin"] else KO_URL
-        slt = ""
-        if p.get("sl"):
-            dr = p.get("dear")
-            slt = " · 🛡️ stop-loss (pays back the rest)" + (f" · {dr * 100:+.0f} % dearer" if dr is not None else "")
-        lines.append(f"\n• <a href=\"{url}\">{p['wkn']}</a> {html.escape(p['iss'])}{' · XDAX' if p['x'] else ''}{' · quanto' if p['q'] else ''}{slt} · KO {f(p['ko'])} "
+        lines.append(f"\n• <a href=\"{url}\">{p['wkn']}</a> {html.escape(p['iss'])}{' · XDAX' if p['x'] else ''}{' · quanto' if p['q'] else ''} · KO {f(p['ko'])} "
                      f"({abs(ix - p['ko']) / ix * 100:.1f} %) · "
                      + (f"ask {a:,.2f} €" if a else f"bid {p['bid']:,.2f} €") + f" · leverage {lev:,.0f}{spr}{tq} · "
                      f"{KO_MIN_EUR:,} € = {p['n']:,} pcs · 1R ≈ {p['eurR']:,} €")
@@ -548,7 +530,7 @@ def ko_line(e, k=None):
 
 def ko_keep(picks):
     pass
-    return [{x: (round(p[x], 4) if isinstance(p[x], float) else p[x]) for x in ("wkn", "iss", "ko", "sk", "sl", "dear", "ratio", "bid", "ask", "n", "eurR", "lev", "spr", "sprR") if x in p} for p in picks]
+    return [{x: (round(p[x], 4) if isinstance(p[x], float) else p[x]) for x in ("wkn", "iss", "ko", "ratio", "bid", "ask", "n", "eurR", "lev", "spr", "sprR") if x in p} for p in picks]
 
 
 def message(e, k, ko=""):
