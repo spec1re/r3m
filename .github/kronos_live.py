@@ -376,6 +376,8 @@ KO_MIN_EUR = 1000
 KO_SPR = 0.0002                                                                                                            
 KO_BUF = 0.001                                                                                    
 KO_WIN = (0.0025, 0.01)                                                                                              
+KO_DIST = 0.04                                                                                                                            
+                                                                                                                                  
 UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36"
 
 
@@ -457,11 +459,14 @@ def ko_find(e, k=None):
     buf = max(risk, KO_BUF * ix)
     long = e["side"] == "LONG"
     st = 10 ** math.floor(math.log10(ix * 0.0004))                                                                       
-    bar = math.floor((sx - buf) / st) * st if long else math.ceil((sx + buf) / st) * st
+    if long:
+        bar = math.floor(min(sx - buf, ix * (1 - KO_DIST)) / st) * st
+    else:
+        bar = math.ceil(max(sx + buf, ix * (1 + KO_DIST)) / st) * st
     d = max(0, -int(math.floor(math.log10(st))))
     f = lambda x: fmt(x, d)
-    head = (f"🎫 KO {'long' if long else 'short'} · {ul[3]} · barrier {'≤' if long else '≥'} {f(bar)} (stop {f(sx)} "
-            f"{'−' if long else '+'} {f(buf)})" + ("" if cash else " · CFD levels"))
+    head = (f"🎫 KO {'long' if long else 'short'} · {ul[3]} · barrier {'≤' if long else '≥'} {f(bar)} "
+            f"({abs(ix - bar) / ix * 100:.1f} % away, leverage ≤ {ix / abs(ix - bar):.0f})" + ("" if cash else " · CFD levels"))
     nb = datetime.now(timezone.utc).astimezone(BER)
     live = nb.weekday() < 5 and 8 <= nb.hour < 22
     fx = fx_eur(ul[2]) if live else None
