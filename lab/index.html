@@ -88,8 +88,13 @@ const $ = s => document.querySelector(s);
 const fmtR = (r, d = 1) => r == null ? "–" : (r > 0 ? "+" : r < 0 ? "−" : "") + Math.abs(r).toFixed(d);
 const cls = r => r > 0.0001 ? "pos" : r < -0.0001 ? "neg" : "dim";
 const pct = (a, b) => b ? Math.round(100 * a / b) + "%" : "–";
-const berlin = (t, o) => new Intl.DateTimeFormat("en-GB", Object.assign({timeZone: TZ}, o)).format(new Date(t * 1000));
-const dayKey = t => berlin(t, {year: "numeric", month: "2-digit", day: "2-digit"});
+const FMT = new Map();
+const berlin = (t, o) => { const k = JSON.stringify(o); let f = FMT.get(k);
+  if (!f) FMT.set(k, f = new Intl.DateTimeFormat("en-GB", Object.assign({timeZone: TZ}, o))); return f.format(new Date(t * 1000)); };
+const DK = new Map();      // Berlin's day as yyyymmdd, one format a UTC hour (130,000 replay rows)
+const dayNo = t => { const h = Math.floor(t / 3600); let v = DK.get(h);
+  if (v === undefined) { const [dd, mm, yy] = berlin(h * 3600, {year: "numeric", month: "2-digit", day: "2-digit"}).split("/").map(Number); DK.set(h, v = yy * 10000 + mm * 100 + dd); }
+  return v; };
 
 async function openLab(buf, pass) {
   const b = new Uint8Array(buf);
@@ -149,14 +154,14 @@ async function load(force) {
 
 function since() {
   const now = Date.now() / 1000;
-  if (S.period[0] === "y") { const y = S.period.slice(1); return t => berlin(t, {year: "numeric"}) === y; }
-  if (S.period === "today") { const k = dayKey(now); return t => dayKey(t) === k; }
+  if (S.period[0] === "y") { const y = +S.period.slice(1); return t => Math.floor(dayNo(t) / 10000) === y; }
+  if (S.period === "today") { const k = dayNo(now); return t => dayNo(t) === k; }
   if (S.period === "week") {
     const d = new Date(new Date().toLocaleString("en-US", {timeZone: TZ}));
     const back = (d.getDay() + 6) % 7;
     const mon = new Date(d.getFullYear(), d.getMonth(), d.getDate() - back);
     const key = mon.getFullYear() * 10000 + (mon.getMonth() + 1) * 100 + mon.getDate();
-    return t => { const [dd, mm, yy] = dayKey(t).split("/").map(Number); return yy * 10000 + mm * 100 + dd >= key; };
+    return t => dayNo(t) >= key;
   }
   return () => true;
 }
@@ -183,16 +188,24 @@ function chips(name, opts) {
 function curve(ts) {
   const c = ts.filter(x => x.R != null).sort((a, b) => a.tx - b.tx);
   if (!c.length) return `<div class="note" style="padding:14px">No closed trades in this period yet.</div>`;
-  const t0 = c[0].tx, t1 = c[c.length - 1].tx, W = 960, H = 260, P = 34;
+  const t0 = c[0].tx, t1 = c[c.length - 1].tx, W = 960, H = 260, P = 62;
   const lines = {};
   for (const src of ORDER) {
     let s = 0;
     lines[src] = [[t0, 0]].concat(c.filter(x => x.src === src).map(x => [x.tx, s += Rof(x)]));
   }
-  const all = Object.values(lines).flat().map(p => p[1]);
-  let lo = Math.min(0, ...all), hi = Math.max(0, ...all);
+  let lo = 0, hi = 0;
+  for (const src of ORDER) for (const p of lines[src]) { if (p[1] < lo) lo = p[1]; if (p[1] > hi) hi = p[1]; }
   if (hi - lo < 1) { hi += 0.5; lo -= 0.5; }
   const X = t => P + (t1 > t0 ? (t - t0) / (t1 - t0) : 0) * (W - P - 10);
+  for (const src of ORDER) {          // one point a pixel column: a replay holds over 100,000 trades
+    const out = [], pts = lines[src];
+    for (const p of pts) {
+      const k = Math.round(X(p[0]) * 2);
+      if (out.length > 1 && out[out.length - 1].k === k) out[out.length - 1] = {k, p}; else out.push({k, p});
+    }
+    lines[src] = out.map(o => o.p);
+  }
   const Y = v => 10 + (hi - v) / (hi - lo) * (H - 30);
   let g = `<line x1="${P}" x2="${W - 10}" y1="${Y(0)}" y2="${Y(0)}" stroke="#1a4556" stroke-width="1"/>`;
   for (const v of [hi, lo]) g += `<text x="${P - 6}" y="${Y(v) + 4}" fill="#8db0b5" font-size="11" text-anchor="end" font-family="IBM Plex Mono">${fmtR(v)}</text>`;
@@ -218,7 +231,7 @@ function draw() {
                   : `live since ${berlin(LAB.start, {day: "2-digit", month: "long", year: "numeric"})}`;
   let h = `<div class="banner"><div class="big">${all.n.toLocaleString("en")} engine trades · ${ts.filter(x => x.src === "auto").length.toLocaleString("en")} Autopilot trades</div>
     <div class="sub">${span} · Custom 12 · 5m · cTrader bars · r3m· #${LAB.ver}</div></div>`;
-  const years = rp ? [...new Set(LAB.T.map(x => berlin(x.t, {year: "numeric"})))].sort() : [];
+  const years = rp ? [...new Set(LAB.T.map(x => String(Math.floor(dayNo(x.t) / 10000))))].sort() : [];
   h += `<div class="chips">` + chips("data", [["mode", "live", "Live"], ["mode", "replay", "Replay"]]) +
     chips("period", rp ? [["period", "all", "All"]].concat(years.map(y => ["period", "y" + y, y])) : [["period", "all", "All"], ["period", "week", "This week"], ["period", "today", "Today"]]) +
     chips("trades", [["kind", "both", "Entries + AF"], ["kind", "entry", "Entries"], ["kind", "af", "AF"]]) +
