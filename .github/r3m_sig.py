@@ -130,6 +130,11 @@ def plan(state, msg_path, cache, dry):
     out(write=1, send=int(LIVE and bool(msgs)))
 
 
+def lab_env():
+    pass
+    return dict(os.environ, R3M_LAB_KEY=os.environ.get("R3M_LAB_KEY", "").strip())
+
+
 def lab(L, st, cache, now, dry):
     pass
     key = os.environ.get("R3M_LAB_KEY", "").strip()
@@ -144,11 +149,11 @@ def lab(L, st, cache, now, dry):
     except Exception as e:
         return f" · lab: {type(e).__name__}"
     st["labH"] = hr
-    sha = hashlib.sha256(raw[raw.index(b'"cols"'):]).hexdigest()
+    sha = "k2" + hashlib.sha256(raw[raw.index(b'"cols"'):]).hexdigest()
     if sha == st.get("labSha") or dry:
         return " · lab unchanged"
     enc = subprocess.run(["openssl", "enc", "-aes-256-cbc", "-pbkdf2", "-iter", "100000", "-md", "sha256", "-salt",
-                          "-pass", "env:R3M_LAB_KEY"], input=gzip.compress(raw, mtime=0), capture_output=True)
+                          "-pass", "env:R3M_LAB_KEY"], input=gzip.compress(raw, mtime=0), capture_output=True, env=lab_env())
     if enc.returncode:
         return " · lab: encryption failed"
     open("r3m-lab.enc", "wb").write(enc.stdout)
@@ -173,7 +178,7 @@ def replay(frm, out_path):
         tb = traceback.extract_tb(e.__traceback__)
         sys.exit(f"engine error: {type(e).__name__} at " + " · ".join(f"{os.path.basename(f.filename)}:{f.lineno}" for f in tb[-3:]))
     enc = subprocess.run(["openssl", "enc", "-aes-256-cbc", "-pbkdf2", "-iter", "100000", "-md", "sha256", "-salt",
-                          "-pass", "env:R3M_LAB_KEY"], input=gzip.compress(raw, mtime=0), capture_output=True)
+                          "-pass", "env:R3M_LAB_KEY"], input=gzip.compress(raw, mtime=0), capture_output=True, env=lab_env())
     if enc.returncode:
         sys.exit("encryption failed")
     open(out_path, "wb").write(enc.stdout)

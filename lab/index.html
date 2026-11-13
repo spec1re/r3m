@@ -94,6 +94,22 @@ const dayKey = t => berlin(t, {year: "numeric", month: "2-digit", day: "2-digit"
 async function openLab(buf, pass) {
   const b = new Uint8Array(buf);
   if (new TextDecoder().decode(b.slice(0, 8)) !== "Salted__") throw new Error("format");
+  let last;
+  for (const p of passes(pass)) {
+    try { return await openWith(b, p); } catch (e) { last = e; }
+  }
+  throw last;
+}
+
+function passes(raw) {
+  let dec = raw;
+  try { dec = decodeURIComponent(raw); } catch (e) {}
+  const out = [];
+  for (const p of [dec, raw, dec.trim(), dec.trim() + "\n", dec.trim() + "\r\n"]) if (p && !out.includes(p)) out.push(p);
+  return out;
+}
+
+async function openWith(b, pass) {
   const km = await crypto.subtle.importKey("raw", new TextEncoder().encode(pass), "PBKDF2", false, ["deriveBits"]);
   const bits = new Uint8Array(await crypto.subtle.deriveBits({name: "PBKDF2", salt: b.slice(8, 16), iterations: 100000, hash: "SHA-256"}, km, 384));
   const key = await crypto.subtle.importKey("raw", bits.slice(0, 32), "AES-CBC", false, ["decrypt"]);
@@ -108,7 +124,9 @@ function fail(big, sub) {
 
 const FILE = {live: "../r3m-lab.enc", replay: "../r3m-replay.enc"};
 async function load(force) {
-  const pass = decodeURIComponent(location.hash.slice(1));
+  const pass = location.hash.slice(1);
+  if (!window.crypto || !crypto.subtle || typeof DecompressionStream === "undefined")
+    return fail("This browser cannot open the lab.", "Open the link in a current Chrome, Safari, Firefox or Edge.");
   if (!pass) return fail("This page needs its full link.", "The lab opens only with the key at the end of its link.");
   const mode = S.mode;
   if (!DATA[mode] || force) {
@@ -124,7 +142,8 @@ async function load(force) {
     DATA[mode].T = DATA[mode].rows.map(r => Object.fromEntries(DATA[mode].cols.map((c, i) => [c, r[i]])));
   }
   LAB = DATA[mode];
-  draw();
+  try { draw(); }
+  catch (e) { fail("The lab could not be drawn.", String(e && e.message || e)); }
 }
 
 function since() {
