@@ -1,0 +1,79 @@
+name: r3m signals
+
+# 🛸 (2026-11-13) r3m·'s alerts without TradingView: after every "Live feed" run, once a new 5m bar has closed, the encrypted
+# engine rebuilds the Custom 12 from cTrader's bars, r3m_sig.py dedups against r3m-sig.json, pushes it (the claim) and sends.
+# LIVE "false" = shadow (logged in r3m-sig.json, nothing sent). Secrets: R3M_ENGINE_KEY, CTRADER_MCP_TOKEN, TG_BOT_TOKEN,
+# TG_CHAT_ID. Source of truth: spec1re/r3m-digest/site-ci/ (r3m_sig.py + the engine come with the site deploy, this file is
+# pushed by hand).
+on:
+  workflow_run:
+    workflows: ["Live feed"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      dry:
+        description: "print the messages, send and write nothing"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: r3m-sig
+  cancel-in-progress: false
+
+env:
+  LIVE: "false"
+
+jobs:
+  signals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - id: due
+        run: python3 .github/r3m_sig.py due r3m-sig.json
+      - if: steps.due.outputs.due == '1' || inputs.dry
+        uses: actions/cache/restore@v4
+        with:
+          path: .cache/r3m
+          key: r3m-bars-${{ github.run_id }}
+          restore-keys: r3m-bars-
+      - if: steps.due.outputs.due == '1' || inputs.dry
+        run: python3 -m pip install -q --user --break-system-packages numpy
+      - id: plan
+        if: steps.due.outputs.due == '1' || inputs.dry
+        env:
+          R3M_ENGINE_KEY: ${{ secrets.R3M_ENGINE_KEY }}
+          CTRADER_MCP_TOKEN: ${{ secrets.CTRADER_MCP_TOKEN }}
+        run: python3 .github/r3m_sig.py plan r3m-sig.json "$RUNNER_TEMP/sig.json" .cache/r3m ${{ inputs.dry && '--dry' || '' }}
+      - if: always() && steps.plan.outcome != 'skipped' && hashFiles('.cache/r3m/*.json.gz') != ''
+        uses: actions/cache/save@v4
+        with:
+          path: .cache/r3m
+          key: r3m-bars-${{ github.run_id }}
+      - name: Claim
+        if: steps.plan.outputs.write == '1'
+        run: |
+          git config user.name "R3M signals"
+          git config user.email "noreply@github.com"
+          git add r3m-sig.json
+          git commit -qm "signals"
+          cp r3m-sig.json "$RUNNER_TEMP/s.json"
+          for i in 1 2 3 4 5 6 7 8; do
+            git push -q origin HEAD:main && exit 0
+            sleep $((i * 2 + RANDOM % 5))
+            git fetch -q origin main && git reset -q --hard origin/main
+            cp "$RUNNER_TEMP/s.json" r3m-sig.json
+            git add r3m-sig.json && { git diff --cached --quiet && exit 0; git commit -qm "signals"; }
+          done
+          exit 1
+      - name: Send
+        if: steps.plan.outputs.send == '1'
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+        run: python3 .github/r3m_sig.py send "$RUNNER_TEMP/sig.json"
