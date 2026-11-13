@@ -156,6 +156,30 @@ def lab(L, st, cache, now, dry):
     return f" · lab {len(enc.stdout):,} bytes"
 
 
+def replay(frm, out_path):
+    pass
+    import gzip
+    for k in ("R3M_ENGINE_KEY", "R3M_LAB_KEY", "CTRADER_MCP_TOKEN"):
+        if not os.environ.get(k, "").strip():
+            sys.exit(k + " missing")
+    try:
+        L, d = engine()
+        start = int(datetime.strptime(frm, "%Y-%m-%d").replace(tzinfo=timezone.utc).timestamp())
+        p = L.replay(start, log=lambda m: print(m, flush=True))
+        raw = json.dumps(p, separators=(",", ":")).encode()
+    except SystemExit:
+        raise
+    except Exception as e:
+        tb = traceback.extract_tb(e.__traceback__)
+        sys.exit(f"engine error: {type(e).__name__} at " + " · ".join(f"{os.path.basename(f.filename)}:{f.lineno}" for f in tb[-3:]))
+    enc = subprocess.run(["openssl", "enc", "-aes-256-cbc", "-pbkdf2", "-iter", "100000", "-md", "sha256", "-salt",
+                          "-pass", "env:R3M_LAB_KEY"], input=gzip.compress(raw, mtime=0), capture_output=True)
+    if enc.returncode:
+        sys.exit("encryption failed")
+    open(out_path, "wb").write(enc.stdout)
+    print(f"{len(p['rows']):,} trades · {len(enc.stdout):,} bytes → {out_path}")
+
+
 def send(msg_path):
     tok, chat = os.environ.get("TG_BOT_TOKEN"), os.environ.get("TG_CHAT_ID")
     if not tok or not chat:
@@ -185,5 +209,7 @@ if __name__ == "__main__":
         due(sys.argv[2])
     elif sys.argv[1] == "plan":
         plan(sys.argv[2], sys.argv[3], sys.argv[4], "--dry" in sys.argv)
+    elif sys.argv[1] == "replay":
+        replay(sys.argv[2], sys.argv[3])
     elif sys.argv[1] == "send":
         send(sys.argv[2])

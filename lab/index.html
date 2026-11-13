@@ -64,7 +64,7 @@ footer{margin-top:30px;color:var(--mist);font-size:12.5px;line-height:1.6}
 <body>
 <div class="wrap">
   <header>
-    <h1>🧪 R3M Lab · Engines live</h1>
+    <h1>🧪 R3M Lab · Engines</h1>
     <div class="meta" id="upd">–</div>
   </header>
   <div id="app"><div class="banner"><div class="big">Opening the lab…</div><div class="sub">&nbsp;</div></div></div>
@@ -80,7 +80,8 @@ const ENG = {lava:["🌋","lava","#ff8577"], climax:["⚡️","climax","#ffcf73"
              dvi:["📈","dvi","#5fd3bf"], ice:["🧊","ice","#7cc7ff"], auto:["🤖","Autopilot","#e6f3f0"]};
 const ORDER = ["auto","lava","climax","equinox","dvi","ice"];
 const TZ = "Europe/Berlin";
-const S = {period: "all", kind: "both", net: false, eng: "all"};
+const S = {mode: "live", period: "all", kind: "both", net: false, eng: "all"};
+const DATA = {};
 let LAB = null;
 
 const $ = s => document.querySelector(s);
@@ -105,23 +106,30 @@ function fail(big, sub) {
   $("#app").innerHTML = `<div class="err"><div class="big">${big}</div><div class="dim">${sub}</div></div>`;
 }
 
-async function load() {
+const FILE = {live: "../r3m-lab.enc", replay: "../r3m-replay.enc"};
+async function load(force) {
   const pass = decodeURIComponent(location.hash.slice(1));
   if (!pass) return fail("This page needs its full link.", "The lab opens only with the key at the end of its link.");
-  let buf;
-  try {
-    const r = await fetch("../r3m-lab.enc?t=" + Date.now(), {cache: "no-store"});
-    if (!r.ok) return fail("No lab data yet.", "The first lab run writes it within the hour after the markets open.");
-    buf = await r.arrayBuffer();
-  } catch (e) { return fail("The lab could not be loaded.", "Try again in a minute."); }
-  try { LAB = await openLab(buf, pass); }
-  catch (e) { return fail("This link's key does not open the lab.", "Check that the whole link was copied."); }
-  LAB.T = LAB.rows.map(r => Object.fromEntries(LAB.cols.map((c, i) => [c, r[i]])));
+  const mode = S.mode;
+  if (!DATA[mode] || force) {
+    if (!DATA[mode]) $("#app").innerHTML = `<div class="banner"><div class="big">Opening the ${mode === "live" ? "lab" : "replay"}…</div><div class="sub">&nbsp;</div></div>`;
+    let buf;
+    try {
+      const r = await fetch(FILE[mode] + "?t=" + Date.now(), {cache: "no-store"});
+      if (!r.ok) { if (mode === "replay") { S.mode = "live"; return load(); } return fail("No lab data yet.", "The first lab run writes it within the hour after the markets open."); }
+      buf = await r.arrayBuffer();
+    } catch (e) { return fail("The lab could not be loaded.", "Try again in a minute."); }
+    try { DATA[mode] = await openLab(buf, pass); }
+    catch (e) { return fail("This link's key does not open the lab.", "Check that the whole link was copied."); }
+    DATA[mode].T = DATA[mode].rows.map(r => Object.fromEntries(DATA[mode].cols.map((c, i) => [c, r[i]])));
+  }
+  LAB = DATA[mode];
   draw();
 }
 
 function since() {
   const now = Date.now() / 1000;
+  if (S.period[0] === "y") { const y = S.period.slice(1); return t => berlin(t, {year: "numeric"}) === y; }
   if (S.period === "today") { const k = dayKey(now); return t => dayKey(t) === k; }
   if (S.period === "week") {
     const d = new Date(new Date().toLocaleString("en-US", {timeZone: TZ}));
@@ -183,12 +191,16 @@ function curve(ts) {
 
 function draw() {
   const ts = pick();
-  $("#upd").textContent = "lab " + berlin(LAB.updated, {weekday: "short", day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit"});
+  $("#upd").textContent = (LAB.replay ? "replay " : "lab ") + berlin(LAB.updated, {weekday: "short", day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit"});
   const all = stats(ts.filter(x => x.src !== "auto"));
-  let h = `<div class="banner"><div class="big">${all.n} engine trades · ${ts.filter(x => x.src === "auto").length} Autopilot trades</div>
-    <div class="sub">since ${berlin(LAB.start, {day: "2-digit", month: "long", year: "numeric"})} · Custom 12 · 5m · cTrader bars · r3m· #${LAB.ver}</div></div>`;
-  h += `<div class="chips">` +
-    chips("period", [["period", "all", "All"], ["period", "week", "This week"], ["period", "today", "Today"]]) +
+  const rp = !!LAB.replay;
+  const span = rp ? `${berlin(LAB.start, {day: "2-digit", month: "short", year: "numeric"})} – ${berlin(LAB.end - 43200, {day: "2-digit", month: "short", year: "numeric"})} · replay on cTrader's history, in-sample (the defaults were tuned on these years)`
+                  : `live since ${berlin(LAB.start, {day: "2-digit", month: "long", year: "numeric"})}`;
+  let h = `<div class="banner"><div class="big">${all.n.toLocaleString("en")} engine trades · ${ts.filter(x => x.src === "auto").length.toLocaleString("en")} Autopilot trades</div>
+    <div class="sub">${span} · Custom 12 · 5m · cTrader bars · r3m· #${LAB.ver}</div></div>`;
+  const years = rp ? [...new Set(LAB.T.map(x => berlin(x.t, {year: "numeric"})))].sort() : [];
+  h += `<div class="chips">` + chips("data", [["mode", "live", "Live"], ["mode", "replay", "Replay"]]) +
+    chips("period", rp ? [["period", "all", "All"]].concat(years.map(y => ["period", "y" + y, y])) : [["period", "all", "All"], ["period", "week", "This week"], ["period", "today", "Today"]]) +
     chips("trades", [["kind", "both", "Entries + AF"], ["kind", "entry", "Entries"], ["kind", "af", "AF"]]) +
     chips("R", [["net", false, "Gross"], ["net", true, "Net"]]) + `</div>`;
 
@@ -240,12 +252,13 @@ function draw() {
   document.querySelectorAll(".chip").forEach(c => c.onclick = () => {
     const k = c.dataset.k, v = c.dataset.v;
     S[k] = k === "net" ? v === "true" : v;
+    if (k === "mode") { S.period = "all"; return load(); }
     draw();
   });
 }
 
 load();
-setInterval(() => LAB && load(), 5 * 60 * 1000);
+setInterval(() => LAB && S.mode === "live" && load(true), 5 * 60 * 1000);
 window.addEventListener("hashchange", load);
 </script>
 </body>
