@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-13",
- "next": 1794591933,
+ "next": 1794595262,
  "lines": 358,
- "left": 355,
+ "left": 354,
  "deck": [
   10,
   248,
@@ -357,13 +357,12 @@
   160,
   27,
   220,
-  349,
-  141
+  349
  ],
  "last": {
-  "t": "2026-11-13 18:12",
+  "t": "2026-11-13 18:46",
   "head": "🎱 Trading Wisdom",
-  "line": "Chasing price is paying more for less."
+  "line": "When the narrative changes, so does the trade. Stubbornness is expensive."
  },
- "sent": 3
+ "sent": 4
 }
