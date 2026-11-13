@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-13",
- "next": 1794589856,
+ "next": 1794591933,
  "lines": 358,
- "left": 356,
+ "left": 355,
  "deck": [
   10,
   248,
@@ -358,13 +358,12 @@
   27,
   220,
   349,
-  141,
-  172
+  141
  ],
  "last": {
-  "t": "2026-11-13 16:54",
+  "t": "2026-11-13 18:12",
   "head": "🎱 Trading Wisdom",
-  "line": "Today's patience is next year's track record."
+  "line": "Chasing price is paying more for less."
  },
- "sent": 2
+ "sent": 3
 }
