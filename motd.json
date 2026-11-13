@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-13",
- "next": 1794585206,
+ "next": 1794589856,
  "lines": 358,
- "left": 357,
+ "left": 356,
  "deck": [
   10,
   248,
@@ -359,13 +359,12 @@
   220,
   349,
   141,
-  172,
-  276
+  172
  ],
  "last": {
-  "t": "2026-11-13 15:50",
+  "t": "2026-11-13 16:54",
   "head": "🎱 Trading Wisdom",
-  "line": "Your journal knows your edge better than your memory does."
+  "line": "Today's patience is next year's track record."
  },
- "sent": 1
+ "sent": 2
 }
