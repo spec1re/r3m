@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-13T08:45:45+00:00",
+ "updated": "2026-11-13T08:51:01+00:00",
  "mode": "live",
  "reports": {
   "morning": "2026-11-13",
@@ -63,12 +63,12 @@
   "site": {
    "label": "Site build",
    "public": false,
-   "last": "2026-11-13T08:43:18Z",
+   "last": "2026-11-13T08:50:26Z",
    "state": "success",
-   "lastDone": "2026-11-13T08:43:45Z",
+   "lastDone": "2026-11-13T08:50:51Z",
    "doneState": "success",
-   "lastOk": "2026-11-13T08:43:45Z",
-   "runs24": 17,
+   "lastOk": "2026-11-13T08:50:51Z",
+   "runs24": 18,
    "fails24": 0,
    "events24": [
     "push",
@@ -132,63 +132,63 @@
   "live": {
    "label": "Live feed",
    "public": true,
-   "last": "2026-11-13T08:44:05Z",
+   "last": "2026-11-13T08:50:12Z",
    "state": "success",
-   "lastDone": "2026-11-13T08:44:34Z",
+   "lastDone": "2026-11-13T08:50:30Z",
    "doneState": "success",
-   "lastOk": "2026-11-13T08:44:34Z",
+   "lastOk": "2026-11-13T08:50:30Z",
    "runs24": 100,
    "fails24": 0,
    "events24": [
     "schedule",
     "workflow_dispatch"
    ],
-   "url": "https://github.com/spec1re/r3m/actions/runs/43395535188"
+   "url": "https://github.com/spec1re/r3m/actions/runs/43396346142"
   },
   "reef": {
    "label": "Reef live",
    "public": true,
-   "last": "2026-11-13T08:44:36Z",
+   "last": "2026-11-13T08:50:33Z",
    "state": "success",
-   "lastDone": "2026-11-13T08:44:57Z",
+   "lastDone": "2026-11-13T08:51:03Z",
    "doneState": "success",
-   "lastOk": "2026-11-13T08:44:57Z",
+   "lastOk": "2026-11-13T08:51:03Z",
    "runs24": 100,
    "fails24": 0,
    "events24": [
     "workflow_run"
    ],
-   "url": "https://github.com/spec1re/r3m/actions/runs/43395604836"
+   "url": "https://github.com/spec1re/r3m/actions/runs/43396393845"
   },
   "kcheck": {
    "label": "Kronos signal check",
    "public": true,
-   "last": "2026-11-13T08:44:36Z",
+   "last": "2026-11-13T08:50:33Z",
    "state": "success",
-   "lastDone": "2026-11-13T08:44:56Z",
+   "lastDone": "2026-11-13T08:50:53Z",
    "doneState": "success",
-   "lastOk": "2026-11-13T08:44:56Z",
+   "lastOk": "2026-11-13T08:50:53Z",
    "runs24": 100,
    "fails24": 0,
    "events24": [
     "workflow_run"
    ],
-   "url": "https://github.com/spec1re/r3m/actions/runs/43395604721"
+   "url": "https://github.com/spec1re/r3m/actions/runs/43396393853"
   },
   "pages": {
    "label": "Pages deploy",
    "public": true,
-   "last": "2026-11-13T08:44:26Z",
+   "last": "2026-11-13T08:50:48Z",
    "state": "success",
-   "lastDone": "2026-11-13T08:44:46Z",
+   "lastDone": "2026-11-13T08:51:11Z",
    "doneState": "success",
-   "lastOk": "2026-11-13T08:44:46Z",
-   "runs24": 30,
+   "lastOk": "2026-11-13T08:51:11Z",
+   "runs24": 32,
    "fails24": 0,
    "events24": [
     "push"
    ],
-   "url": "https://github.com/spec1re/r3m/actions/runs/43395584343"
+   "url": "https://github.com/spec1re/r3m/actions/runs/43396426586"
   }
  }
 }
