@@ -12,7 +12,7 @@ FOCUS = {"NAS100", "GER40", "US500", "XAUUSD", "EURUSD"}
                                                                                                                             
                                                                                                                           
                                                                                                                          
-FOCUS_LIVE = False
+FOCUS_LIVE = True
 ORACLE = SYMS if FOCUS_LIVE else [s for s in SYMS if s not in FOCUS]
 NYZ = ZoneInfo("America/New_York")
 SESSIONS = {"London": {"tz": "Europe/London", "open": (8, 0), "close": (16, 30), "due": ((7, 25), (12, 0))},
