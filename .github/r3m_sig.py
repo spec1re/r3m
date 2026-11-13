@@ -113,9 +113,10 @@ def plan(state, msg_path, cache, dry):
     st["last"] = {"t": now, "new": len(msgs), "stale": stale, "lag": lag, "live": LIVE,
                   "syms": {s: {k: i[k] for k in ("bars", "new", "err")} for s, i in res["syms"].items()}}
     st["runs"] = st.get("runs", 0) + 1
+    lab_note = lab(L, st, cache, now, dry)
     print(f"{datetime.fromtimestamp(now, timezone.utc):%a %H:%M} UTC · {sum(1 for i in res['syms'].values() if not i['err'])}"
           f"/{len(res['syms'])} symbols · {len(msgs)} new · {stale} stale" + (f" · waiting for {', '.join(lag)}" if lag else "")
-          + ("" if LIVE else " · shadow"))
+          + ("" if LIVE else " · shadow") + lab_note)
     for s, i in res["syms"].items():
         if i["err"]:
             print(f"  {s}: {i['err']}")
@@ -127,6 +128,32 @@ def plan(state, msg_path, cache, dry):
     json.dump([{"text": m["text"], "quiet": not m["ring"]} for m in msgs], open(msg_path, "w", encoding="utf-8"), ensure_ascii=False)
     json.dump(st, open(state, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
     out(write=1, send=int(LIVE and bool(msgs)))
+
+
+def lab(L, st, cache, now, dry):
+    pass
+    key = os.environ.get("R3M_LAB_KEY", "").strip()
+    if not key or not hasattr(L, "lab"):
+        return " · lab: no key"
+    hr = now // 3600
+    if st.get("labH") == hr:
+        return ""
+    import gzip, hashlib
+    try:
+        raw = json.dumps(L.lab(cache, now), separators=(",", ":")).encode()
+    except Exception as e:
+        return f" · lab: {type(e).__name__}"
+    st["labH"] = hr
+    sha = hashlib.sha256(raw[raw.index(b'"cols"'):]).hexdigest()
+    if sha == st.get("labSha") or dry:
+        return " · lab unchanged"
+    enc = subprocess.run(["openssl", "enc", "-aes-256-cbc", "-pbkdf2", "-iter", "100000", "-md", "sha256", "-salt",
+                          "-pass", "env:R3M_LAB_KEY"], input=gzip.compress(raw, mtime=0), capture_output=True)
+    if enc.returncode:
+        return " · lab: encryption failed"
+    open("r3m-lab.enc", "wb").write(enc.stdout)
+    st["labSha"] = sha
+    return f" · lab {len(enc.stdout):,} bytes"
 
 
 def send(msg_path):

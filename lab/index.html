@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M24 6h16v4h-3v16l15 24c2 4-1 8-5 8H17c-4 0-7-4-5-8l15-24V10h-3z' fill='%235fd3bf'/%3E%3Ccircle cx='28' cy='46' r='4' fill='%23061a24'/%3E%3Ccircle cx='38' cy='40' r='3' fill='%23061a24'/%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>R3M Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --abyss:#061a24; --deep:#0a2430; --reef:#0e2f3d; --line:#1a4556;
+  --foam:#e6f3f0; --mist:#8db0b5; --glass:#5fd3bf; --coral:#ff8577; --sun:#ffcf73; --violet:#a99bff; --sky:#7cc7ff;
+  --f-display:"Fredoka","Nunito","Trebuchet MS",system-ui,sans-serif;
+  --f-body:"Figtree","Segoe UI",system-ui,sans-serif;
+  --f-data:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:radial-gradient(1200px 600px at 50% -200px,#0d3a4a 0%,var(--abyss) 60%) fixed,var(--abyss);
+  color:var(--foam);font:15px/1.5 var(--f-body);min-height:100vh}
+.wrap{max-width:1040px;margin:0 auto;padding:28px 16px 60px}
+header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font:600 26px/1.2 var(--f-display);margin:0;letter-spacing:.2px}
+.meta{color:var(--mist);font:13px var(--f-data)}
+.banner{margin:20px 0 18px;padding:16px 18px;border-radius:14px;border:1px solid var(--line);
+  background:linear-gradient(135deg,rgba(14,47,61,.9),rgba(10,36,48,.9))}
+.banner .big{font:600 20px var(--f-display)}
+.banner .sub{color:var(--mist);font-size:13.5px}
+h2{font:600 15px var(--f-display);color:var(--mist);text-transform:uppercase;letter-spacing:1.2px;margin:28px 0 10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px 18px;margin:6px 0 4px}
+.grp{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.grp b{font:500 12px var(--f-data);color:var(--mist);margin-right:2px}
+.chip{font:500 13px var(--f-body);color:var(--mist);background:rgba(10,36,48,.72);border:1px solid var(--line);
+  border-radius:999px;padding:3px 11px;cursor:pointer}
+.chip.on{color:var(--abyss);background:var(--glass);border-color:var(--glass)}
+.card{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:rgba(10,36,48,.72)}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font:13.5px var(--f-data)}
+th,td{padding:8px 12px;text-align:right;white-space:nowrap;border-top:1px solid var(--line)}
+th{font:500 12px var(--f-data);color:var(--mist);text-transform:uppercase;letter-spacing:.6px;border-top:0;background:rgba(14,47,61,.6)}
+th:first-child,td:first-child{text-align:left}
+td.eng{font:600 14px var(--f-body)}
+tr.auto td{background:rgba(95,211,191,.06)}
+.pos{color:var(--glass)} .neg{color:var(--coral)} .dim{color:var(--mist)}
+.sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:8px;vertical-align:0}
+.chart{padding:14px 10px 8px}
+.chart svg{width:100%;height:auto;display:block}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;padding:0 14px 12px;font:13px var(--f-body);color:var(--mist)}
+.note{color:var(--mist);font-size:13px;margin:8px 2px 0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:760px){.two{grid-template-columns:1fr}}
+.kpi{padding:14px 16px}
+.kpi .v{font:600 22px var(--f-display)}
+.kpi .l{color:var(--mist);font-size:13px}
+footer{margin-top:30px;color:var(--mist);font-size:12.5px;line-height:1.6}
+.err{margin-top:40px;padding:22px;border-radius:14px;border:1px solid var(--line);background:rgba(10,36,48,.72)}
+.err .big{font:600 20px var(--f-display);margin-bottom:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🧪 R3M Lab · Engines live</h1>
+    <div class="meta" id="upd">–</div>
+  </header>
+  <div id="app"><div class="banner"><div class="big">Opening the lab…</div><div class="sub">&nbsp;</div></div></div>
+  <footer>
+    Every engine runs on its own on the same Pepperstone 5m bars, with the 🤖 Autopilot beside them exactly as r3m· runs it.
+    Nothing on this page is sent anywhere. R = r3m·'s exit (half at TP1, the rest to TP2 or out at the close that took it back
+    to the entry), stops at the close they fired on. Net = after the spread. 2R reach = the best move in the trade's way within
+    6 hours before a close beyond its stop. Times in Berlin. The page refreshes itself every 5 minutes, the lab hourly.
+  </footer>
+</div>
+<script>
+const ENG = {lava:["🌋","lava","#ff8577"], climax:["⚡️","climax","#ffcf73"], equinox:["🌗","equinox","#a99bff"],
+             dvi:["📈","dvi","#5fd3bf"], ice:["🧊","ice","#7cc7ff"], auto:["🤖","Autopilot","#e6f3f0"]};
+const ORDER = ["auto","lava","climax","equinox","dvi","ice"];
+const TZ = "Europe/Berlin";
+const S = {period: "all", kind: "both", net: false, eng: "all"};
+let LAB = null;
+
+const $ = s => document.querySelector(s);
+const fmtR = (r, d = 1) => r == null ? "–" : (r > 0 ? "+" : r < 0 ? "−" : "") + Math.abs(r).toFixed(d);
+const cls = r => r > 0.0001 ? "pos" : r < -0.0001 ? "neg" : "dim";
+const pct = (a, b) => b ? Math.round(100 * a / b) + "%" : "–";
+const berlin = (t, o) => new Intl.DateTimeFormat("en-GB", Object.assign({timeZone: TZ}, o)).format(new Date(t * 1000));
+const dayKey = t => berlin(t, {year: "numeric", month: "2-digit", day: "2-digit"});
+
+async function openLab(buf, pass) {
+  const b = new Uint8Array(buf);
+  if (new TextDecoder().decode(b.slice(0, 8)) !== "Salted__") throw new Error("format");
+  const km = await crypto.subtle.importKey("raw", new TextEncoder().encode(pass), "PBKDF2", false, ["deriveBits"]);
+  const bits = new Uint8Array(await crypto.subtle.deriveBits({name: "PBKDF2", salt: b.slice(8, 16), iterations: 100000, hash: "SHA-256"}, km, 384));
+  const key = await crypto.subtle.importKey("raw", bits.slice(0, 32), "AES-CBC", false, ["decrypt"]);
+  const pt = await crypto.subtle.decrypt({name: "AES-CBC", iv: bits.slice(32, 48)}, key, b.slice(16));
+  const ds = new Blob([pt]).stream().pipeThrough(new DecompressionStream("gzip"));
+  return JSON.parse(await new Response(ds).text());
+}
+
+function fail(big, sub) {
+  $("#app").innerHTML = `<div class="err"><div class="big">${big}</div><div class="dim">${sub}</div></div>`;
+}
+
+async function load() {
+  const pass = decodeURIComponent(location.hash.slice(1));
+  if (!pass) return fail("This page needs its full link.", "The lab opens only with the key at the end of its link.");
+  let buf;
+  try {
+    const r = await fetch("../r3m-lab.enc?t=" + Date.now(), {cache: "no-store"});
+    if (!r.ok) return fail("No lab data yet.", "The first lab run writes it within the hour after the markets open.");
+    buf = await r.arrayBuffer();
+  } catch (e) { return fail("The lab could not be loaded.", "Try again in a minute."); }
+  try { LAB = await openLab(buf, pass); }
+  catch (e) { return fail("This link's key does not open the lab.", "Check that the whole link was copied."); }
+  LAB.T = LAB.rows.map(r => Object.fromEntries(LAB.cols.map((c, i) => [c, r[i]])));
+  draw();
+}
+
+function since() {
+  const now = Date.now() / 1000;
+  if (S.period === "today") { const k = dayKey(now); return t => dayKey(t) === k; }
+  if (S.period === "week") {
+    const d = new Date(new Date().toLocaleString("en-US", {timeZone: TZ}));
+    const back = (d.getDay() + 6) % 7;
+    const mon = new Date(d.getFullYear(), d.getMonth(), d.getDate() - back);
+    const key = mon.getFullYear() * 10000 + (mon.getMonth() + 1) * 100 + mon.getDate();
+    return t => { const [dd, mm, yy] = dayKey(t).split("/").map(Number); return yy * 10000 + mm * 100 + dd >= key; };
+  }
+  return () => true;
+}
+
+function pick() {
+  const ok = since();
+  return LAB.T.filter(x => ok(x.t) && (S.kind === "both" || (S.kind === "af") === !!x.af));
+}
+const Rof = x => x.R == null ? null : (S.net ? x.R - (x.cost || 0) : x.R);
+
+function stats(ts) {
+  const c = ts.filter(x => x.R != null);
+  const R = c.reduce((a, x) => a + Rof(x), 0);
+  return {n: ts.length, closed: c.length, open: ts.length - c.length, R, avg: c.length ? R / c.length : null,
+          tp1: c.filter(x => x.tp1).length, stop: c.filter(x => x.res === "stop").length,
+          r2: c.filter(x => x.mfe >= 2).length};
+}
+
+function chips(name, opts) {
+  return `<div class="grp"><b>${name}</b>` + opts.map(([k, v, l]) =>
+    `<span class="chip${S[k] === v ? " on" : ""}" data-k="${k}" data-v="${v}">${l}</span>`).join("") + "</div>";
+}
+
+function curve(ts) {
+  const c = ts.filter(x => x.R != null).sort((a, b) => a.tx - b.tx);
+  if (!c.length) return `<div class="note" style="padding:14px">No closed trades in this period yet.</div>`;
+  const t0 = c[0].tx, t1 = c[c.length - 1].tx, W = 960, H = 260, P = 34;
+  const lines = {};
+  for (const src of ORDER) {
+    let s = 0;
+    lines[src] = [[t0, 0]].concat(c.filter(x => x.src === src).map(x => [x.tx, s += Rof(x)]));
+  }
+  const all = Object.values(lines).flat().map(p => p[1]);
+  let lo = Math.min(0, ...all), hi = Math.max(0, ...all);
+  if (hi - lo < 1) { hi += 0.5; lo -= 0.5; }
+  const X = t => P + (t1 > t0 ? (t - t0) / (t1 - t0) : 0) * (W - P - 10);
+  const Y = v => 10 + (hi - v) / (hi - lo) * (H - 30);
+  let g = `<line x1="${P}" x2="${W - 10}" y1="${Y(0)}" y2="${Y(0)}" stroke="#1a4556" stroke-width="1"/>`;
+  for (const v of [hi, lo]) g += `<text x="${P - 6}" y="${Y(v) + 4}" fill="#8db0b5" font-size="11" text-anchor="end" font-family="IBM Plex Mono">${fmtR(v)}</text>`;
+  g += `<text x="${P}" y="${H - 4}" fill="#8db0b5" font-size="11" font-family="IBM Plex Mono">${berlin(t0, {day: "2-digit", month: "short"})}</text>`;
+  g += `<text x="${W - 10}" y="${H - 4}" fill="#8db0b5" font-size="11" text-anchor="end" font-family="IBM Plex Mono">${berlin(t1, {day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit"})}</text>`;
+  for (const src of ORDER) {
+    const pts = lines[src];
+    if (pts.length < 2) continue;
+    let d = "";
+    pts.forEach((p, i) => { d += (i ? `H${X(p[0]).toFixed(1)}V${Y(p[1]).toFixed(1)}` : `M${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`); });
+    g += `<path d="${d}" fill="none" stroke="${ENG[src][2]}" stroke-width="${src === "auto" ? 2.6 : 1.8}" ${src === "auto" ? 'stroke-dasharray="6 4"' : ""} stroke-linejoin="round"/>`;
+  }
+  return `<div class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Σ R over time per engine">${g}</svg></div>
+    <div class="legend">${ORDER.map(s => `<span><span class="sw" style="background:${ENG[s][2]}"></span>${ENG[s][0]} ${ENG[s][1]}</span>`).join("")}</div>`;
+}
+
+function draw() {
+  const ts = pick();
+  $("#upd").textContent = "lab " + berlin(LAB.updated, {weekday: "short", day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit"});
+  const all = stats(ts.filter(x => x.src !== "auto"));
+  let h = `<div class="banner"><div class="big">${all.n} engine trades · ${ts.filter(x => x.src === "auto").length} Autopilot trades</div>
+    <div class="sub">since ${berlin(LAB.start, {day: "2-digit", month: "long", year: "numeric"})} · Custom 12 · 5m · cTrader bars · r3m· #${LAB.ver}</div></div>`;
+  h += `<div class="chips">` +
+    chips("period", [["period", "all", "All"], ["period", "week", "This week"], ["period", "today", "Today"]]) +
+    chips("trades", [["kind", "both", "Entries + AF"], ["kind", "entry", "Entries"], ["kind", "af", "AF"]]) +
+    chips("R", [["net", false, "Gross"], ["net", true, "Net"]]) + `</div>`;
+
+  // the board
+  const rows = ORDER.map(src => [src, stats(ts.filter(x => x.src === src))]).sort((a, b) => (a[0] === "auto") - (b[0] === "auto") || b[1].R - a[1].R);
+  h += `<h2>Board</h2><div class="card scroll"><table><thead><tr><th>Engine</th><th>Σ R</th><th>Ø R</th><th>Trades</th><th>TP1</th><th>Stop</th><th>2R reach</th><th>Open</th></tr></thead><tbody>`;
+  for (const [src, s] of rows) {
+    h += `<tr class="${src === "auto" ? "auto" : ""}"><td class="eng"><span class="sw" style="background:${ENG[src][2]}"></span>${ENG[src][0]} ${ENG[src][1]}</td>
+      <td class="${cls(s.R)}"><b>${fmtR(s.R)}</b></td><td class="${cls(s.avg)}">${fmtR(s.avg, 2)}</td><td>${s.closed}</td>
+      <td>${pct(s.tp1, s.closed)}</td><td>${pct(s.stop, s.closed)}</td><td>${pct(s.r2, s.closed)}</td><td class="dim">${s.open || ""}</td></tr>`;
+  }
+  h += `</tbody></table></div>`;
+  h += `<p class="note">Few trades are noise: a lead needs weeks. The Autopilot row trades one engine a session, so it does not add up to the others.</p>`;
+
+  h += `<h2>Σ R over time</h2><div class="card">${curve(ts)}</div>`;
+
+  // by symbol
+  const syms = [...new Set(LAB.T.map(x => x.sym))];
+  h += `<h2>By symbol · Σ R</h2><div class="card scroll"><table><thead><tr><th>Symbol</th>${ORDER.map(s => `<th>${ENG[s][0]} ${ENG[s][1]}</th>`).join("")}</tr></thead><tbody>`;
+  for (const sym of syms) {
+    h += `<tr><td>${sym}</td>` + ORDER.map(src => {
+      const s = stats(ts.filter(x => x.src === src && x.sym === sym));
+      return s.closed ? `<td class="${cls(s.R)}" title="${s.closed} closed · TP1 ${pct(s.tp1, s.closed)}">${fmtR(s.R)}</td>` : `<td class="dim">·</td>`;
+    }).join("") + `</tr>`;
+  }
+  h += `</tbody></table></div>`;
+
+  // lava · LVN
+  const lv = ts.filter(x => x.src === "lava" && !x.af && x.lvn != null);
+  const a = stats(lv.filter(x => x.lvn)), b = stats(lv.filter(x => !x.lvn));
+  h += `<h2>🌋 lava · LVN on the way to 2R</h2><div class="two">` + [["LVN on the way", a], ["no LVN", b]].map(([l, s]) =>
+    `<div class="card kpi"><div class="l">${l}</div><div class="v">${pct(s.r2, s.closed)} <span class="dim" style="font-size:14px">reach 2R</span></div>
+     <div class="l">${s.closed} closed · TP1 ${pct(s.tp1, s.closed)} · Ø <span class="${cls(s.avg)}">${fmtR(s.avg, 2)}R</span> · Σ <span class="${cls(s.R)}">${fmtR(s.R)}R</span></div></div>`).join("") + `</div>`;
+
+  // latest trades
+  h += `<h2>Latest trades</h2><div class="chips">` + chips("engine", [["eng", "all", "All"]].concat(ORDER.map(s => ["eng", s, ENG[s][0] + " " + ENG[s][1]]))) + `</div>`;
+  const last = ts.filter(x => S.eng === "all" || x.src === S.eng).sort((p, q) => (q.tx || q.t) - (p.tx || p.t)).slice(0, 60);
+  h += `<div class="card scroll"><table><thead><tr><th>Time</th><th>Engine</th><th>Symbol</th><th>Side</th><th>Entry</th><th>Stop</th><th>TP1</th><th>Result</th><th>2R reach</th><th>R</th></tr></thead><tbody>`;
+  for (const x of last) {
+    const r = Rof(x), dec = (String(x.en).split(".")[1] || "").length, px = v => v == null ? "–" : (+v).toFixed(dec);
+    h += `<tr><td>${berlin(x.t, {day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit"})}</td>
+      <td>${ENG[x.src][0]}${x.src === "auto" ? " " + ENG[x.eng][0] : ""}${x.af ? " AF" : ""}</td><td>${x.sym}</td>
+      <td class="${x.d > 0 ? "pos" : "neg"}">${x.d > 0 ? "▲ long" : "▼ short"}</td><td>${px(x.en)}</td><td class="dim">${px(x.sl)}</td>
+      <td class="dim">${px(x.t1)}</td><td class="dim">${x.res}</td>
+      <td>${x.mfe >= 2 ? "✓" : x.mfe.toFixed(1)}</td><td class="${cls(r)}">${r == null ? "live" : fmtR(r, 2)}</td></tr>`;
+  }
+  h += `</tbody></table></div>`;
+  $("#app").innerHTML = h;
+  document.querySelectorAll(".chip").forEach(c => c.onclick = () => {
+    const k = c.dataset.k, v = c.dataset.v;
+    S[k] = k === "net" ? v === "true" : v;
+    draw();
+  });
+}
+
+load();
+setInterval(() => LAB && load(), 5 * 60 * 1000);
+window.addEventListener("hashchange", load);
+</script>
+</body>
+</html>
