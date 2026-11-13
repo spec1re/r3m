@@ -1,0 +1,56 @@
+name: Message of the day
+
+# ☕ (2026-11-13) motd· off TradingView: after every "Live feed" run, motd.py decides whether a line is due (☕ 07:30 · 🎱 / 🎬
+# a random 0.5–1.5 h apart, 07:00–22:00 Berlin, weekdays), pushes motd.json first (the claim), then sends it.
+# Source of truth: spec1re/r3m-digest/site-ci/ (motd.py + motd_lines.json are copied by the site deploy, this file is
+# pushed by hand).
+on:
+  workflow_run:
+    workflows: ["Live feed"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      dry:
+        description: "print the decision and the line, send and write nothing"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: motd
+  cancel-in-progress: false
+
+jobs:
+  motd:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - id: plan
+        run: python3 .github/motd.py plan motd.json "$RUNNER_TEMP/motd.txt" ${{ inputs.dry && '--dry' || '' }}
+      - name: Claim
+        if: steps.plan.outputs.write == '1'
+        run: |
+          git config user.name "R3M motd"
+          git config user.email "noreply@github.com"
+          git add motd.json
+          git commit -qm "motd"
+          cp motd.json "$RUNNER_TEMP/m.json"
+          for i in 1 2 3 4 5 6 7 8; do
+            git push -q origin HEAD:main && exit 0
+            sleep $((i * 2 + RANDOM % 5))
+            git fetch -q origin main && git reset -q --hard origin/main
+            cp "$RUNNER_TEMP/m.json" motd.json
+            git add motd.json && { git diff --cached --quiet && exit 0; git commit -qm "motd"; }
+          done
+          exit 1
+      - name: Send
+        if: steps.plan.outputs.send == '1'
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+        run: python3 .github/motd.py send "$RUNNER_TEMP/motd.txt"
