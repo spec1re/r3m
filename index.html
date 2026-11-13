@@ -769,11 +769,19 @@ function buildNext(M){ const yr = +((M.date || "").slice(0, 4)) || new Date().ge
   for (const a of calDays(M)){ const m = a.day.match(/^\w+\s+(\w{3})\s+(\d{1,2})$/), dated = m && MON.indexOf(m[1]) >= 0;
     for (const i of a.items){ const txt0 = typeof i === "string" ? i : i.text;
       /* the "Next" card's lines carry their own day (`Tue Nov 10: 14:30 …`, 2026-11-06): the countdown runs on to them once today is done */
-      const d = dated ? null : txt0.match(/^\w{3},? (\w{3}) (\d{1,2}):?\s+(.*)$/); if (!dated && (!d || MON.indexOf(d[1]) < 0)) continue;
-      const txt = dated ? txt0 : d[3], t = txt.match(/^~?(\d{1,2}):(\d{2})\s+(.*)$/); if (!t) continue;
+      /* also `Tue 08:00 …` (the weekday alone: the next such day after the report's) and `Thu Nov 19 before the open WMT` /
+         `Thu WMT (before the open)` (earnings without a time: ~13:00 / ~22:00 Berlin), 2026-11-13 · they were skipped before */
+      const d = dated ? null : txt0.match(/^(Mon|Tue|Wed|Thu|Fri|Sat|Sun),?(?: (\w{3}) (\d{1,2}))?:?\s+(.*)$/); if (!dated && (!d || (d[2] && MON.indexOf(d[2]) < 0))) continue;
+      let txt = dated ? txt0 : d[4], t = txt.match(/^~?(\d{1,2}):(\d{2})\s+(.*)$/), ap = txt.startsWith("~");
+      if (!t){ const q = txt.match(/\(?\b(before the open|after the close)\b\)?/i); if (!q) continue;
+        const ttl = txt.replace(q[0], "").replace(/\s{2,}/g, " ").trim(); if (!ttl) continue;
+        t = [null, /before/i.test(q[1]) ? "13" : "22", "00", ttl]; ap = true; txt = `${t[1]}:00 ${ttl}`; }
       const imp = impOf(i, txt); if (imp === -1) continue;   // the countdown waits for medium and high
-      const mo = MON.indexOf(dated ? m[1] : d[1]), dd = +(dated ? m[2] : d[2]), y = mo < new Date().getMonth() - 6 ? yr + 1 : yr;
-      out.push({utc: berlinUtc(y, mo, dd, +t[1], +t[2]), title: t[3], flag: "", tv: typeof i === "string" ? null : i.tv, approx: txt.startsWith("~"), imp, earn: isEarn(txt)}); } }
+      let mo, dd, y;
+      if (dated || d[2]){ mo = MON.indexOf(dated ? m[1] : d[2]); dd = +(dated ? m[2] : d[3]); y = mo < new Date().getMonth() - 6 ? yr + 1 : yr; }
+      else { const base = new Date(Date.parse((M.date || "") + "T12:00:00Z") || Date.now()), want = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].indexOf(d[1]);
+        let k = (want - base.getUTCDay() + 7) % 7 || 7; const dt = new Date(base.getTime() + k * 864e5); y = dt.getUTCFullYear(); mo = dt.getUTCMonth(); dd = dt.getUTCDate(); }
+      out.push({utc: berlinUtc(y, mo, dd, +t[1], +t[2]), title: t[3], flag: "", tv: typeof i === "string" ? null : i.tv, approx: ap, imp, earn: isEarn(t[3])}); } }
   const hi = EVENTS.map(e => ({utc: Date.parse(e.utc), title: e.title, flag: e.flag, tv: e.tv, imp: [-1, 0, 1].includes(e.imp) ? e.imp : 1}));   // events/*.json = the day's high ones
   NEXTEV = out.concat(hi.filter(h => !out.some(o => Math.abs(h.utc - o.utc) < 60e3 && o.title.includes(h.flag || "\u0000")))).sort((a, b) => a.utc - b.utc); }
 function countdown(){ const now = Date.now(); const next = NEXTEV.find(e => e.utc > now - 5*60e3);
