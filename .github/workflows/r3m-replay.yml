@@ -1,0 +1,46 @@
+name: r3m lab replay
+
+# 🧪 (2026-11-13) the engine lab's replay, by hand: every engine alone + the 🤖 Autopilot on cTrader's 5m history from
+# `from` to the lab's start → r3m-replay.enc (encrypted with R3M_LAB_KEY, read by the lab page). Source of truth:
+# spec1re/r3m-digest/site-ci/ (r3m_sig.py + the engine come with the site deploy, this file is pushed by hand).
+on:
+  workflow_dispatch:
+    inputs:
+      from:
+        description: "first day (YYYY-MM-DD)"
+        default: "2023-01-02"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: r3m-replay
+  cancel-in-progress: false
+
+jobs:
+  replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - run: python3 -m pip install -q --user --break-system-packages numpy
+      - name: Replay
+        env:
+          R3M_ENGINE_KEY: ${{ secrets.R3M_ENGINE_KEY }}
+          R3M_LAB_KEY: ${{ secrets.R3M_LAB_KEY }}
+          CTRADER_MCP_TOKEN: ${{ secrets.CTRADER_MCP_TOKEN }}
+          FROM: ${{ inputs.from }}
+        run: python3 .github/r3m_sig.py replay "$FROM" "$RUNNER_TEMP/r3m-replay.enc"
+      - name: Publish
+        run: |
+          git config user.name "R3M lab"
+          git config user.email "noreply@github.com"
+          for i in 1 2 3 4 5 6 7 8; do
+            git fetch -q origin main && git reset -q --hard origin/main
+            cp "$RUNNER_TEMP/r3m-replay.enc" r3m-replay.enc
+            git add r3m-replay.enc && git commit -qm "lab replay" && git push -q origin HEAD:main && exit 0
+            sleep $((i * 3 + RANDOM % 5))
+          done
+          exit 1
