@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-13",
- "next": 1794595262,
+ "next": 1794599230,
  "lines": 358,
- "left": 354,
+ "left": 353,
  "deck": [
   10,
   248,
@@ -356,13 +356,12 @@
   314,
   160,
   27,
-  220,
-  349
+  220
  ],
  "last": {
-  "t": "2026-11-13 18:46",
-  "head": "🎱 Trading Wisdom",
-  "line": "When the narrative changes, so does the trade. Stubbornness is expensive."
+  "t": "2026-11-13 19:42",
+  "head": "🎬 Trading Floor",
+  "line": "The desk doesn't forgive mistakes; it just reallocates your desk to the next guy."
  },
- "sent": 4
+ "sent": 5
 }
