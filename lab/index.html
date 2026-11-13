@@ -105,7 +105,8 @@ function passes(raw) {
   let dec = raw;
   try { dec = decodeURIComponent(raw); } catch (e) {}
   const out = [];
-  for (const p of [dec, raw, dec.trim(), dec.trim() + "\n", dec.trim() + "\r\n"]) if (p && !out.includes(p)) out.push(p);
+  const t = dec.trim(), h = t.replace(/^#+/, "");
+  for (const p of [dec, raw, t, t + "\n", t + "\r\n", "#" + h, h, "#" + h + "\n"]) if (p && !out.includes(p)) out.push(p);
   return out;
 }
 
@@ -138,7 +139,7 @@ async function load(force) {
       buf = await r.arrayBuffer();
     } catch (e) { return fail("The lab could not be loaded.", "Try again in a minute."); }
     try { DATA[mode] = await openLab(buf, pass); }
-    catch (e) { return fail("This link's key does not open the lab.", "Check that the whole link was copied."); }
+    catch (e) { return fail("This link's key does not open the lab.", `Check that the whole link was copied · ${[...pass].length} characters after the # · ${mode} data ${buf.byteLength.toLocaleString("en")} bytes`); }
     DATA[mode].T = DATA[mode].rows.map(r => Object.fromEntries(DATA[mode].cols.map((c, i) => [c, r[i]])));
   }
   LAB = DATA[mode];

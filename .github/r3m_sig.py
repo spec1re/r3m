@@ -135,6 +135,15 @@ def lab_env():
     return dict(os.environ, R3M_LAB_KEY=os.environ.get("R3M_LAB_KEY", "").strip())
 
 
+def opens(path):
+    pass
+    if not os.path.exists(path):
+        return False
+    r = subprocess.run(["openssl", "enc", "-d", "-aes-256-cbc", "-pbkdf2", "-iter", "100000", "-md", "sha256",
+                        "-pass", "env:R3M_LAB_KEY", "-in", path], capture_output=True, env=lab_env())
+    return r.returncode == 0 and r.stdout[:2] == b"\x1f\x8b"
+
+
 def lab(L, st, cache, now, dry):
     pass
     key = os.environ.get("R3M_LAB_KEY", "").strip()
@@ -150,7 +159,7 @@ def lab(L, st, cache, now, dry):
         return f" · lab: {type(e).__name__}"
     st["labH"] = hr
     sha = "k2" + hashlib.sha256(raw[raw.index(b'"cols"'):]).hexdigest()
-    if sha == st.get("labSha") or dry:
+    if (sha == st.get("labSha") and opens("r3m-lab.enc")) or dry:
         return " · lab unchanged"
     enc = subprocess.run(["openssl", "enc", "-aes-256-cbc", "-pbkdf2", "-iter", "100000", "-md", "sha256", "-salt",
                           "-pass", "env:R3M_LAB_KEY"], input=gzip.compress(raw, mtime=0), capture_output=True, env=lab_env())
