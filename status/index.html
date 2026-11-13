@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>R3M Reef Status</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --abyss:#061a24; --deep:#0a2430; --reef:#0e2f3d; --line:#1a4556;
+  --foam:#e6f3f0; --mist:#8db0b5; --glass:#5fd3bf; --coral:#ff8577; --sun:#ffcf73;
+  --f-display:"Fredoka","Nunito","Trebuchet MS",system-ui,sans-serif;
+  --f-body:"Figtree","Segoe UI",system-ui,sans-serif;
+  --f-data:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:radial-gradient(1200px 600px at 50% -200px,#0d3a4a 0%,var(--abyss) 60%) fixed,var(--abyss);
+  color:var(--foam);font:15px/1.5 var(--f-body);min-height:100vh}
+.wrap{max-width:880px;margin:0 auto;padding:28px 16px 60px}
+header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font:600 26px/1.2 var(--f-display);margin:0;letter-spacing:.2px}
+h1 a{color:inherit;text-decoration:none}
+.meta{color:var(--mist);font:13px var(--f-data)}
+.banner{margin:20px 0 26px;padding:16px 18px;border-radius:14px;border:1px solid var(--line);
+  background:linear-gradient(135deg,rgba(14,47,61,.9),rgba(10,36,48,.9));display:flex;gap:14px;align-items:center}
+.banner .big{font:600 20px var(--f-display)}
+.banner .sub{color:var(--mist);font-size:13.5px}
+.banner .dot{width:14px;height:14px;flex:none}
+h2{font:600 15px var(--f-display);color:var(--mist);text-transform:uppercase;letter-spacing:1.2px;margin:26px 0 10px}
+.list{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:rgba(10,36,48,.72)}
+.row{display:grid;grid-template-columns:18px minmax(0,1fr) auto;gap:4px 12px;padding:12px 16px;border-top:1px solid var(--line);align-items:start}
+.row:first-child{border-top:0}
+.dot{width:10px;height:10px;border-radius:50%;margin-top:6px;background:var(--mist)}
+.ok .dot{background:var(--glass);box-shadow:0 0 0 3px rgba(95,211,191,.15)}
+.late .dot{background:var(--sun);box-shadow:0 0 0 3px rgba(255,207,115,.18)}
+.fail .dot{background:var(--coral);box-shadow:0 0 0 3px rgba(255,133,119,.2)}
+.idle .dot{background:#4c6f78}
+.unknown .dot{background:transparent;border:2px solid var(--mist)}
+.name{font-weight:600}
+.name a{color:inherit;text-decoration:none;border-bottom:1px dotted var(--line)}
+.what{color:var(--mist);font-size:13px}
+.say{font-size:13.5px}
+.late .say{color:var(--sun)} .fail .say{color:var(--coral)}
+.when{color:var(--mist);font:12.5px var(--f-data);text-align:right;white-space:nowrap}
+.tag{display:inline-block;font:11px var(--f-data);color:var(--mist);border:1px solid var(--line);border-radius:6px;padding:0 5px;margin-left:6px;vertical-align:1px}
+footer{margin-top:30px;color:var(--mist);font-size:12.5px}
+footer a{color:var(--glass)}
+@media (max-width:560px){
+  .row{grid-template-columns:18px minmax(0,1fr)}
+  .when{grid-column:2;text-align:left}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><a href="../">🫧 R3M Reef</a> · Status</h1>
+    <div class="meta" id="now">–</div>
+  </header>
+  <div class="banner" id="banner"><span class="dot"></span><div><div class="big">Reading the reef…</div><div class="sub">&nbsp;</div></div></div>
+  <h2>Channel</h2>
+  <div class="list" id="core"></div>
+  <h2>Background</h2>
+  <div class="list" id="bg"></div>
+  <footer>
+    Times in Berlin. Green = ran when it should · yellow = late or missing · red = the last run failed · grey = not due now.
+    The page checks itself every minute.
+  </footer>
+</div>
+<script>
+"use strict";
+const TZ = "Europe/Berlin";
+const PUB_RUNS = "https://api.github.com/repos/spec1re/r3m/actions/runs?per_page=60";
+const PUB_WF = {live: "live.yml", reef: "reef-live.yml", kcheck: "kronos-live.yml", pages: "pages.yml"};
+let S = null, LIVE = null, SYM = null, ORA = null, RUNS = null, runsAt = 0;
+
+// ── Berlin clock ─────────────────────────────────────────────────────────────────────────────────────────────────────
+const fmt = new Intl.DateTimeFormat("en-GB", {timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit",
+  hour: "2-digit", minute: "2-digit", weekday: "short", hourCycle: "h23"});
+function ber(d) {
+  const p = Object.fromEntries(fmt.formatToParts(d).map(x => [x.type, x.value]));
+  const wd = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].indexOf(p.weekday);
+  const h = +p.hour % 24;
+  return {day: `${p.year}-${p.month}-${p.day}`, wd, h, m: +p.minute, hm: `${String(h).padStart(2, "0")}:${p.minute}`,
+    dm: `${p.day}.${p.month}`, min: h * 60 + +p.minute};
+}
+const T = s => s ? new Date(s) : null;
+function ago(d) {
+  if (!d) return "never";
+  const s = (Date.now() - d) / 1000;
+  if (s < 90) return "just now";
+  if (s < 5400) return `${Math.round(s / 60)} min ago`;
+  if (s < 172800) return `${Math.round(s / 3600)} h ago`;
+  return `${Math.round(s / 86400)} days ago`;
+}
+function when(d) {
+  if (!d) return "–";
+  const b = ber(d), n = ber(new Date());
+  return (b.day === n.day ? b.hm : `${b.dm} ${b.hm}`) + " · " + ago(d);
+}
+// the newest Berlin day (today or back) on which `kind` was due by now: [day string, weekday]
+function lastDue(days, dueMin) {
+  for (let i = 0; i < 9; i++) {
+    const d = new Date(Date.now() - i * 864e5), b = ber(d);
+    if (!days.includes(b.wd)) continue;
+    if (i === 0 && ber(new Date()).min < dueMin) continue;
+    return b;
+  }
+  return null;
+}
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+
+// ── the rows ─────────────────────────────────────────────────────────────────────────────────────────────────────────
+function job(k) {                     // public jobs from the GitHub API when it answered, else from status.json
+  const w = PUB_WF[k], rs = w && RUNS ? RUNS.filter(r => r.path.endsWith(w)) : [];
+  if (rs.length) {                    // the API's newest 60 runs: a rare job (Pages) may not be among them
+    const done = rs.filter(r => r.status === "completed"), ok = done.filter(r => r.conclusion === "success");
+    return {last: rs[0] && T(rs[0].created_at), doneState: done[0] && done[0].conclusion,
+      lastDone: done[0] && T(done[0].updated_at), lastOk: ok[0] && T(ok[0].updated_at), url: rs[0] && rs[0].html_url};
+  }
+  const j = S && S.jobs && S.jobs[k];
+  if (!j) return null;
+  return {last: T(j.last), doneState: j.doneState, lastDone: T(j.lastDone), lastOk: T(j.lastOk), url: j.url,
+    runs24: j.runs24, fails24: j.fails24};
+}
+function cadence(k, label, what, maxMin, window) {
+  const j = job(k), n = ber(new Date());
+  if (!j) return {label, what, st: "unknown", say: "no data yet"};
+  const inWin = !window || window(n);
+  const ageOk = j.lastOk ? (Date.now() - j.lastOk) / 6e4 : 1e9;
+  let st = "ok", say = j.runs24 != null ? `${j.runs24} runs in 24 h` : "running";
+  if (j.doneState === "failure" && (!j.lastOk || j.lastOk < j.lastDone)) { st = "fail"; say = "the last run failed"; }
+  else if (inWin && ageOk > maxMin) { st = "late"; say = `no successful run for ${Math.round(ageOk)} min (expected every ${what})`; }
+  else if (!inWin) { st = "idle"; say = "not due now"; }
+  if (st === "ok" && j.fails24) say += ` · ${j.fails24} failed`;
+  return {label, what: "every " + what, st, say, at: j.last, url: j.url};
+}
+function onFail(k, label, what) {
+  const j = job(k);
+  if (!j) return {label, what, st: "unknown", say: "no data yet"};
+  const bad = j.doneState === "failure" && (!j.lastOk || j.lastOk < j.lastDone);
+  return {label, what, st: bad ? "fail" : "ok", say: bad ? "the last run failed" : (j.last ? "last run fine" : "no run in 8 days"),
+    at: j.last, url: j.url};
+}
+function report(kind, label, days, due, dueTxt) {
+  const shadow = S && S.mode === "shadow";
+  const row = {label: label + (shadow ? ' <span class="tag">shadow</span>' : ""), what: dueTxt};
+  if (!S) return {...row, st: "unknown", say: "no data yet"};
+  const d = lastDue(days, due), have = S.reports[kind];
+  const cl = shadow && S.claude ? S.claude[kind] : null;
+  const claude = shadow ? (cl && d && cl >= d.day ? " · Claude ✓" : " · Claude –") : "";
+  if (!d) return {...row, st: "idle", say: "not due yet" + claude};
+  if (!have && S.start && d.day < S.start) return {...row, st: "idle", say: "waiting for its first run" + claude};
+  const okDay = have && have >= d.day;
+  if (okDay) return {...row, st: "ok", say: `written ${d.dm}` + claude};
+  const today = d.day === ber(new Date()).day;
+  return {...row, st: "late", say: (today ? `missing, due ${dueTxt.split(" ").pop()}` : `missing for ${d.dm}`) + claude};
+}
+function fileAge(label, what, t, maxMin, window) {
+  const n = ber(new Date()), inWin = !window || window(n);
+  if (!t) return {label, what, st: "unknown", say: "no data yet"};
+  const age = (Date.now() - t) / 6e4;
+  if (!inWin) return {label, what, st: "idle", say: "not due now", at: t};
+  return {label, what, st: age > maxMin ? "late" : "ok", say: age > maxMin ? `not updated for ${Math.round(age)} min` : "fresh", at: t};
+}
+const weekday = (from, to) => n => n.wd < 5 && n.min >= from && n.min < to;
+
+function rows() {
+  const n = ber(new Date()), shadow = S && S.mode === "shadow";
+  const stale = S ? (Date.now() - T(S.updated)) / 6e4 : 1e9;
+  const statusMax = n.wd < 5 && n.h >= 6 ? 90 : 360;
+  const core = [
+    report("morning", "Morning report", [0, 1, 2, 3, 4], 355, "Mon–Fri 05:30"),
+    report("midday", "Midday report", [0, 1, 2, 3, 4], 825, "Mon–Fri 13:17"),
+    report("close", "US close report", [0, 1, 2, 3, 4], 1365, "Mon–Fri 22:17"),
+    report("gap", "Gap check", [0], 115, "Mon 01:30"),
+    report("review", "Weekly review", [5], 355, "Sat 05:30"),
+    report("outlook", "Weekly outlook", [6], 355, "Sun 05:30"),
+    cadence("news", "News warnings", "15 min, Mon–Fri 06:00–24:00", 40, weekday(375, 1440)),
+    (() => {
+      if (!S) return {label: "Calendar for the news warnings", st: "unknown", say: "no data yet"};
+      const has = shadow ? S.events.claude : S.events.auto, due = n.wd < 5 && n.min >= 360;
+      return {label: "Calendar for the news warnings", what: "today's events file, written with the morning report",
+        st: !due ? "idle" : has ? "ok" : "late", say: !due ? "not due now" : has ? "today's file is there" : "today's file is missing"};
+    })(),
+    onFail("telegram", "Telegram send", "on every new report"),
+    cadence("live", "Live feed", "2 min", 10),
+    cadence("reef", "Reef live", "2 min, after the live feed", 15),
+    cadence("kcheck", "Kronos signal check", "2 min, after the live feed", 15),
+    onFail("site", "Site build", "on every pushed report"),
+    onFail("pages", "Pages deploy", "on every push to the site"),
+    {label: "This status", what: "status.json, after every job and hourly",
+      st: !S ? "unknown" : stale > statusMax ? "late" : "ok",
+      say: !S ? "status.json not found" : stale > statusMax ? `not updated for ${Math.round(stale)} min` : "fresh", at: S && T(S.updated)},
+  ];
+  const oraDay = ORA && ORA.days && ORA.days.length ? ORA.days[ORA.days.length - 1] : null;
+  const bg = [
+    (() => {
+      const r = {label: "Reef oracle", what: "Mon–Fri from 07:25 London"};
+      if (!ORA) return {...r, st: "unknown", say: "no data yet"};
+      const due = n.wd < 5 && n.min >= 9 * 60 + 30;
+      const ok = oraDay && oraDay.day === n.day;
+      return {...r, st: !due ? "idle" : ok ? "ok" : "late", say: oraDay ? `latest ${oraDay.day.slice(8)}.${oraDay.day.slice(5, 7)}` : "none yet",
+        at: oraDay && T(oraDay.made)};
+    })(),
+    onFail("kronos", "Kronos oracle (private)", "after each session's bars"),
+    (() => {
+      const r = onFail("signals", "Saturday signal report", "Sat");
+      const j = job("signals");
+      if (r.st === "ok" && j && j.lastOk && (Date.now() - j.lastOk) / 864e5 > 8) { r.st = "late"; r.say = "no report for over a week"; }
+      return r;
+    })(),
+    (() => {
+      const r = onFail("bars", "Nightly bars", "Tue–Sat night");
+      const j = job("bars");
+      if (r.st === "ok" && j && j.lastOk && (Date.now() - j.lastOk) / 36e5 > 80) { r.st = "late"; r.say = "no fresh bars for over 3 days"; }
+      return r;
+    })(),
+  ];
+  return {core, bg};
+}
+
+// ── draw ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+function draw() {
+  const {core, bg} = rows();
+  const html = list => list.map(r => `<div class="row ${r.st}"><span class="dot"></span>
+    <div><div class="name">${r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener">${r.label}</a>` : r.label}</div>
+    <div class="say">${esc(r.say || "")}</div>${r.what ? `<div class="what">${esc(r.what)}</div>` : ""}</div>
+    <div class="when">${r.at ? when(r.at) : ""}</div></div>`).join("");
+  document.getElementById("core").innerHTML = html(core);
+  document.getElementById("bg").innerHTML = html(bg);
+  const bad = core.filter(r => r.st === "fail").length, late = core.filter(r => r.st === "late").length;
+  const bgBad = bg.filter(r => r.st === "fail" || r.st === "late").length;
+  const b = document.getElementById("banner");
+  b.className = "banner " + (bad ? "fail" : late ? "late" : "ok");
+  b.innerHTML = `<span class="dot"></span><div><div class="big">${bad || late
+      ? `${bad + late} ${bad + late === 1 ? "thing needs" : "things need"} a look`
+      : "All quiet in the reef"}</div>
+    <div class="sub">${[bad && `${bad} failed`, late && `${late} late or missing`, bgBad && `background: ${bgBad} to check`,
+      S && S.mode === "shadow" && "the automatic reports run in shadow mode"].filter(Boolean).join(" · ") || "every channel job ran when it should"}</div></div>`;
+  document.getElementById("now").textContent = ber(new Date()).hm + " Berlin";
+}
+
+async function get(url) {
+  try { const r = await fetch(url, {cache: "no-store"}); return r.ok ? r.json() : null; } catch (e) { return null; }
+}
+async function load() {
+  const q = "?t=" + Date.now();
+  [S, LIVE, SYM, ORA] = await Promise.all(["../status.json", "../live.json", "../symbols.json", "../oracle.json"].map(f => get(f + q)));
+  if (Date.now() - runsAt > 110e3) {    // GitHub's API: 60 calls an hour without a sign-in
+    const r = await get(PUB_RUNS);
+    if (r && r.workflow_runs) { RUNS = r.workflow_runs; runsAt = Date.now(); }
+  }
+  draw();
+}
+load();
+setInterval(load, 60e3);
+</script>
+</body>
+</html>
