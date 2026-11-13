@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-13",
- "next": 1794602377,
+ "next": 1794606518,
  "lines": 358,
- "left": 352,
+ "left": 351,
  "deck": [
   10,
   248,
@@ -354,13 +354,12 @@
   292,
   341,
   314,
-  160,
-  27
+  160
  ],
  "last": {
-  "t": "2026-11-13 20:48",
+  "t": "2026-11-13 21:40",
   "head": "🎱 Trading Wisdom",
-  "line": "Overtrading is boredom dressed up as opportunity."
+  "line": "Learn to read one candle well before you try to read a hundred."
  },
- "sent": 6
+ "sent": 7
 }
