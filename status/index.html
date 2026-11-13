@@ -208,7 +208,6 @@ function rows() {
       return {...r, st: !due ? "idle" : ok ? "ok" : "late", say: oraDay ? `latest ${oraDay.day.slice(8)}.${oraDay.day.slice(5, 7)}` : "none yet",
         at: oraDay && T(oraDay.made)};
     })(),
-    onFail("kronos", "Kronos oracle (private)", "after each session's bars"),
     (() => {
       const r = onFail("signals", "Saturday signal report", "Sat");
       const j = job("signals");
