@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-13",
- "next": 1794599230,
+ "next": 1794602377,
  "lines": 358,
- "left": 353,
+ "left": 352,
  "deck": [
   10,
   248,
@@ -355,13 +355,12 @@
   341,
   314,
   160,
-  27,
-  220
+  27
  ],
  "last": {
-  "t": "2026-11-13 19:42",
-  "head": "🎬 Trading Floor",
-  "line": "The desk doesn't forgive mistakes; it just reallocates your desk to the next guy."
+  "t": "2026-11-13 20:48",
+  "head": "🎱 Trading Wisdom",
+  "line": "Overtrading is boredom dressed up as opportunity."
  },
- "sent": 5
+ "sent": 6
 }
