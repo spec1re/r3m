@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-16",
- "next": 1794839303,
+ "next": 1794843346,
  "lines": 358,
- "left": 343,
+ "left": 342,
  "deck": [
   10,
   248,
@@ -345,13 +345,12 @@
   13,
   183,
   208,
-  317,
-  274
+  317
  ],
  "last": {
-  "t": "2026-11-16 14:24",
+  "t": "2026-11-16 15:28",
   "head": "🎱 Trading Wisdom",
-  "line": "Being flat is a decision, and often the best one."
+  "line": "One good habit, repeated every day, outperforms any secret strategy."
  },
- "sent": 15
+ "sent": 16
 }
