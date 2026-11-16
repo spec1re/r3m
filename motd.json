@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-16",
- "next": 1794835359,
+ "next": 1794839303,
  "lines": 358,
- "left": 344,
+ "left": 343,
  "deck": [
   10,
   248,
@@ -346,13 +346,12 @@
   183,
   208,
   317,
-  274,
-  178
+  274
  ],
  "last": {
-  "t": "2026-11-16 13:42",
+  "t": "2026-11-16 14:24",
   "head": "🎱 Trading Wisdom",
-  "line": "A clean trendline is a clean target."
+  "line": "Being flat is a decision, and often the best one."
  },
- "sent": 14
+ "sent": 15
 }
