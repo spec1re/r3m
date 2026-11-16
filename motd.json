@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-16",
- "next": 1794852458,
+ "next": 1794856934,
  "lines": 358,
- "left": 339,
+ "left": 338,
  "deck": [
   10,
   248,
@@ -341,13 +341,12 @@
   195,
   81,
   32,
-  261,
-  13
+  261
  ],
  "last": {
-  "t": "2026-11-16 18:28",
+  "t": "2026-11-16 19:08",
   "head": "🎱 Trading Wisdom",
-  "line": "A clean trade has three parts: a reason to enter, a place to be wrong, a place to be paid."
+  "line": "The candle that breaks the structure is more important than the ten that built it."
  },
- "sent": 19
+ "sent": 20
 }
