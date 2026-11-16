@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-16",
- "next": 1794828899,
+ "next": 1794832891,
  "lines": 358,
- "left": 346,
+ "left": 345,
  "deck": [
   10,
   248,
@@ -348,13 +348,12 @@
   317,
   274,
   178,
-  40,
-  309
+  40
  ],
  "last": {
-  "t": "2026-11-16 11:48",
-  "head": "🎱 Trading Wisdom",
-  "line": "Stay in the game. Time in the market is time learning the market."
+  "t": "2026-11-16 12:36",
+  "head": "🎬 Trading Floor",
+  "line": "Greed, for lack of a better word, is good."
  },
- "sent": 12
+ "sent": 13
 }
