@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-16",
- "next": 1794818892,
+ "next": 1794823744,
  "lines": 358,
- "left": 349,
+ "left": 348,
  "deck": [
   10,
   248,
@@ -351,13 +351,12 @@
   40,
   309,
   279,
-  292,
-  341
+  292
  ],
  "last": {
-  "t": "2026-11-16 08:32",
+  "t": "2026-11-16 09:48",
   "head": "🎬 Trading Floor",
-  "line": "Tell me the difference between stupid and illegal, and I'll have my wife's brother arrested."
+  "line": "Desperation is a terrible perfume, so smile when you pitch the crash."
  },
- "sent": 9
+ "sent": 10
 }
