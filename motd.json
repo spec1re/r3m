@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-16",
- "next": 1794832891,
+ "next": 1794835359,
  "lines": 358,
- "left": 345,
+ "left": 344,
  "deck": [
   10,
   248,
@@ -347,13 +347,12 @@
   208,
   317,
   274,
-  178,
-  40
+  178
  ],
  "last": {
-  "t": "2026-11-16 12:36",
-  "head": "🎬 Trading Floor",
-  "line": "Greed, for lack of a better word, is good."
+  "t": "2026-11-16 13:42",
+  "head": "🎱 Trading Wisdom",
+  "line": "A clean trendline is a clean target."
  },
- "sent": 13
+ "sent": 14
 }
