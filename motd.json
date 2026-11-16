@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-16",
- "next": 1794843346,
+ "next": 1794845859,
  "lines": 358,
- "left": 342,
+ "left": 341,
  "deck": [
   10,
   248,
@@ -344,13 +344,12 @@
   261,
   13,
   183,
-  208,
-  317
+  208
  ],
  "last": {
-  "t": "2026-11-16 15:28",
-  "head": "🎱 Trading Wisdom",
-  "line": "One good habit, repeated every day, outperforms any secret strategy."
+  "t": "2026-11-16 16:36",
+  "head": "🎬 Trading Floor",
+  "line": "The best way you hurt rich people is by turning them into poor people."
  },
- "sent": 16
+ "sent": 17
 }
