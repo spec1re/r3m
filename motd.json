@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-16",
- "next": 1794856934,
+ "next": 1794861556,
  "lines": 358,
- "left": 338,
+ "left": 337,
  "deck": [
   10,
   248,
@@ -340,13 +340,12 @@
   175,
   195,
   81,
-  32,
-  261
+  32
  ],
  "last": {
-  "t": "2026-11-16 19:08",
+  "t": "2026-11-16 20:22",
   "head": "🎱 Trading Wisdom",
-  "line": "The candle that breaks the structure is more important than the ten that built it."
+  "line": "Review your losers for rule breaks, not for bad luck."
  },
- "sent": 20
+ "sent": 21
 }
