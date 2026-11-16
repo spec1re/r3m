@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-16",
- "next": 1794814324,
+ "next": 1794818892,
  "lines": 358,
- "left": 350,
+ "left": 349,
  "deck": [
   10,
   248,
@@ -352,13 +352,12 @@
   309,
   279,
   292,
-  341,
-  314
+  341
  ],
  "last": {
-  "t": "2026-11-16 07:30",
-  "head": "☕ Message of the Day",
-  "line": "Reassess at every key level. A narrative that can't update is a narrative that breaks."
+  "t": "2026-11-16 08:32",
+  "head": "🎬 Trading Floor",
+  "line": "Tell me the difference between stupid and illegal, and I'll have my wife's brother arrested."
  },
- "sent": 8
+ "sent": 9
 }
