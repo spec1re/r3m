@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-16",
- "next": 1794845859,
+ "next": 1794850098,
  "lines": 358,
- "left": 341,
+ "left": 340,
  "deck": [
   10,
   248,
@@ -343,13 +343,12 @@
   32,
   261,
   13,
-  183,
-  208
+  183
  ],
  "last": {
-  "t": "2026-11-16 16:36",
-  "head": "🎬 Trading Floor",
-  "line": "The best way you hurt rich people is by turning them into poor people."
+  "t": "2026-11-16 17:18",
+  "head": "🎱 Trading Wisdom",
+  "line": "Your first loss is your best loss."
  },
- "sent": 17
+ "sent": 18
 }
