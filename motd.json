@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-16",
- "next": 1794826058,
+ "next": 1794828899,
  "lines": 358,
- "left": 347,
+ "left": 346,
  "deck": [
   10,
   248,
@@ -349,13 +349,12 @@
   274,
   178,
   40,
-  309,
-  279
+  309
  ],
  "last": {
-  "t": "2026-11-16 11:10",
+  "t": "2026-11-16 11:48",
   "head": "🎱 Trading Wisdom",
-  "line": "Rest is part of the job. A tired mind sees setups that aren't there."
+  "line": "Stay in the game. Time in the market is time learning the market."
  },
- "sent": 11
+ "sent": 12
 }
