@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-16",
- "next": 1794823744,
+ "next": 1794826058,
  "lines": 358,
- "left": 348,
+ "left": 347,
  "deck": [
   10,
   248,
@@ -350,13 +350,12 @@
   178,
   40,
   309,
-  279,
-  292
+  279
  ],
  "last": {
-  "t": "2026-11-16 09:48",
-  "head": "🎬 Trading Floor",
-  "line": "Desperation is a terrible perfume, so smile when you pitch the crash."
+  "t": "2026-11-16 11:10",
+  "head": "🎱 Trading Wisdom",
+  "line": "Rest is part of the job. A tired mind sees setups that aren't there."
  },
- "sent": 10
+ "sent": 11
 }
