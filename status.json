@@ -1,9 +1,9 @@
 {
- "updated": "2026-11-16T12:15:46+00:00",
+ "updated": "2026-11-16T12:20:49+00:00",
  "mode": "live",
  "reports": {
   "morning": "2026-11-16",
-  "midday": "2026-11-13",
+  "midday": "2026-11-16",
   "close": "2026-11-13",
   "gap": "2026-11-16",
   "review": "2026-11-14",
@@ -19,12 +19,12 @@
   "reports": {
    "label": "Reports (auto)",
    "public": false,
-   "last": "2026-11-16T11:54:03Z",
+   "last": "2026-11-16T12:17:09Z",
    "state": "success",
-   "lastDone": "2026-11-16T11:54:23Z",
+   "lastDone": "2026-11-16T12:20:38Z",
    "doneState": "success",
-   "lastOk": "2026-11-16T11:54:23Z",
-   "runs24": 4,
+   "lastOk": "2026-11-16T12:20:38Z",
+   "runs24": 5,
    "fails24": 0,
    "events24": [
     "schedule",
@@ -48,12 +48,12 @@
   "telegram": {
    "label": "Telegram send",
    "public": false,
-   "last": "2026-11-16T04:34:42Z",
-   "state": "success",
+   "last": "2026-11-16T12:20:33Z",
+   "state": "in_progress",
    "lastDone": "2026-11-16T04:35:08Z",
    "doneState": "success",
    "lastOk": "2026-11-16T04:35:08Z",
-   "runs24": 2,
+   "runs24": 3,
    "fails24": 0,
    "events24": [
     "workflow_dispatch"
@@ -62,12 +62,12 @@
   "site": {
    "label": "Site build",
    "public": false,
-   "last": "2026-11-16T04:34:44Z",
-   "state": "success",
+   "last": "2026-11-16T12:20:35Z",
+   "state": "in_progress",
    "lastDone": "2026-11-16T04:35:11Z",
    "doneState": "success",
    "lastOk": "2026-11-16T04:35:11Z",
-   "runs24": 2,
+   "runs24": 3,
    "fails24": 0,
    "events24": [
     "workflow_dispatch"
@@ -126,62 +126,62 @@
   "live": {
    "label": "Live feed",
    "public": true,
-   "last": "2026-11-16T12:14:05Z",
+   "last": "2026-11-16T12:20:13Z",
    "state": "success",
-   "lastDone": "2026-11-16T12:14:23Z",
+   "lastDone": "2026-11-16T12:20:31Z",
    "doneState": "success",
-   "lastOk": "2026-11-16T12:14:23Z",
+   "lastOk": "2026-11-16T12:20:31Z",
    "runs24": 100,
    "fails24": 0,
    "events24": [
     "workflow_dispatch"
    ],
-   "url": "https://github.com/spec1re/r3m/actions/runs/43864703497"
+   "url": "https://github.com/spec1re/r3m/actions/runs/43865639747"
   },
   "reef": {
    "label": "Reef live",
    "public": true,
-   "last": "2026-11-16T12:14:27Z",
+   "last": "2026-11-16T12:20:33Z",
    "state": "success",
-   "lastDone": "2026-11-16T12:14:48Z",
+   "lastDone": "2026-11-16T12:20:58Z",
    "doneState": "success",
-   "lastOk": "2026-11-16T12:14:48Z",
+   "lastOk": "2026-11-16T12:20:58Z",
    "runs24": 100,
    "fails24": 0,
    "events24": [
     "workflow_run"
    ],
-   "url": "https://github.com/spec1re/r3m/actions/runs/43864759690"
+   "url": "https://github.com/spec1re/r3m/actions/runs/43865692238"
   },
   "kcheck": {
    "label": "Kronos signal check",
    "public": true,
-   "last": "2026-11-16T12:14:27Z",
+   "last": "2026-11-16T12:20:33Z",
    "state": "success",
-   "lastDone": "2026-11-16T12:14:42Z",
+   "lastDone": "2026-11-16T12:20:53Z",
    "doneState": "success",
-   "lastOk": "2026-11-16T12:14:42Z",
+   "lastOk": "2026-11-16T12:20:53Z",
    "runs24": 100,
    "fails24": 0,
    "events24": [
     "workflow_run"
    ],
-   "url": "https://github.com/spec1re/r3m/actions/runs/43864759595"
+   "url": "https://github.com/spec1re/r3m/actions/runs/43865692204"
   },
   "pages": {
    "label": "Pages deploy",
    "public": true,
-   "last": "2026-11-16T12:01:33Z",
-   "state": "success",
-   "lastDone": "2026-11-16T12:01:55Z",
+   "last": "2026-11-16T12:20:58Z",
+   "state": "in_progress",
+   "lastDone": "2026-11-16T12:16:32Z",
    "doneState": "success",
-   "lastOk": "2026-11-16T12:01:55Z",
+   "lastOk": "2026-11-16T12:16:32Z",
    "runs24": 100,
    "fails24": 0,
    "events24": [
     "push"
    ],
-   "url": "https://github.com/spec1re/r3m/actions/runs/43862855960"
+   "url": "https://github.com/spec1re/r3m/actions/runs/43865753571"
   }
  }
 }
