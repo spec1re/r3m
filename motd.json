@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-16",
- "next": 1794850098,
+ "next": 1794852458,
  "lines": 358,
- "left": 340,
+ "left": 339,
  "deck": [
   10,
   248,
@@ -342,13 +342,12 @@
   81,
   32,
   261,
-  13,
-  183
+  13
  ],
  "last": {
-  "t": "2026-11-16 17:18",
+  "t": "2026-11-16 18:28",
   "head": "🎱 Trading Wisdom",
-  "line": "Your first loss is your best loss."
+  "line": "A clean trade has three parts: a reason to enter, a place to be wrong, a place to be paid."
  },
- "sent": 18
+ "sent": 19
 }
