@@ -1,8 +1,8 @@
 {
- "motd": "2026-11-15",
- "next": 1794813673,
+ "motd": "2026-11-16",
+ "next": 1794814324,
  "lines": 358,
- "left": 351,
+ "left": 350,
  "deck": [
   10,
   248,
@@ -353,13 +353,12 @@
   279,
   292,
   341,
-  314,
-  160
+  314
  ],
  "last": {
-  "t": "2026-11-13 21:40",
-  "head": "🎱 Trading Wisdom",
-  "line": "Learn to read one candle well before you try to read a hundred."
+  "t": "2026-11-16 07:30",
+  "head": "☕ Message of the Day",
+  "line": "Reassess at every key level. A narrative that can't update is a narrative that breaks."
  },
- "sent": 7
+ "sent": 8
 }
