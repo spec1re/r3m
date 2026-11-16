@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-16",
- "next": 1794861556,
+ "next": 1794864569,
  "lines": 358,
- "left": 337,
+ "left": 336,
  "deck": [
   10,
   248,
@@ -339,13 +339,12 @@
   322,
   175,
   195,
-  81,
-  32
+  81
  ],
  "last": {
-  "t": "2026-11-16 20:22",
+  "t": "2026-11-16 21:40",
   "head": "🎱 Trading Wisdom",
-  "line": "Review your losers for rule breaks, not for bad luck."
+  "line": "A sweep is not a reversal until the close says so."
  },
- "sent": 21
+ "sent": 22
 }
