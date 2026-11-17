@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-17",
- "next": 1794932947,
+ "next": 1794936093,
  "lines": 358,
- "left": 326,
+ "left": 325,
  "deck": [
   10,
   248,
@@ -328,13 +328,12 @@
   222,
   26,
   291,
-  312,
-  247
+  312
  ],
  "last": {
-  "t": "2026-11-17 16:24",
+  "t": "2026-11-17 17:31",
   "head": "🎱 Trading Wisdom",
-  "line": "If the setup needs explaining, it isn't the setup."
+  "line": "Backtest until the setup feels boring. Then you're ready to trade it live."
  },
- "sent": 32
+ "sent": 33
 }
