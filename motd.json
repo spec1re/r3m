@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-17",
- "next": 1794948468,
+ "next": 1794950429,
  "lines": 358,
- "left": 322,
+ "left": 321,
  "deck": [
   10,
   248,
@@ -324,13 +324,12 @@
   271,
   194,
   299,
-  117,
-  222
+  117
  ],
  "last": {
-  "t": "2026-11-17 20:18",
+  "t": "2026-11-17 21:48",
   "head": "🎱 Trading Wisdom",
-  "line": "The cleanest moves start with a candle that leaves everyone behind."
+  "line": "Win or lose, follow the process. It's the only thing you control."
  },
- "sent": 36
+ "sent": 37
 }
