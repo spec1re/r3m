@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-17",
- "next": 1794904385,
+ "next": 1794908942,
  "lines": 358,
- "left": 334,
+ "left": 333,
  "deck": [
   10,
   248,
@@ -336,13 +336,12 @@
   97,
   149,
   281,
-  322,
-  175
+  322
  ],
  "last": {
-  "t": "2026-11-17 08:20",
+  "t": "2026-11-17 09:34",
   "head": "🎱 Trading Wisdom",
-  "line": "Never move a stop further away because you hope. Hope is not a strategy."
+  "line": "Price came to your level, gave you the signal, and you took it. That's a perfect trade, whatever the result."
  },
- "sent": 24
+ "sent": 25
 }
