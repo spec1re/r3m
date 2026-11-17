@@ -1,8 +1,8 @@
 {
- "motd": "2026-11-16",
- "next": 1794899084,
+ "motd": "2026-11-17",
+ "next": 1794900028,
  "lines": 358,
- "left": 336,
+ "left": 335,
  "deck": [
   10,
   248,
@@ -338,13 +338,12 @@
   281,
   322,
   175,
-  195,
-  81
+  195
  ],
  "last": {
-  "t": "2026-11-16 21:40",
-  "head": "🎱 Trading Wisdom",
-  "line": "A sweep is not a reversal until the close says so."
+  "t": "2026-11-17 07:31",
+  "head": "☕ Message of the Day",
+  "line": "The first pullback after a shift in structure is often the best entry of the move."
  },
- "sent": 22
+ "sent": 23
 }
