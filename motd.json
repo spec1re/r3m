@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-17",
- "next": 1794943033,
+ "next": 1794948468,
  "lines": 358,
- "left": 323,
+ "left": 322,
  "deck": [
   10,
   248,
@@ -325,13 +325,12 @@
   194,
   299,
   117,
-  222,
-  26
+  222
  ],
  "last": {
-  "t": "2026-11-17 19:26",
+  "t": "2026-11-17 20:18",
   "head": "🎱 Trading Wisdom",
-  "line": "Great traders aren't fearless. They just follow the plan while afraid."
+  "line": "The cleanest moves start with a candle that leaves everyone behind."
  },
- "sent": 35
+ "sent": 36
 }
