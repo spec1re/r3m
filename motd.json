@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-17",
- "next": 1794928996,
+ "next": 1794932947,
  "lines": 358,
- "left": 327,
+ "left": 326,
  "deck": [
   10,
   248,
@@ -329,13 +329,12 @@
   26,
   291,
   312,
-  247,
-  171
+  247
  ],
  "last": {
-  "t": "2026-11-17 15:52",
+  "t": "2026-11-17 16:24",
   "head": "🎱 Trading Wisdom",
-  "line": "Good trades rarely need you to sit at the screen for ten hours."
+  "line": "If the setup needs explaining, it isn't the setup."
  },
- "sent": 31
+ "sent": 32
 }
