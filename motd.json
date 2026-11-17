@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-17",
- "next": 1794927073,
+ "next": 1794928996,
  "lines": 358,
- "left": 328,
+ "left": 327,
  "deck": [
   10,
   248,
@@ -330,13 +330,12 @@
   291,
   312,
   247,
-  171,
-  105
+  171
  ],
  "last": {
-  "t": "2026-11-17 14:42",
+  "t": "2026-11-17 15:52",
   "head": "🎱 Trading Wisdom",
-  "line": "A good narrative is simple: where it came from, where it is, where it wants to go."
+  "line": "Good trades rarely need you to sit at the screen for ten hours."
  },
- "sent": 30
+ "sent": 31
 }
