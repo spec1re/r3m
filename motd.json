@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-17",
- "next": 1794911197,
+ "next": 1794914344,
  "lines": 358,
- "left": 332,
+ "left": 331,
  "deck": [
   10,
   248,
@@ -334,13 +334,12 @@
   105,
   151,
   97,
-  149,
-  281
+  149
  ],
  "last": {
-  "t": "2026-11-17 10:50",
-  "head": "🎬 Trading Floor",
-  "line": "We're betting against the system, and the system is built on a lie."
+  "t": "2026-11-17 11:28",
+  "head": "🎱 Trading Wisdom",
+  "line": "You don't need to be great today. You need to be disciplined today."
  },
- "sent": 26
+ "sent": 27
 }
