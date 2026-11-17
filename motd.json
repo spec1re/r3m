@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-17",
- "next": 1794922927,
+ "next": 1794927073,
  "lines": 358,
- "left": 329,
+ "left": 328,
  "deck": [
   10,
   248,
@@ -331,13 +331,12 @@
   312,
   247,
   171,
-  105,
-  151
+  105
  ],
  "last": {
-  "t": "2026-11-17 13:18",
+  "t": "2026-11-17 14:42",
   "head": "🎱 Trading Wisdom",
-  "line": "Monday shows the range. Tuesday and Wednesday often show the week's intent."
+  "line": "A good narrative is simple: where it came from, where it is, where it wants to go."
  },
- "sent": 29
+ "sent": 30
 }
