@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-17T14:14:45+00:00",
+ "updated": "2026-11-17T14:15:50+00:00",
  "mode": "live",
  "reports": {
   "morning": "2026-11-17",
@@ -34,11 +34,11 @@
   "news": {
    "label": "News warnings",
    "public": false,
-   "last": "2026-11-17T14:14:22Z",
+   "last": "2026-11-17T14:15:24Z",
    "state": "success",
-   "lastDone": "2026-11-17T14:14:34Z",
+   "lastDone": "2026-11-17T14:15:38Z",
    "doneState": "success",
-   "lastOk": "2026-11-17T14:14:34Z",
+   "lastOk": "2026-11-17T14:15:38Z",
    "runs24": 98,
    "fails24": 0,
    "events24": [
@@ -172,17 +172,17 @@
   "pages": {
    "label": "Pages deploy",
    "public": true,
-   "last": "2026-11-17T14:01:27Z",
+   "last": "2026-11-17T14:15:04Z",
    "state": "success",
-   "lastDone": "2026-11-17T14:01:48Z",
+   "lastDone": "2026-11-17T14:15:37Z",
    "doneState": "success",
-   "lastOk": "2026-11-17T14:01:48Z",
+   "lastOk": "2026-11-17T14:15:37Z",
    "runs24": 100,
    "fails24": 0,
    "events24": [
     "push"
    ],
-   "url": "https://github.com/spec1re/r3m/actions/runs/44098625274"
+   "url": "https://github.com/spec1re/r3m/actions/runs/44101050419"
   }
  }
 }
