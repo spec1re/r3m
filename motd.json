@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-17",
- "next": 1794917842,
+ "next": 1794922927,
  "lines": 358,
- "left": 330,
+ "left": 329,
  "deck": [
   10,
   248,
@@ -332,13 +332,12 @@
   247,
   171,
   105,
-  151,
-  97
+  151
  ],
  "last": {
-  "t": "2026-11-17 12:20",
+  "t": "2026-11-17 13:18",
   "head": "🎱 Trading Wisdom",
-  "line": "Be bullish or bearish for a reason, and flat when there isn't one."
+  "line": "Monday shows the range. Tuesday and Wednesday often show the week's intent."
  },
- "sent": 28
+ "sent": 29
 }
