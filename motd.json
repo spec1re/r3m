@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-17",
- "next": 1794936093,
+ "next": 1794939907,
  "lines": 358,
- "left": 325,
+ "left": 324,
  "deck": [
   10,
   248,
@@ -327,13 +327,12 @@
   117,
   222,
   26,
-  291,
-  312
+  291
  ],
  "last": {
-  "t": "2026-11-17 17:31",
-  "head": "🎱 Trading Wisdom",
-  "line": "Backtest until the setup feels boring. Then you're ready to trade it live."
+  "t": "2026-11-17 18:22",
+  "head": "🎬 Trading Floor",
+  "line": "Money never sleeps, pal."
  },
- "sent": 33
+ "sent": 34
 }
