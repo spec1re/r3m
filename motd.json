@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-18",
- "next": 1795001965,
+ "next": 1795006295,
  "lines": 358,
- "left": 316,
+ "left": 315,
  "deck": [
   10,
   248,
@@ -318,13 +318,12 @@
   325,
   8,
   56,
-  80,
-  143
+  80
  ],
  "last": {
-  "t": "2026-11-18 11:58",
-  "head": "🎬 Trading Floor",
-  "line": "We are young, we are hungry, and we are going to bleed this market dry."
+  "t": "2026-11-18 12:40",
+  "head": "🎱 Trading Wisdom",
+  "line": "The draw on liquidity is the question. Everything else is the answer."
  },
- "sent": 42
+ "sent": 43
 }
