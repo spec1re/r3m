@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-18",
- "next": 1794999475,
+ "next": 1795001965,
  "lines": 358,
- "left": 317,
+ "left": 316,
  "deck": [
   10,
   248,
@@ -319,13 +319,12 @@
   8,
   56,
   80,
-  143,
-  342
+  143
  ],
  "last": {
-  "t": "2026-11-18 10:58",
-  "head": "🎱 Trading Wisdom",
-  "line": "Every master was once a beginner who didn't quit."
+  "t": "2026-11-18 11:58",
+  "head": "🎬 Trading Floor",
+  "line": "We are young, we are hungry, and we are going to bleed this market dry."
  },
- "sent": 41
+ "sent": 42
 }
