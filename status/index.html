@@ -76,7 +76,7 @@ footer a{color:var(--glass)}
 "use strict";
 const TZ = "Europe/Berlin";
 const PUB_RUNS = "https://api.github.com/repos/spec1re/r3m/actions/runs?per_page=60";
-const PUB_WF = {live: "live.yml", reef: "reef-live.yml", kcheck: "kronos-live.yml", pages: "pages.yml"};
+const PUB_WF = {live: "live.yml", reef: "reef-live.yml", kcheck: "kronos-live.yml", pages: "pages.yml", news: "ffcal.yml"};
 let S = null, LIVE = null, SYM = null, ORA = null, RUNS = null, runsAt = 0;
 
 // ── Berlin clock ─────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -173,7 +173,7 @@ const weekday = (from, to) => n => n.wd < 5 && n.min >= from && n.min < to;
 function rows() {
   const n = ber(new Date()), shadow = S && S.mode === "shadow";
   const stale = S ? (Date.now() - T(S.updated)) / 6e4 : 1e9;
-  const statusMax = n.wd < 5 && n.h >= 6 ? 90 : 360;
+  const statusMax = n.wd < 5 && n.h >= 6 ? 240 : 420;
   const core = [
     report("morning", "Morning report", [0, 1, 2, 3, 4], 355, "Mon–Fri 05:30"),
     report("midday", "Midday report", [0, 1, 2, 3, 4], 825, "Mon–Fri 13:17"),
@@ -181,7 +181,7 @@ function rows() {
     report("gap", "Gap check", [0], 115, "Mon 01:30"),
     report("review", "Weekly review", [5], 355, "Sat 05:30"),
     report("outlook", "Weekly outlook", [6], 355, "Sun 05:30"),
-    cadence("news", "News warnings", "15 min, Mon–Fri 06:00–24:00", 40, weekday(375, 1440)),
+    cadence("news", "News warnings", "2 min, with the calendar", 15),
     (() => {
       if (!S) return {label: "Calendar for the news warnings", st: "unknown", say: "no data yet"};
       const has = shadow ? S.events.claude : S.events.auto, due = n.wd < 5 && n.min >= 360;
@@ -194,7 +194,7 @@ function rows() {
     cadence("kcheck", "Kronos signal check", "2 min, after the live feed", 15),
     onFail("site", "Site build", "on every pushed report"),
     onFail("pages", "Pages deploy", "on every push to the site"),
-    {label: "This status", what: "status.json, after every job and hourly",
+    {label: "This status", what: "status.json, after the reports and every 3 hours",
       st: !S ? "unknown" : stale > statusMax ? "late" : "ok",
       say: !S ? "status.json not found" : stale > statusMax ? `not updated for ${Math.round(stale)} min` : "fresh", at: S && T(S.updated)},
   ];
@@ -216,12 +216,7 @@ function rows() {
       if (r.st === "ok" && j && j.lastOk && (Date.now() - j.lastOk) / 864e5 > 8) { r.st = "late"; r.say = "no report for over a week"; }
       return r;
     })(),
-    (() => {
-      const r = onFail("bars", "Nightly bars", "Tue–Sat night");
-      const j = job("bars");
-      if (r.st === "ok" && j && j.lastOk && (Date.now() - j.lastOk) / 36e5 > 80) { r.st = "late"; r.say = "no fresh bars for over 3 days"; }
-      return r;
-    })(),
+    onFail("bars", "Bars", "on demand"),
   ];
   return {core, bg};
 }

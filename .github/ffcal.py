@@ -12,6 +12,10 @@ EVERY = 3600
 CUR = ("EUR", "GBP", "JPY", "USD")
 LEAD = 5                                        
 LATE = 10                                                     
+NEWS_LEAD = 30                                                   
+NEWS_LATE = 10
+NFLAG = {"US": "🇺🇸", "DE": "🇩🇪", "EU": "🇪🇺", "GB": "🇬🇧", "JP": "🇯🇵", "CH": "🇨🇭", "CN": "🇨🇳", "FR": "🇫🇷", "IT": "🇮🇹",
+         "ES": "🇪🇸", "CA": "🇨🇦", "AU": "🇦🇺", "NZ": "🇳🇿"}
 HOL_AT = (6, 40)                           
 DIG_AT = (6, 45)                           
 SILENT = {2, 1}                                                  
@@ -73,6 +77,43 @@ def line(e):
     return f"{TAG[e['lv']]} · {e['ttl']} {FLAG.get(e['c'], e['c'])}"
 
 
+def news(st, now, data_path):
+    try:
+        evs = json.load(open(data_path, encoding="utf-8")).get("events") or []
+    except (OSError, ValueError):
+        evs = []
+    first = "nsent" not in st
+    sent = set(st.get("nsent", []))
+    hits = []
+    for e in evs:
+        try:
+            t = int(datetime.fromisoformat(e["utc"].replace("Z", "+00:00")).timestamp())
+        except (KeyError, ValueError):
+            continue
+        k = f'{e["utc"]}|{e.get("country", "")}|{e.get("title", "")}'
+        if k in sent or not (now - NEWS_LATE * 60 <= t <= now + NEWS_LEAD * 60):
+            continue
+        sent.add(k)
+        if not first:
+            hits.append((t, e))
+    st["nsent"] = sorted(k for k in sent if k.split("|")[0] >= datetime.fromtimestamp(now - 7 * 86400, timezone.utc).isoformat()[:19])
+    msgs = []
+    for t in sorted({h[0] for h in hits}):
+        mins = round((t - now) / 60)
+        head = "Now" if mins <= 1 else f"In {mins} min"
+        lines = [f"⚠️ <b>{head} · {datetime.fromtimestamp(t, BER):%H:%M}</b>"]
+        for _, e in (h for h in hits if h[0] == t):
+            ln = f'{NFLAG.get(e.get("country"), "🌐")} {esc(str(e.get("title", "")))}'
+            ex = [f'{w} {esc(str(e[k]))}' for k, w in (("forecast", "fcst"), ("previous", "prev")) if e.get(k) not in (None, "")]
+            if ex:
+                ln += " · " + " · ".join(ex)
+            if e.get("note"):
+                ln += f'\n   ↳ {esc(str(e["note"]))}'
+            lines.append(ln)
+        msgs.append({"text": "\n".join(lines), "quiet": False})
+    return msgs
+
+
 def plan(state_path, msg_path, dry, now_iso=None):
     try:
         st = json.load(open(state_path, encoding="utf-8"))
@@ -122,6 +163,7 @@ def plan(state_path, msg_path, dry, now_iso=None):
                 dig = ([f"— nothing today · {len(week)} in the week's schedule —"], 0)
 
     st["sent"] = sorted(k for k in sent if int(k.rsplit("|", 1)[1]) > now - 8 * 86400)
+    nmsg = news(st, now, os.path.join(os.path.dirname(os.path.abspath(state_path)), "data.json"))
     msg = None
     if drv or hol or dig:
         if drv:
@@ -145,11 +187,14 @@ def plan(state_path, msg_path, dry, now_iso=None):
         ring = bool(drv and loud not in SILENT) or (hol and not dig and 1 not in SILENT) or bool(dig)
         msg = {"text": f'<b><a href="{FF_URL}">Forex Factory</a> · {esc(head)}</b>\n' + esc("\n".join(body)),
                "quiet": not ring}
+    if nmsg:
+        msg = dict(nmsg[0], more=nmsg[1:]) if msg is None else dict(msg, more=nmsg)
+    if msg:
         json.dump(msg, open(msg_path, "w", encoding="utf-8"), ensure_ascii=False)
     print(f"now {now_dt:%a %d.%m %H:%M} Berlin · week {len(week)} · " + ("send" if msg else "nothing due"))
     if dry:
-        if msg:
-            print(("🔕 " if msg["quiet"] else "🔔 ") + msg["text"])
+        for m in ([msg] + msg.get("more", [])) if msg else []:
+            print(("🔕 " if m["quiet"] else "🔔 ") + m["text"])
         out(write=0, send=0)
         return
     changed = json.dumps(st, sort_keys=True) != before
@@ -162,16 +207,23 @@ def send(msg_path):
     tok, chat = os.environ.get("TG_BOT_TOKEN"), os.environ.get("TG_CHAT_ID")
     if not tok or not chat:
         sys.exit("TG_BOT_TOKEN / TG_CHAT_ID missing")
-    m = json.load(open(msg_path, encoding="utf-8"))
-    body = {"chat_id": chat, "parse_mode": "HTML", "disable_web_page_preview": True, "text": m["text"]}
-    if m.get("quiet"):
-        body["disable_notification"] = True
-    req = urllib.request.Request(f"https://api.telegram.org/bot{tok}/sendMessage", data=json.dumps(body).encode(),
-                                 headers={"Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=20) as r:
-        ok = json.loads(r.read()).get("ok")
-    print("sent" if ok else "Telegram said no")
-    if not ok:
+    m0 = json.load(open(msg_path, encoding="utf-8"))
+    bad = 0
+    for m in [m0] + m0.get("more", []):
+        body = {"chat_id": chat, "parse_mode": "HTML", "disable_web_page_preview": True, "text": m["text"]}
+        if m.get("quiet"):
+            body["disable_notification"] = True
+        req = urllib.request.Request(f"https://api.telegram.org/bot{tok}/sendMessage", data=json.dumps(body).encode(),
+                                     headers={"Content-Type": "application/json"})
+        try:
+            with urllib.request.urlopen(req, timeout=20) as r:
+                ok = json.loads(r.read()).get("ok")
+        except Exception as e:
+            print(f"Telegram: {e}")
+            ok = False
+        print("sent" if ok else "Telegram said no")
+        bad += not ok
+    if bad:
         sys.exit(1)
 
 
