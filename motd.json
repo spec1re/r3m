@@ -1,8 +1,8 @@
 {
- "motd": "2026-11-17",
- "next": 1794984008,
+ "motd": "2026-11-18",
+ "next": 1794987761,
  "lines": 358,
- "left": 321,
+ "left": 320,
  "deck": [
   10,
   248,
@@ -323,13 +323,12 @@
   342,
   271,
   194,
-  299,
-  117
+  299
  ],
  "last": {
-  "t": "2026-11-17 21:48",
-  "head": "🎱 Trading Wisdom",
-  "line": "Win or lose, follow the process. It's the only thing you control."
+  "t": "2026-11-18 07:30",
+  "head": "☕ Message of the Day",
+  "line": "The order block that matters is the one that caused displacement."
  },
- "sent": 37
+ "sent": 38
 }
