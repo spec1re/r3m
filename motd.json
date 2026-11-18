@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-18",
- "next": 1794991091,
+ "next": 1794995878,
  "lines": 358,
- "left": 319,
+ "left": 318,
  "deck": [
   10,
   248,
@@ -321,13 +321,12 @@
   80,
   143,
   342,
-  271,
-  194
+  271
  ],
  "last": {
-  "t": "2026-11-18 08:44",
+  "t": "2026-11-18 09:38",
   "head": "🎱 Trading Wisdom",
-  "line": "If you trade the news, size like you mean it to be small."
+  "line": "The market will be here tomorrow. Make sure your capital is too."
  },
- "sent": 39
+ "sent": 40
 }
