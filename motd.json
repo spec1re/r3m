@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-18",
- "next": 1794995878,
+ "next": 1794999475,
  "lines": 358,
- "left": 318,
+ "left": 317,
  "deck": [
   10,
   248,
@@ -320,13 +320,12 @@
   56,
   80,
   143,
-  342,
-  271
+  342
  ],
  "last": {
-  "t": "2026-11-18 09:38",
+  "t": "2026-11-18 10:58",
   "head": "🎱 Trading Wisdom",
-  "line": "The market will be here tomorrow. Make sure your capital is too."
+  "line": "Every master was once a beginner who didn't quit."
  },
- "sent": 40
+ "sent": 41
 }
