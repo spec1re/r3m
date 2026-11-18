@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-18",
- "next": 1795011503,
+ "next": 1795015698,
  "lines": 358,
- "left": 314,
+ "left": 313,
  "deck": [
   10,
   248,
@@ -316,13 +316,12 @@
   179,
   310,
   325,
-  8,
-  56
+  8
  ],
  "last": {
-  "t": "2026-11-18 13:52",
+  "t": "2026-11-18 15:18",
   "head": "🎱 Trading Wisdom",
-  "line": "Retracements are gifts in a trend and traps against it."
+  "line": "Engineered liquidity looks like a perfect setup for the other side."
  },
- "sent": 44
+ "sent": 45
 }
