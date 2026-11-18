@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-18",
- "next": 1794987761,
+ "next": 1794991091,
  "lines": 358,
- "left": 320,
+ "left": 319,
  "deck": [
   10,
   248,
@@ -322,13 +322,12 @@
   143,
   342,
   271,
-  194,
-  299
+  194
  ],
  "last": {
-  "t": "2026-11-18 07:30",
-  "head": "☕ Message of the Day",
-  "line": "The order block that matters is the one that caused displacement."
+  "t": "2026-11-18 08:44",
+  "head": "🎱 Trading Wisdom",
+  "line": "If you trade the news, size like you mean it to be small."
  },
- "sent": 38
+ "sent": 39
 }
