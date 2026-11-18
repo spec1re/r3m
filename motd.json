@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-18",
- "next": 1795025213,
+ "next": 1795029818,
  "lines": 358,
- "left": 311,
+ "left": 310,
  "deck": [
   10,
   248,
@@ -313,13 +313,12 @@
   155,
   139,
   31,
-  179,
-  310
+  179
  ],
  "last": {
-  "t": "2026-11-18 17:48",
+  "t": "2026-11-18 19:08",
   "head": "🎬 Trading Floor",
-  "line": "Don't pitch the stock. Sell the money."
+  "line": "We are living in an era of fraud in America."
  },
- "sent": 47
+ "sent": 48
 }
