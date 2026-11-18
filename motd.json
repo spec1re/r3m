@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-18",
- "next": 1795015698,
+ "next": 1795020492,
  "lines": 358,
- "left": 313,
+ "left": 312,
  "deck": [
   10,
   248,
@@ -315,13 +315,12 @@
   31,
   179,
   310,
-  325,
-  8
+  325
  ],
  "last": {
-  "t": "2026-11-18 15:18",
+  "t": "2026-11-18 16:28",
   "head": "🎱 Trading Wisdom",
-  "line": "Engineered liquidity looks like a perfect setup for the other side."
+  "line": "A candle that closes back inside the range has told you the breakout was a visit."
  },
- "sent": 45
+ "sent": 46
 }
