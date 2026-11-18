@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-18",
- "next": 1795006295,
+ "next": 1795011503,
  "lines": 358,
- "left": 315,
+ "left": 314,
  "deck": [
   10,
   248,
@@ -317,13 +317,12 @@
   310,
   325,
   8,
-  56,
-  80
+  56
  ],
  "last": {
-  "t": "2026-11-18 12:40",
+  "t": "2026-11-18 13:52",
   "head": "🎱 Trading Wisdom",
-  "line": "The draw on liquidity is the question. Everything else is the answer."
+  "line": "Retracements are gifts in a trend and traps against it."
  },
- "sent": 43
+ "sent": 44
 }
