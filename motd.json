@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-18",
- "next": 1795029818,
+ "next": 1795035066,
  "lines": 358,
- "left": 310,
+ "left": 309,
  "deck": [
   10,
   248,
@@ -312,13 +312,12 @@
   283,
   155,
   139,
-  31,
-  179
+  31
  ],
  "last": {
-  "t": "2026-11-18 19:08",
-  "head": "🎬 Trading Floor",
-  "line": "We are living in an era of fraud in America."
+  "t": "2026-11-18 20:24",
+  "head": "🎱 Trading Wisdom",
+  "line": "The best setups make you feel slightly late. That's because the stops were taken first."
  },
- "sent": 48
+ "sent": 49
 }
