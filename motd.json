@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-18",
- "next": 1795035066,
+ "next": 1795039044,
  "lines": 358,
- "left": 309,
+ "left": 308,
  "deck": [
   10,
   248,
@@ -311,13 +311,12 @@
   293,
   283,
   155,
-  139,
-  31
+  139
  ],
  "last": {
-  "t": "2026-11-18 20:24",
+  "t": "2026-11-18 21:52",
   "head": "🎱 Trading Wisdom",
-  "line": "The best setups make you feel slightly late. That's because the stops were taken first."
+  "line": "The obvious level is obvious to everyone. That is exactly why it gets run."
  },
- "sent": 49
+ "sent": 50
 }
