@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-19",
- "next": 1795075026,
+ "next": 1795078958,
  "lines": 358,
- "left": 307,
+ "left": 306,
  "deck": [
   10,
   248,
@@ -309,13 +309,12 @@
   99,
   270,
   293,
-  283,
-  155
+  283
  ],
  "last": {
-  "t": "2026-11-19 07:30",
-  "head": "☕ Message of the Day",
-  "line": "If you can't say where price is going and why, you're not ready to enter."
+  "t": "2026-11-19 08:58",
+  "head": "🎱 Trading Wisdom",
+  "line": "If you need three timeframes to find a reason, there probably isn't one."
  },
- "sent": 51
+ "sent": 52
 }
