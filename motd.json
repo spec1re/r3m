@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-19",
- "next": 1795109598,
+ "next": 1795112306,
  "lines": 358,
- "left": 298,
+ "left": 297,
  "deck": [
   10,
   248,
@@ -300,13 +300,12 @@
   83,
   321,
   5,
-  29,
-  102
+  29
  ],
  "last": {
-  "t": "2026-11-19 17:16",
+  "t": "2026-11-19 18:34",
   "head": "🎱 Trading Wisdom",
-  "line": "A run without a sweep first is a run that may still come back for it."
+  "line": "Opening prices are the line between premium and discount for the session."
  },
- "sent": 60
+ "sent": 61
 }
