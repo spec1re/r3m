@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-19",
- "next": 1795089839,
+ "next": 1795094274,
  "lines": 358,
- "left": 303,
+ "left": 302,
  "deck": [
   10,
   248,
@@ -305,13 +305,12 @@
   51,
   316,
   59,
-  47,
-  99
+  47
  ],
  "last": {
-  "t": "2026-11-19 12:06",
+  "t": "2026-11-19 13:04",
   "head": "🎱 Trading Wisdom",
-  "line": "A trading plan you don't read every morning is just a document."
+  "line": "The market moves on time. Trade the time windows, not the whole day."
  },
- "sent": 55
+ "sent": 56
 }
