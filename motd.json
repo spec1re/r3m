@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-19",
- "next": 1795104952,
+ "next": 1795109598,
  "lines": 358,
- "left": 299,
+ "left": 298,
  "deck": [
   10,
   248,
@@ -301,13 +301,12 @@
   321,
   5,
   29,
-  102,
-  51
+  102
  ],
  "last": {
-  "t": "2026-11-19 16:04",
-  "head": "🎬 Trading Floor",
-  "line": "The music has stopped, and we are selling the chairs before the lights come on."
+  "t": "2026-11-19 17:16",
+  "head": "🎱 Trading Wisdom",
+  "line": "A run without a sweep first is a run that may still come back for it."
  },
- "sent": 59
+ "sent": 60
 }
