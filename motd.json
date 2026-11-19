@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-19",
- "next": 1795083797,
+ "next": 1795086361,
  "lines": 358,
- "left": 305,
+ "left": 304,
  "deck": [
   10,
   248,
@@ -307,13 +307,12 @@
   59,
   47,
   99,
-  270,
-  293
+  270
  ],
  "last": {
-  "t": "2026-11-19 10:04",
+  "t": "2026-11-19 11:24",
   "head": "🎱 Trading Wisdom",
-  "line": "Progress in trading is measured in months, not trades."
+  "line": "New week, clean slate. Last week's mistakes are this week's rules."
  },
- "sent": 53
+ "sent": 54
 }
