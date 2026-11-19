@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-19",
- "next": 1795078958,
+ "next": 1795083797,
  "lines": 358,
- "left": 306,
+ "left": 305,
  "deck": [
   10,
   248,
@@ -308,13 +308,12 @@
   47,
   99,
   270,
-  293,
-  283
+  293
  ],
  "last": {
-  "t": "2026-11-19 08:58",
+  "t": "2026-11-19 10:04",
   "head": "🎱 Trading Wisdom",
-  "line": "If you need three timeframes to find a reason, there probably isn't one."
+  "line": "Progress in trading is measured in months, not trades."
  },
- "sent": 52
+ "sent": 53
 }
