@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-19",
- "next": 1795114369,
+ "next": 1795119834,
  "lines": 358,
- "left": 296,
+ "left": 295,
  "deck": [
   10,
   248,
@@ -298,13 +298,12 @@
   307,
   320,
   83,
-  321,
-  5
+  321
  ],
  "last": {
-  "t": "2026-11-19 19:18",
+  "t": "2026-11-19 19:54",
   "head": "🎱 Trading Wisdom",
-  "line": "Equal highs are not resistance. They are an invitation."
+  "line": "A long wick into a key level is the market tasting liquidity, not accepting price."
  },
- "sent": 62
+ "sent": 63
 }
