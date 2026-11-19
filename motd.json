@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-19",
- "next": 1795086361,
+ "next": 1795089839,
  "lines": 358,
- "left": 304,
+ "left": 303,
  "deck": [
   10,
   248,
@@ -306,13 +306,12 @@
   316,
   59,
   47,
-  99,
-  270
+  99
  ],
  "last": {
-  "t": "2026-11-19 11:24",
+  "t": "2026-11-19 12:06",
   "head": "🎱 Trading Wisdom",
-  "line": "New week, clean slate. Last week's mistakes are this week's rules."
+  "line": "A trading plan you don't read every morning is just a document."
  },
- "sent": 54
+ "sent": 55
 }
