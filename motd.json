@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-19",
- "next": 1795119834,
+ "next": 1795123926,
  "lines": 358,
- "left": 295,
+ "left": 294,
  "deck": [
   10,
   248,
@@ -297,13 +297,12 @@
   197,
   307,
   320,
-  83,
-  321
+  83
  ],
  "last": {
-  "t": "2026-11-19 19:54",
-  "head": "🎱 Trading Wisdom",
-  "line": "A long wick into a key level is the market tasting liquidity, not accepting price."
+  "t": "2026-11-19 21:24",
+  "head": "🎬 Trading Floor",
+  "line": "I don't care about the product, I care about the reservation at Dorsia it buys me."
  },
- "sent": 63
+ "sent": 64
 }
