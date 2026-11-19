@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-19",
- "next": 1795096501,
+ "next": 1795100650,
  "lines": 358,
- "left": 301,
+ "left": 300,
  "deck": [
   10,
   248,
@@ -303,13 +303,12 @@
   29,
   102,
   51,
-  316,
-  59
+  316
  ],
  "last": {
-  "t": "2026-11-19 14:18",
+  "t": "2026-11-19 14:56",
   "head": "🎱 Trading Wisdom",
-  "line": "Inducement looks like opportunity. That is the whole point of it."
+  "line": "A higher high means nothing until it holds a higher low."
  },
- "sent": 57
+ "sent": 58
 }
