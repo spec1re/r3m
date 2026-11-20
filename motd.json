@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-20",
- "next": 1795203501,
+ "next": 1795206033,
  "lines": 358,
- "left": 281,
+ "left": 280,
  "deck": [
   10,
   248,
@@ -283,13 +283,12 @@
   140,
   98,
   133,
-  22,
-  324
+  22
  ],
  "last": {
-  "t": "2026-11-20 19:48",
+  "t": "2026-11-20 20:38",
   "head": "🎬 Trading Floor",
-  "line": "It’s just money, it’s made up – but the power it buys is very real."
+  "line": "If you're not inside, you're outside."
  },
- "sent": 77
+ "sent": 78
 }
