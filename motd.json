@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-20",
- "next": 1795180109,
+ "next": 1795184793,
  "lines": 358,
- "left": 288,
+ "left": 287,
  "deck": [
   10,
   248,
@@ -290,13 +290,12 @@
   189,
   352,
   44,
-  216,
-  115
+  216
  ],
  "last": {
-  "t": "2026-11-20 12:42",
+  "t": "2026-11-20 14:08",
   "head": "🎱 Trading Wisdom",
-  "line": "Some days the best trade is closing the platform."
+  "line": "Let the level come to you. Price paying you to wait is a good deal."
  },
- "sent": 70
+ "sent": 71
 }
