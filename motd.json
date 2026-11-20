@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-20",
- "next": 1795165645,
+ "next": 1795168190,
  "lines": 358,
- "left": 292,
+ "left": 291,
  "deck": [
   10,
   248,
@@ -294,13 +294,12 @@
   115,
   244,
   168,
-  197,
-  307
+  197
  ],
  "last": {
-  "t": "2026-11-20 08:50",
-  "head": "🎬 Trading Floor",
-  "line": "First prize is a Cadillac; second prize is a set of steak knives; third prize is you're fired."
+  "t": "2026-11-20 10:08",
+  "head": "🎱 Trading Wisdom",
+  "line": "Spread widens, slippage grows, stops get hunted. Trade the news only if your plan says so."
  },
- "sent": 66
+ "sent": 67
 }
