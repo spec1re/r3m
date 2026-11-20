@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-20",
- "next": 1795171754,
+ "next": 1795174894,
  "lines": 358,
- "left": 290,
+ "left": 289,
  "deck": [
   10,
   248,
@@ -292,13 +292,12 @@
   44,
   216,
   115,
-  244,
-  168
+  244
  ],
  "last": {
-  "t": "2026-11-20 10:50",
+  "t": "2026-11-20 11:50",
   "head": "🎱 Trading Wisdom",
-  "line": "A stop is the price of finding out you were wrong. Pay it gladly."
+  "line": "Take partials where liquidity rests. Let the market pay you on the way."
  },
- "sent": 68
+ "sent": 69
 }
