@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-20T12:21:06+00:00",
+ "updated": "2026-11-20T17:11:27+00:00",
  "mode": "live",
  "reports": {
   "morning": "2026-11-20",
@@ -33,26 +33,26 @@
   "news": {
    "label": "News warnings",
    "public": true,
-   "last": "2026-11-20T12:20:41Z",
+   "last": "2026-11-20T17:10:52Z",
    "state": "success",
-   "lastDone": "2026-11-20T12:20:49Z",
+   "lastDone": "2026-11-20T17:10:59Z",
    "doneState": "success",
-   "lastOk": "2026-11-20T12:20:49Z",
+   "lastOk": "2026-11-20T17:10:59Z",
    "runs24": 100,
    "fails24": 0,
    "events24": [
     "workflow_run"
    ],
-   "url": "https://github.com/spec1re/r3m/actions/runs/44734993043"
+   "url": "https://github.com/spec1re/r3m/actions/runs/44780770315"
   },
   "telegram": {
    "label": "Telegram send",
    "public": false,
    "last": "2026-11-20T12:20:50Z",
-   "state": "in_progress",
-   "lastDone": "2026-11-20T04:32:06Z",
+   "state": "success",
+   "lastDone": "2026-11-20T12:21:13Z",
    "doneState": "success",
-   "lastOk": "2026-11-20T04:32:06Z",
+   "lastOk": "2026-11-20T12:21:13Z",
    "runs24": 3,
    "fails24": 0,
    "events24": [
@@ -63,10 +63,10 @@
    "label": "Site build",
    "public": false,
    "last": "2026-11-20T12:20:52Z",
-   "state": "in_progress",
-   "lastDone": "2026-11-20T04:32:20Z",
+   "state": "success",
+   "lastDone": "2026-11-20T12:21:23Z",
    "doneState": "success",
-   "lastOk": "2026-11-20T04:32:20Z",
+   "lastOk": "2026-11-20T12:21:23Z",
    "runs24": 3,
    "fails24": 0,
    "events24": [
@@ -117,73 +117,71 @@
    "lastDone": "2026-11-20T03:44:37Z",
    "doneState": "success",
    "lastOk": "2026-11-20T03:44:37Z",
-   "runs24": 2,
+   "runs24": 1,
    "fails24": 0,
    "events24": [
-    "schedule",
-    "workflow_dispatch"
+    "schedule"
    ]
   },
   "live": {
    "label": "Live feed",
    "public": true,
-   "last": "2026-11-20T12:20:21Z",
+   "last": "2026-11-20T17:10:19Z",
    "state": "success",
-   "lastDone": "2026-11-20T12:20:38Z",
+   "lastDone": "2026-11-20T17:10:50Z",
    "doneState": "success",
-   "lastOk": "2026-11-20T12:20:38Z",
+   "lastOk": "2026-11-20T17:10:50Z",
    "runs24": 100,
    "fails24": 0,
    "events24": [
-    "schedule",
     "workflow_dispatch"
    ],
-   "url": "https://github.com/spec1re/r3m/actions/runs/44734946253"
+   "url": "https://github.com/spec1re/r3m/actions/runs/44780676966"
   },
   "reef": {
    "label": "Reef live",
    "public": true,
-   "last": "2026-11-20T12:20:41Z",
+   "last": "2026-11-20T17:10:52Z",
    "state": "success",
-   "lastDone": "2026-11-20T12:21:15Z",
+   "lastDone": "2026-11-20T17:11:18Z",
    "doneState": "success",
-   "lastOk": "2026-11-20T12:21:15Z",
+   "lastOk": "2026-11-20T17:11:18Z",
    "runs24": 100,
    "fails24": 0,
    "events24": [
     "workflow_run"
    ],
-   "url": "https://github.com/spec1re/r3m/actions/runs/44734992534"
+   "url": "https://github.com/spec1re/r3m/actions/runs/44780770267"
   },
   "kcheck": {
    "label": "Kronos signal check",
    "public": true,
-   "last": "2026-11-20T12:20:41Z",
+   "last": "2026-11-20T17:10:53Z",
    "state": "success",
-   "lastDone": "2026-11-20T12:20:56Z",
+   "lastDone": "2026-11-20T17:11:11Z",
    "doneState": "success",
-   "lastOk": "2026-11-20T12:20:56Z",
+   "lastOk": "2026-11-20T17:11:11Z",
    "runs24": 100,
    "fails24": 0,
    "events24": [
     "workflow_run"
    ],
-   "url": "https://github.com/spec1re/r3m/actions/runs/44734992409"
+   "url": "https://github.com/spec1re/r3m/actions/runs/44780770778"
   },
   "pages": {
    "label": "Pages deploy",
    "public": true,
-   "last": "2026-11-20T12:07:51Z",
+   "last": "2026-11-20T12:21:29Z",
    "state": "success",
-   "lastDone": "2026-11-20T12:08:12Z",
+   "lastDone": "2026-11-20T12:21:53Z",
    "doneState": "success",
-   "lastOk": "2026-11-20T12:08:12Z",
-   "runs24": 7,
+   "lastOk": "2026-11-20T12:21:53Z",
+   "runs24": 9,
    "fails24": 0,
    "events24": [
     "push"
    ],
-   "url": "https://github.com/spec1re/r3m/actions/runs/44733214449"
+   "url": "https://github.com/spec1re/r3m/actions/runs/44735103319"
   }
  }
 }
