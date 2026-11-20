@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-20",
- "next": 1795174894,
+ "next": 1795180109,
  "lines": 358,
- "left": 289,
+ "left": 288,
  "deck": [
   10,
   248,
@@ -291,13 +291,12 @@
   352,
   44,
   216,
-  115,
-  244
+  115
  ],
  "last": {
-  "t": "2026-11-20 11:50",
+  "t": "2026-11-20 12:42",
   "head": "🎱 Trading Wisdom",
-  "line": "Take partials where liquidity rests. Let the market pay you on the way."
+  "line": "Some days the best trade is closing the platform."
  },
- "sent": 69
+ "sent": 70
 }
