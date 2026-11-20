@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-20",
- "next": 1795187865,
+ "next": 1795189962,
  "lines": 358,
- "left": 286,
+ "left": 285,
  "deck": [
   10,
   248,
@@ -288,13 +288,12 @@
   318,
   19,
   189,
-  352,
-  44
+  352
  ],
  "last": {
-  "t": "2026-11-20 15:26",
+  "t": "2026-11-20 16:18",
   "head": "🎱 Trading Wisdom",
-  "line": "The chart doesn't know your position. Trade what you see, not what you need."
+  "line": "The market seeks liquidity, then it seeks imbalance. In that order."
  },
- "sent": 72
+ "sent": 73
 }
