@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-20",
- "next": 1795161027,
+ "next": 1795165645,
  "lines": 358,
- "left": 293,
+ "left": 292,
  "deck": [
   10,
   248,
@@ -295,13 +295,12 @@
   244,
   168,
   197,
-  307,
-  320
+  307
  ],
  "last": {
-  "t": "2026-11-20 07:30",
-  "head": "☕ Message of the Day",
-  "line": "Time first, then price. A perfect setup at the wrong hour is just a guess."
+  "t": "2026-11-20 08:50",
+  "head": "🎬 Trading Floor",
+  "line": "First prize is a Cadillac; second prize is a set of steak knives; third prize is you're fired."
  },
- "sent": 65
+ "sent": 66
 }
