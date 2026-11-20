@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-20",
- "next": 1795184793,
+ "next": 1795187865,
  "lines": 358,
- "left": 287,
+ "left": 286,
  "deck": [
   10,
   248,
@@ -289,13 +289,12 @@
   19,
   189,
   352,
-  44,
-  216
+  44
  ],
  "last": {
-  "t": "2026-11-20 14:08",
+  "t": "2026-11-20 15:26",
   "head": "🎱 Trading Wisdom",
-  "line": "Let the level come to you. Price paying you to wait is a good deal."
+  "line": "The chart doesn't know your position. Trade what you see, not what you need."
  },
- "sent": 71
+ "sent": 72
 }
