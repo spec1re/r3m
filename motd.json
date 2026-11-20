@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-20",
- "next": 1795168190,
+ "next": 1795171754,
  "lines": 358,
- "left": 291,
+ "left": 290,
  "deck": [
   10,
   248,
@@ -293,13 +293,12 @@
   216,
   115,
   244,
-  168,
-  197
+  168
  ],
  "last": {
-  "t": "2026-11-20 10:08",
+  "t": "2026-11-20 10:50",
   "head": "🎱 Trading Wisdom",
-  "line": "Spread widens, slippage grows, stops get hunted. Trade the news only if your plan says so."
+  "line": "A stop is the price of finding out you were wrong. Pay it gladly."
  },
- "sent": 67
+ "sent": 68
 }
