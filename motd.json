@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-20",
- "next": 1795206033,
+ "next": 1795210988,
  "lines": 358,
- "left": 280,
+ "left": 279,
  "deck": [
   10,
   248,
@@ -282,13 +282,12 @@
   146,
   140,
   98,
-  133,
-  22
+  133
  ],
  "last": {
-  "t": "2026-11-20 20:38",
-  "head": "🎬 Trading Floor",
-  "line": "If you're not inside, you're outside."
+  "t": "2026-11-20 21:20",
+  "head": "🎱 Trading Wisdom",
+  "line": "A candle that opens, sweeps and closes the other way is the market changing its mind in public."
  },
- "sent": 78
+ "sent": 79
 }
