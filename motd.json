@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-20",
- "next": 1795200496,
+ "next": 1795203501,
  "lines": 358,
- "left": 282,
+ "left": 281,
  "deck": [
   10,
   248,
@@ -284,13 +284,12 @@
   98,
   133,
   22,
-  324,
-  318
+  324
  ],
  "last": {
-  "t": "2026-11-20 19:04",
-  "head": "🎱 Trading Wisdom",
-  "line": "The market can lie with a wick. It rarely lies with a close on the higher timeframe."
+  "t": "2026-11-20 19:48",
+  "head": "🎬 Trading Floor",
+  "line": "It’s just money, it’s made up – but the power it buys is very real."
  },
- "sent": 76
+ "sent": 77
 }
