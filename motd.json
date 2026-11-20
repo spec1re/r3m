@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-20",
- "next": 1795189962,
+ "next": 1795193183,
  "lines": 358,
- "left": 285,
+ "left": 284,
  "deck": [
   10,
   248,
@@ -287,13 +287,12 @@
   324,
   318,
   19,
-  189,
-  352
+  189
  ],
  "last": {
-  "t": "2026-11-20 16:18",
-  "head": "🎱 Trading Wisdom",
-  "line": "The market seeks liquidity, then it seeks imbalance. In that order."
+  "t": "2026-11-20 16:54",
+  "head": "🎬 Trading Floor",
+  "line": "You become a millionaire in three years or you get the hell out of this office."
  },
- "sent": 73
+ "sent": 74
 }
