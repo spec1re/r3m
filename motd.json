@@ -1,8 +1,8 @@
 {
  "motd": "2026-11-20",
- "next": 1795193183,
+ "next": 1795197830,
  "lines": 358,
- "left": 284,
+ "left": 283,
  "deck": [
   10,
   248,
@@ -286,13 +286,12 @@
   22,
   324,
   318,
-  19,
-  189
+  19
  ],
  "last": {
-  "t": "2026-11-20 16:54",
-  "head": "🎬 Trading Floor",
-  "line": "You become a millionaire in three years or you get the hell out of this office."
+  "t": "2026-11-20 17:46",
+  "head": "🎱 Trading Wisdom",
+  "line": "If it's not an A setup, it's not your setup."
  },
- "sent": 74
+ "sent": 75
 }
